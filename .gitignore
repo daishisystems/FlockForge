@@ -342,3 +342,18 @@ Xamarin.Android.Common.targets
 
 # MAUI Hot Reload
 .maui-hotreload/
+
+# macOS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows specific files
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
