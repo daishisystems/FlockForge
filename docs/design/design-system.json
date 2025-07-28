@@ -1,0 +1,414 @@
+{
+    "designSystem": {
+        "name": "Breedr Livestock App",
+        "version": "1.0.0",
+        "description": "Precision Livestock Network mobile application design system"
+    },
+    "colorPalette": {
+        "primary": {
+            "blue": "#2B5CB6",
+            "darkBlue": "#1E3D82",
+            "lightBlue": "#4A7BC8"
+        },
+        "accent": {
+            "yellow": "#F4B942",
+            "darkYellow": "#E6A835",
+            "lightYellow": "#F7C65C"
+        },
+        "semantic": {
+            "success": "#4CAF50",
+            "successLight": "#81C784",
+            "error": "#F44336",
+            "warning": "#FF9800",
+            "info": "#2196F3"
+        },
+        "neutral": {
+            "white": "#FFFFFF",
+            "lightGray": "#F5F5F5",
+            "gray": "#9E9E9E",
+            "darkGray": "#616161",
+            "charcoal": "#424242",
+            "black": "#212121"
+        },
+        "gradients": {
+            "farmBackground": "linear-gradient(180deg, #87CEEB 0%, #4682B4 100%)",
+            "hillsSilhouette": "linear-gradient(180deg, #2B5CB6 0%, #1E3D82 100%)"
+        }
+    },
+    "typography": {
+        "fontFamily": {
+            "primary": "SF Pro Display",
+            "fallback": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif"
+        },
+        "weights": {
+            "light": 300,
+            "regular": 400,
+            "medium": 500,
+            "semibold": 600,
+            "bold": 700
+        },
+        "scales": {
+            "h1": {
+                "fontSize": "28px",
+                "lineHeight": "34px",
+                "fontWeight": 700,
+                "color": "#212121"
+            },
+            "h2": {
+                "fontSize": "24px",
+                "lineHeight": "30px",
+                "fontWeight": 600,
+                "color": "#212121"
+            },
+            "h3": {
+                "fontSize": "20px",
+                "lineHeight": "26px",
+                "fontWeight": 600,
+                "color": "#212121"
+            },
+            "body1": {
+                "fontSize": "16px",
+                "lineHeight": "22px",
+                "fontWeight": 400,
+                "color": "#424242"
+            },
+            "body2": {
+                "fontSize": "14px",
+                "lineHeight": "20px",
+                "fontWeight": 400,
+                "color": "#616161"
+            },
+            "caption": {
+                "fontSize": "12px",
+                "lineHeight": "16px",
+                "fontWeight": 400,
+                "color": "#9E9E9E"
+            },
+            "button": {
+                "fontSize": "16px",
+                "lineHeight": "20px",
+                "fontWeight": 600,
+                "textTransform": "none"
+            }
+        }
+    },
+    "spacing": {
+        "xs": "4px",
+        "sm": "8px",
+        "md": "16px",
+        "lg": "24px",
+        "xl": "32px",
+        "xxl": "48px"
+    },
+    "borderRadius": {
+        "small": "8px",
+        "medium": "12px",
+        "large": "16px",
+        "xlarge": "24px",
+        "round": "50%"
+    },
+    "shadows": {
+        "card": "0px 2px 8px rgba(0, 0, 0, 0.1)",
+        "button": "0px 1px 4px rgba(0, 0, 0, 0.15)",
+        "modal": "0px 8px 24px rgba(0, 0, 0, 0.2)",
+        "appIcon": "0px 2px 10px rgba(0, 0, 0, 0.15)"
+    },
+    "elementStyling": {
+        "appIcon": {
+            "background": "linear-gradient(135deg, #2B5CB6 0%, #4A7BC8 100%)",
+            "borderRadius": "22px",
+            "shadow": "0px 2px 10px rgba(0, 0, 0, 0.15)",
+            "logoColor": "#F4B942",
+            "size": "60px"
+        },
+        "cards": {
+            "preview": {
+                "background": "#F4B942",
+                "borderRadius": "16px",
+                "padding": "16px",
+                "shadow": "0px 2px 8px rgba(0, 0, 0, 0.1)",
+                "textColor": "#212121",
+                "titleWeight": 600,
+                "subtitleWeight": 400
+            },
+            "livestock": {
+                "background": "#2B5CB6",
+                "borderRadius": "12px",
+                "padding": "16px",
+                "shadow": "0px 2px 8px rgba(0, 0, 0, 0.1)",
+                "headerColor": "#FFFFFF",
+                "idColor": "#FFFFFF",
+                "metaColor": "#FFFFFF",
+                "dividerColor": "rgba(255, 255, 255, 0.2)",
+                "weightDisplay": {
+                    "background": "#4CAF50",
+                    "textColor": "#FFFFFF",
+                    "fontSize": "24px",
+                    "fontWeight": 700,
+                    "borderRadius": "8px",
+                    "padding": "12px"
+                },
+                "statsGrid": {
+                    "itemBackground": "#4CAF50",
+                    "itemTextColor": "#FFFFFF",
+                    "itemBorderRadius": "6px",
+                    "itemPadding": "8px"
+                },
+                "priceGrid": {
+                    "labelColor": "#FFFFFF",
+                    "valueColor": "#FFFFFF",
+                    "changePositive": "#4CAF50",
+                    "changeNegative": "#F44336"
+                }
+            }
+        },
+        "buttons": {
+            "primary": {
+                "background": "#F4B942",
+                "textColor": "#212121",
+                "borderRadius": "8px",
+                "padding": "12px 24px",
+                "fontSize": "16px",
+                "fontWeight": 600,
+                "shadow": "0px 1px 4px rgba(0, 0, 0, 0.15)",
+                "states": {
+                    "hover": {
+                        "background": "#E6A835"
+                    },
+                    "pressed": {
+                        "background": "#D49429",
+                        "transform": "scale(0.98)"
+                    },
+                    "disabled": {
+                        "background": "#F5F5F5",
+                        "textColor": "#9E9E9E"
+                    }
+                }
+            },
+            "secondary": {
+                "background": "transparent",
+                "textColor": "#2B5CB6",
+                "border": "1px solid #2B5CB6",
+                "borderRadius": "8px",
+                "padding": "12px 24px",
+                "fontSize": "16px",
+                "fontWeight": 600,
+                "states": {
+                    "hover": {
+                        "background": "rgba(43, 92, 182, 0.1)"
+                    },
+                    "pressed": {
+                        "background": "rgba(43, 92, 182, 0.2)"
+                    }
+                }
+            },
+            "floating": {
+                "background": "#F4B942",
+                "borderRadius": "50%",
+                "size": "56px",
+                "iconColor": "#212121",
+                "iconSize": "24px",
+                "shadow": "0px 4px 12px rgba(0, 0, 0, 0.2)",
+                "states": {
+                    "hover": {
+                        "transform": "scale(1.05)"
+                    },
+                    "pressed": {
+                        "transform": "scale(0.95)"
+                    }
+                }
+            },
+            "navigation": {
+                "background": "transparent",
+                "iconColor": "#9E9E9E",
+                "iconSize": "24px",
+                "states": {
+                    "active": {
+                        "iconColor": "#2B5CB6"
+                    },
+                    "pressed": {
+                        "background": "rgba(43, 92, 182, 0.1)"
+                    }
+                }
+            }
+        },
+        "inputs": {
+            "textField": {
+                "background": "#FFFFFF",
+                "border": "1px solid #E0E0E0",
+                "borderRadius": "8px",
+                "padding": "12px 16px",
+                "fontSize": "16px",
+                "placeholderColor": "#9E9E9E",
+                "textColor": "#212121",
+                "states": {
+                    "focus": {
+                        "borderColor": "#2B5CB6",
+                        "shadow": "0px 0px 0px 3px rgba(43, 92, 182, 0.1)"
+                    },
+                    "error": {
+                        "borderColor": "#F44336",
+                        "shadow": "0px 0px 0px 3px rgba(244, 67, 54, 0.1)"
+                    },
+                    "disabled": {
+                        "background": "#F5F5F5",
+                        "textColor": "#9E9E9E"
+                    }
+                }
+            }
+        },
+        "navigation": {
+            "statusBar": {
+                "background": "#FFFFFF",
+                "textColor": "#212121",
+                "iconColor": "#212121"
+            },
+            "header": {
+                "background": "#FFFFFF",
+                "titleColor": "#212121",
+                "titleWeight": 600,
+                "titleSize": "18px",
+                "backButtonColor": "#2B5CB6",
+                "actionButtonColor": "#2B5CB6",
+                "shadow": "0px 1px 3px rgba(0, 0, 0, 0.1)"
+            },
+            "tabBar": {
+                "background": "#FFFFFF",
+                "activeIconColor": "#2B5CB6",
+                "inactiveIconColor": "#9E9E9E",
+                "activeLabelColor": "#2B5CB6",
+                "inactiveLabelColor": "#9E9E9E",
+                "shadow": "0px -1px 3px rgba(0, 0, 0, 0.1)"
+            },
+            "progressIndicator": {
+                "steps": {
+                    "activeBackground": "#2B5CB6",
+                    "activeIconColor": "#FFFFFF",
+                    "completedBackground": "#4CAF50",
+                    "completedIconColor": "#FFFFFF",
+                    "inactiveBackground": "#E0E0E0",
+                    "inactiveIconColor": "#9E9E9E"
+                },
+                "connector": {
+                    "completedColor": "#4CAF50",
+                    "incompleteColor": "#E0E0E0",
+                    "width": "2px"
+                }
+            }
+        },
+        "backgrounds": {
+            "primary": "#FFFFFF",
+            "secondary": "#F5F5F5",
+            "onboarding": {
+                "gradient": "linear-gradient(180deg, #87CEEB 0%, #4682B4 50%, #2B5CB6 100%)",
+                "hillsSilhouette": "linear-gradient(180deg, #2B5CB6 0%, #1E3D82 100%)"
+            }
+        },
+        "icons": {
+            "system": {
+                "size": "24px",
+                "color": "#9E9E9E",
+                "activeColor": "#2B5CB6"
+            },
+            "action": {
+                "size": "20px",
+                "color": "#FFFFFF",
+                "background": "transparent"
+            },
+            "navigation": {
+                "size": "24px",
+                "color": "#2B5CB6"
+            }
+        },
+        "tags": {
+            "management": {
+                "background": "#E91E63",
+                "textColor": "#FFFFFF",
+                "borderRadius": "16px",
+                "padding": "4px 12px",
+                "fontSize": "12px",
+                "fontWeight": 500
+            },
+            "hoof": {
+                "background": "#2196F3",
+                "textColor": "#FFFFFF",
+                "borderRadius": "16px",
+                "padding": "4px 12px",
+                "fontSize": "12px",
+                "fontWeight": 500
+            },
+            "sell": {
+                "background": "#FF9800",
+                "textColor": "#FFFFFF",
+                "borderRadius": "16px",
+                "padding": "4px 12px",
+                "fontSize": "12px",
+                "fontWeight": 500
+            }
+        }
+    },
+    "animations": {
+        "transitions": {
+            "fast": "150ms ease-out",
+            "medium": "250ms ease-out",
+            "slow": "350ms ease-out"
+        },
+        "easing": {
+            "standard": "cubic-bezier(0.4, 0.0, 0.2, 1)",
+            "decelerate": "cubic-bezier(0.0, 0.0, 0.2, 1)",
+            "accelerate": "cubic-bezier(0.4, 0.0, 1, 1)"
+        }
+    },
+    "layout": {
+        "container": {
+            "padding": "16px",
+            "maxWidth": "100%"
+        },
+        "grid": {
+            "columns": 12,
+            "gutter": "16px"
+        }
+    },
+    "doNotRules": {
+        "colors": [
+            "DO NOT apply card gradient backgrounds to icons or text elements",
+            "DO NOT use button colors on card backgrounds",
+            "DO NOT apply livestock card blue background to other card types",
+            "DO NOT use accent yellow on text that needs high contrast",
+            "DO NOT apply success green to non-weight/value display elements"
+        ],
+        "gradients": [
+            "DO NOT apply the farm background gradient to cards or buttons",
+            "DO NOT use the hills silhouette gradient on UI elements",
+            "DO NOT apply gradients to text elements",
+            "DO NOT use card gradients on input fields"
+        ],
+        "shadows": [
+            "DO NOT apply card shadows to text elements",
+            "DO NOT use modal shadows on small UI components",
+            "DO NOT apply button shadows to icons without backgrounds"
+        ],
+        "spacing": [
+            "DO NOT use container padding values for component internal spacing",
+            "DO NOT apply grid gutters to non-grid layouts",
+            "DO NOT use header padding for card content spacing"
+        ]
+    },
+    "usageContexts": {
+        "cards": {
+            "preview": "Use for app store previews and feature highlights",
+            "livestock": "Use for animal data display and management interfaces"
+        },
+        "buttons": {
+            "primary": "Use for main actions like 'Next', 'Save', 'Submit'",
+            "secondary": "Use for alternative actions like 'Cancel', 'Back'",
+            "floating": "Use for add actions and primary interactions",
+            "navigation": "Use for tab bars and navigation elements"
+        },
+        "backgrounds": {
+            "onboarding": "Use only for welcome/setup screens with illustrated elements",
+            "primary": "Use for main app screens and content areas",
+            "secondary": "Use for subtle section backgrounds"
+        }
+    }
+}
