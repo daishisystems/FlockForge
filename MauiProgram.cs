@@ -54,13 +54,14 @@ public static class MauiProgram
 		builder.Services.AddDbContext<FlockForgeDbContext>(options =>
 		{
 			options.UseSqlite($"Data Source={dbPath}")
-				   .EnableSensitiveDataLogging(false)
-				   .EnableServiceProviderCaching()
-				   .EnableDetailedErrors(false);
+				   .EnableServiceProviderCaching();
 				   
 #if DEBUG
 			options.EnableSensitiveDataLogging(true)
 				   .EnableDetailedErrors(true);
+#else
+			options.EnableSensitiveDataLogging(false)
+				   .EnableDetailedErrors(false);
 #endif
 		}, ServiceLifetime.Scoped);
 	}

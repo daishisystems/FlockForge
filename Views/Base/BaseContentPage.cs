@@ -7,8 +7,8 @@ namespace FlockForge.Views.Base;
 public abstract class BaseContentPage<TViewModel> : ContentPage
     where TViewModel : BaseViewModel
 {
-    private readonly ILogger? _logger;
-    private readonly IPlatformMemoryService? _memoryService;
+    private ILogger? _logger;
+    private IPlatformMemoryService? _memoryService;
     private bool _isAppearing;
     private bool _disposed;
 
@@ -179,17 +179,17 @@ public abstract class BaseContentPage<TViewModel> : ContentPage
         base.OnHandlerChanged();
         
         // Re-register services if handler changed
-        if (Handler?.MauiContext?.Services != null && (_logger == null || _memoryService == null))
+        if (Handler?.MauiContext?.Services != null)
         {
             try
             {
                 var serviceProvider = Handler.MauiContext.Services;
-                if (_logger == null)
-                {
-                    var logger = serviceProvider.GetService<ILogger<BaseContentPage<TViewModel>>>();
-                    // Note: Can't assign to readonly field, but we can use it going forward
-                }
                 
+                // Update service references if they're null
+                _logger ??= serviceProvider.GetService<ILogger<BaseContentPage<TViewModel>>>();
+                _memoryService ??= serviceProvider.GetService<IPlatformMemoryService>();
+                
+                // Re-register memory pressure callback with updated service
                 RegisterMemoryPressureCallback();
             }
             catch (Exception ex)

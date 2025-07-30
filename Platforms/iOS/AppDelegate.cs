@@ -19,9 +19,13 @@ public class AppDelegate : MauiUIApplicationDelegate
         
         try
         {
-            // Get services from DI container
-            // Note: Services will be available after the app is fully initialized
-            // For now, we'll set up basic memory management and get services later
+            // Get services from DI container after MAUI app is created
+            var mauiApp = IPlatformApplication.Current?.Services;
+            if (mauiApp != null)
+            {
+                _logger = mauiApp.GetService<ILogger<AppDelegate>>();
+                _memoryService = mauiApp.GetService<IPlatformMemoryService>();
+            }
             
             SetupMemoryManagement();
             ConfigureForPerformance();

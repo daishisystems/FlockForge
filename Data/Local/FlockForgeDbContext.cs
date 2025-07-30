@@ -13,14 +13,16 @@ public class FlockForgeDbContext : DbContext
     // Authentication entities
     public DbSet<FlockForgeUser> Users { get; set; } = null!;
     
-    // Future entities will be added here
-    // public DbSet<Farmer> Farmers { get; set; }
-    // public DbSet<Farm> Farms { get; set; }
-    // public DbSet<Group> Groups { get; set; }
-    // public DbSet<BreedingRecord> BreedingRecords { get; set; }
-    // public DbSet<ScanningRecord> ScanningRecords { get; set; }
-    // public DbSet<LambingRecord> LambingRecords { get; set; }
-    // public DbSet<WeaningRecord> WeaningRecords { get; set; }
+    // Core business entities
+    public DbSet<Farmer> Farmers { get; set; } = null!;
+    public DbSet<Farm> Farms { get; set; } = null!;
+    public DbSet<LambingSeason> LambingSeasons { get; set; } = null!;
+    
+    // Production record entities
+    public DbSet<BreedingRecord> BreedingRecords { get; set; } = null!;
+    public DbSet<ScanningRecord> ScanningRecords { get; set; } = null!;
+    public DbSet<LambingRecord> LambingRecords { get; set; } = null!;
+    public DbSet<WeaningRecord> WeaningRecords { get; set; } = null!;
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -71,6 +73,116 @@ public class FlockForgeDbContext : DbContext
                   
             // Configure soft delete filter
             entity.HasQueryFilter(e => !e.IsDeleted);
+        });
+        
+        // Configure Farmer entity
+        modelBuilder.Entity<Farmer>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            
+            entity.HasIndex(e => e.FirebaseUid)
+                  .IsUnique()
+                  .HasDatabaseName("IX_Farmers_FirebaseUid");
+                  
+            entity.HasIndex(e => e.Email)
+                  .IsUnique()
+                  .HasDatabaseName("IX_Farmers_Email");
+            
+            entity.Property(e => e.FirebaseUid)
+                  .IsRequired()
+                  .HasMaxLength(128);
+                  
+            entity.Property(e => e.Email)
+                  .IsRequired()
+                  .HasMaxLength(256);
+        });
+        
+        // Configure Farm entity
+        modelBuilder.Entity<Farm>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            
+            entity.HasIndex(e => e.FarmerId)
+                  .HasDatabaseName("IX_Farms_FarmerId");
+            
+            entity.HasOne(e => e.Farmer)
+                  .WithMany(f => f.Farms)
+                  .HasForeignKey(e => e.FarmerId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+        
+        // Configure LambingSeason entity
+        modelBuilder.Entity<LambingSeason>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            
+            entity.HasIndex(e => e.FarmId)
+                  .HasDatabaseName("IX_LambingSeasons_FarmId");
+                  
+            entity.HasIndex(e => new { e.FarmId, e.Code })
+                  .IsUnique()
+                  .HasDatabaseName("IX_LambingSeasons_FarmId_Code");
+            
+            entity.HasOne(e => e.Farm)
+                  .WithMany(f => f.LambingSeasons)
+                  .HasForeignKey(e => e.FarmId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+        
+        // Configure BreedingRecord entity
+        modelBuilder.Entity<BreedingRecord>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            
+            entity.HasIndex(e => e.LambingSeasonId)
+                  .HasDatabaseName("IX_BreedingRecords_LambingSeasonId");
+            
+            entity.HasOne(e => e.LambingSeason)
+                  .WithMany(ls => ls.BreedingRecords)
+                  .HasForeignKey(e => e.LambingSeasonId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+        
+        // Configure ScanningRecord entity
+        modelBuilder.Entity<ScanningRecord>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            
+            entity.HasIndex(e => e.LambingSeasonId)
+                  .HasDatabaseName("IX_ScanningRecords_LambingSeasonId");
+            
+            entity.HasOne(e => e.LambingSeason)
+                  .WithMany(ls => ls.ScanningRecords)
+                  .HasForeignKey(e => e.LambingSeasonId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+        
+        // Configure LambingRecord entity
+        modelBuilder.Entity<LambingRecord>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            
+            entity.HasIndex(e => e.LambingSeasonId)
+                  .HasDatabaseName("IX_LambingRecords_LambingSeasonId");
+            
+            entity.HasOne(e => e.LambingSeason)
+                  .WithMany(ls => ls.LambingRecords)
+                  .HasForeignKey(e => e.LambingSeasonId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+        
+        // Configure WeaningRecord entity
+        modelBuilder.Entity<WeaningRecord>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            
+            entity.HasIndex(e => e.LambingSeasonId)
+                  .HasDatabaseName("IX_WeaningRecords_LambingSeasonId");
+            
+            entity.HasOne(e => e.LambingSeason)
+                  .WithMany(ls => ls.WeaningRecords)
+                  .HasForeignKey(e => e.LambingSeasonId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
         
         // Configure BaseEntity properties for all entities

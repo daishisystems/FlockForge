@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using FlockForge.Data.Local;
 using FlockForge.Models.Entities;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace FlockForge.Services.Database;
 
@@ -61,15 +62,26 @@ public class DatabaseService : IDatabaseService
     {
         try
         {
-            var query = _context.Set<T>().AsQueryable();
-            
-            // If T is BaseEntity, filter out deleted items
-            if (typeof(T).IsSubclassOf(typeof(BaseEntity)))
-            {
-                query = query.Where(e => !((BaseEntity)(object)e).IsDeleted);
-            }
-            
-            return await query.ToListAsync();
+            // Use EF Core's global query filters instead of manual filtering
+            // BaseEntity types already have query filters configured in OnModelCreating
+            return await _context.Set<T>().ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to get active entities of type {Type}", typeof(T).Name);
+            throw;
+        }
+    }
+
+    // Alternative method for explicit active filtering when needed
+    public async Task<IEnumerable<T>> GetActiveExplicitAsync<T>() where T : BaseEntity
+    {
+        try
+        {
+            // This works because T is constrained to BaseEntity
+            return await _context.Set<T>()
+                .Where(e => !e.IsDeleted)
+                .ToListAsync();
         }
         catch (Exception ex)
         {
@@ -189,7 +201,7 @@ public class DatabaseService : IDatabaseService
         
         // Get all DbSet properties from the context
         var dbSetProperties = _context.GetType().GetProperties()
-            .Where(p => p.PropertyType.IsGenericType && 
+            .Where(p => p.PropertyType.IsGenericType &&
                        p.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>))
             .ToList();
 
@@ -198,18 +210,35 @@ public class DatabaseService : IDatabaseService
             var entityType = property.PropertyType.GetGenericArguments()[0];
             if (entityType.IsSubclassOf(typeof(BaseEntity)))
             {
-                var dbSet = property.GetValue(_context);
-                if (dbSet != null)
+                // Use reflection to call the generic method
+                var method = typeof(DatabaseService)
+                    .GetMethod(nameof(GetUnsyncedEntitiesOfTypeAsync), BindingFlags.NonPublic | BindingFlags.Instance)
+                    ?.MakeGenericMethod(entityType);
+                    
+                if (method != null)
                 {
-                    var queryable = (IQueryable<BaseEntity>)dbSet;
-                    var unsynced = await queryable
-                        .Where(e => !e.IsSynced && !e.IsDeleted)
-                        .ToListAsync();
-                    unsyncedEntities.AddRange(unsynced);
+                    var result = await (Task<IEnumerable<BaseEntity>>)method.Invoke(this, null)!;
+                    unsyncedEntities.AddRange(result);
                 }
             }
         }
 
         return unsyncedEntities;
+    }
+
+    private async Task<IEnumerable<BaseEntity>> GetUnsyncedEntitiesOfTypeAsync<T>() where T : BaseEntity
+    {
+        try
+        {
+            return await _context.Set<T>()
+                .Where(e => !e.IsSynced && !e.IsDeleted)
+                .Cast<BaseEntity>()
+                .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to get unsynced entities of type {Type}", typeof(T).Name);
+            throw;
+        }
     }
 }
