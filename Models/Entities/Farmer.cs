@@ -72,25 +72,25 @@ public class Farmer : BaseEntity
     /// </summary>
     [MaxLength(500)]
     public string? Address { get; set; }
-
+    
     /// <summary>
     /// City for address autocomplete
     /// </summary>
     [MaxLength(100)]
     public string? City { get; set; }
-
+    
     /// <summary>
     /// Province/State
     /// </summary>
     [MaxLength(100)]
     public string? Province { get; set; }
-
+    
     /// <summary>
     /// Postal/Zip code
     /// </summary>
     [MaxLength(20)]
     public string? ZipCode { get; set; }
-
+    
     /// <summary>
     /// Sub region or district
     /// </summary>

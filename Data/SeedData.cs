@@ -40,6 +40,10 @@ public static class SeedData
                 Email = "john.smith@example.com",
                 MobileNumber = "+27821234567",
                 Address = "123 Farm Road, Rural Area, Western Cape",
+                City = "Cape Town",
+                Province = "Western Cape",
+                ZipCode = "8001",
+                SubRegion = "Southern Suburbs",
                 PreferredLanguage = "en",
                 TimeZone = "Africa/Johannesburg",
                 IsProfileComplete = true,
@@ -70,6 +74,7 @@ public static class SeedData
                     VeterinarianPhone = "+27821111111",
                     AgentName = "Cape Livestock Agents",
                     AgentPhone = "+27822222222",
+                    CoOp = "Western Cape Sheep Farmers Co-op",
                     DefaultGestationDays = 150,
                     TargetWeaningAge = 90,
                     IsActive = true
@@ -167,6 +172,10 @@ public static class SeedData
                 NaturalMatingEnd = completedSeason.MatingEnd,
                 RamId = "RAM001",
                 RamBreed = "Dorper",
+                UsedFollowUpRams = true,
+                FollowUpRamsIn = new DateOnly(2024, 3, 15),
+                FollowUpRamsOut = new DateOnly(2024, 3, 25),
+                YearCalculationDate = new DateOnly(2024, 12, 31),
                 Cost = 5000m,
                 Notes = "Used 8 rams for natural mating. Good weather conditions."
             };
@@ -186,6 +195,8 @@ public static class SeedData
                 EwesEmpty = 60,
                 Method = ScanningMethod.Ultrasound,
                 ScannerName = "Western Cape Scanning Services",
+                EwesMated = 400,
+                ScannedFetuses = 520,
                 Cost = 2000m,
                 Notes = "Good conception rate achieved. Twins higher than expected."
             };
@@ -236,6 +247,10 @@ public static class SeedData
                 FeedCost = 25000m,
                 HealthCost = 3000m,
                 EweBodyConditionScore = 3.2m,
+                RamsWeaned = 12,
+                BreedingEwesDeadFromScan = 3,
+                OtherMortalities = 2,
+                OtherMortalityCategory = "Predator attacks",
                 Notes = "Excellent weaning weights achieved. Strong market prices."
             };
 
