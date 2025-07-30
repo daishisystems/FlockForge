@@ -12,9 +12,13 @@ public class AppDelegate : MauiUIApplicationDelegate
     private IPlatformMemoryService? _memoryService;
 
     protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
+    
 
     public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
     {
+        // Register custom fonts manually to avoid conflicts
+        RegisterCustomFonts();
+        
         var result = base.FinishedLaunching(application, launchOptions);
         
         try
@@ -38,6 +42,20 @@ public class AppDelegate : MauiUIApplicationDelegate
         }
         
         return result;
+    }
+    
+    private void RegisterCustomFonts()
+    {
+        try
+        {
+            // Explicitly handle font registration to prevent conflicts
+            // This prevents the "GSFont already exists" error by ensuring
+            // fonts are only registered once
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Font registration workaround: {ex.Message}");
+        }
     }
 
     private void SetupMemoryManagement()

@@ -97,6 +97,12 @@ public class Farm : BaseEntity
     [MaxLength(100)]
     public string Country { get; set; } = "South Africa";
 
+    /// <summary>
+    /// Cooperative or association membership
+    /// </summary>
+    [MaxLength(200)]
+    public string? CoOp { get; set; }
+
     // Contact Information
     /// <summary>
     /// Primary veterinarian contact name
@@ -186,7 +192,7 @@ public class Farm : BaseEntity
     /// Display name combining farm name and company name if available
     /// </summary>
     [NotMapped]
-    public string DisplayName => 
+    public string DisplayName =>
         !string.IsNullOrWhiteSpace(CompanyName) ? $"{FarmName} ({CompanyName})" : FarmName;
 
     /// <summary>
@@ -204,7 +210,7 @@ public class Farm : BaseEntity
             if (parts.Length != 2)
                 return (null, null);
 
-            if (double.TryParse(parts[0].Trim(), out var lat) && 
+            if (double.TryParse(parts[0].Trim(), out var lat) &&
                 double.TryParse(parts[1].Trim(), out var lng))
             {
                 return (lat, lng);
@@ -276,6 +282,18 @@ public class Farm : BaseEntity
         if (feedSupplierName != null) FeedSupplierName = feedSupplierName.Trim();
         if (feedSupplierPhone != null) FeedSupplierPhone = feedSupplierPhone.Trim();
 
+        UpdatedAt = DateTimeOffset.UtcNow;
+        IsSynced = false;
+    }
+
+    /// <summary>
+    /// Updates the farm's cooperative information
+    /// </summary>
+    /// <param name="coOp">Cooperative or association membership</param>
+    public void UpdateCoOp(string? coOp)
+    {
+        if (coOp != null) CoOp = coOp.Trim();
+        
         UpdatedAt = DateTimeOffset.UtcNow;
         IsSynced = false;
     }

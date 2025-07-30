@@ -74,6 +74,30 @@ public class Farmer : BaseEntity
     public string? Address { get; set; }
 
     /// <summary>
+    /// City for address autocomplete
+    /// </summary>
+    [MaxLength(100)]
+    public string? City { get; set; }
+
+    /// <summary>
+    /// Province/State
+    /// </summary>
+    [MaxLength(100)]
+    public string? Province { get; set; }
+
+    /// <summary>
+    /// Postal/Zip code
+    /// </summary>
+    [MaxLength(20)]
+    public string? ZipCode { get; set; }
+
+    /// <summary>
+    /// Sub region or district
+    /// </summary>
+    [MaxLength(100)]
+    public string? SubRegion { get; set; }
+
+    /// <summary>
     /// Profile photo URL (Firebase Storage or external)
     /// </summary>
     [MaxLength(2048)]
@@ -128,7 +152,7 @@ public class Farmer : BaseEntity
     /// Display name with fallback to email if names are not available
     /// </summary>
     [NotMapped]
-    public string DisplayName => 
+    public string DisplayName =>
         !string.IsNullOrWhiteSpace(FullName) ? FullName : Email.Split('@')[0];
 
     /// <summary>
@@ -167,9 +191,9 @@ public class Farmer : BaseEntity
     /// </summary>
     public void CompleteProfile()
     {
-        if (string.IsNullOrWhiteSpace(FirstName) || 
-            string.IsNullOrWhiteSpace(Surname) || 
-            string.IsNullOrWhiteSpace(Email) || 
+        if (string.IsNullOrWhiteSpace(FirstName) ||
+            string.IsNullOrWhiteSpace(Surname) ||
+            string.IsNullOrWhiteSpace(Email) ||
             string.IsNullOrWhiteSpace(MobileNumber))
         {
             throw new InvalidOperationException("All required fields must be completed before marking profile as complete");
@@ -207,6 +231,24 @@ public class Farmer : BaseEntity
     public void UpdatePhoto(string? photoUrl)
     {
         PhotoUrl = photoUrl;
+        UpdatedAt = DateTimeOffset.UtcNow;
+        IsSynced = false;
+    }
+
+    /// <summary>
+    /// Updates the farmer's address information
+    /// </summary>
+    /// <param name="city">City name</param>
+    /// <param name="province">Province/State</param>
+    /// <param name="zipCode">Postal/Zip code</param>
+    /// <param name="subRegion">Sub region or district</param>
+    public void UpdateAddress(string? city = null, string? province = null, string? zipCode = null, string? subRegion = null)
+    {
+        if (city != null) City = city.Trim();
+        if (province != null) Province = province.Trim();
+        if (zipCode != null) ZipCode = zipCode.Trim();
+        if (subRegion != null) SubRegion = subRegion.Trim();
+        
         UpdatedAt = DateTimeOffset.UtcNow;
         IsSynced = false;
     }

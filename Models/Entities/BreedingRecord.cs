@@ -44,6 +44,26 @@ public class BreedingRecord : BaseEntity
     public DateOnly? NaturalMatingEnd { get; set; }
 
     /// <summary>
+    /// Whether follow-up rams were used
+    /// </summary>
+    public bool? UsedFollowUpRams { get; set; }
+
+    /// <summary>
+    /// Date follow-up rams were introduced
+    /// </summary>
+    public DateOnly? FollowUpRamsIn { get; set; }
+
+    /// <summary>
+    /// Date follow-up rams were removed
+    /// </summary>
+    public DateOnly? FollowUpRamsOut { get; set; }
+
+    /// <summary>
+    /// Date used for year calculation
+    /// </summary>
+    public DateOnly? YearCalculationDate { get; set; }
+
+    /// <summary>
     /// Ram/sire identification used for mating
     /// </summary>
     [MaxLength(100)]
@@ -87,6 +107,26 @@ public class BreedingRecord : BaseEntity
             return null;
         }
     }
+
+    /// <summary>
+    /// Number of days follow-up rams were present
+    /// </summary>
+    [NotMapped]
+    public int? DaysIn
+    {
+        get
+        {
+            if (FollowUpRamsIn.HasValue && FollowUpRamsOut.HasValue)
+                return FollowUpRamsOut.Value.DayNumber - FollowUpRamsIn.Value.DayNumber + 1;
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Year extracted from calculation date
+    /// </summary>
+    [NotMapped]
+    public int? Year => YearCalculationDate?.Year;
 
     /// <summary>
     /// Primary mating date for calculations
@@ -159,6 +199,34 @@ public class BreedingRecord : BaseEntity
     }
 
     /// <summary>
+    /// Updates the follow-up rams details
+    /// </summary>
+    /// <param name="usedFollowUpRams">Whether follow-up rams were used</param>
+    /// <param name="followUpRamsIn">Date follow-up rams were introduced</param>
+    /// <param name="followUpRamsOut">Date follow-up rams were removed</param>
+    public void UpdateFollowUpRams(bool? usedFollowUpRams, DateOnly? followUpRamsIn = null, DateOnly? followUpRamsOut = null)
+    {
+        UsedFollowUpRams = usedFollowUpRams;
+        FollowUpRamsIn = followUpRamsIn;
+        FollowUpRamsOut = followUpRamsOut;
+        
+        UpdatedAt = DateTimeOffset.UtcNow;
+        IsSynced = false;
+    }
+
+    /// <summary>
+    /// Updates the year calculation date
+    /// </summary>
+    /// <param name="yearCalculationDate">Date used for year calculation</param>
+    public void UpdateYearCalculationDate(DateOnly? yearCalculationDate)
+    {
+        YearCalculationDate = yearCalculationDate;
+        
+        UpdatedAt = DateTimeOffset.UtcNow;
+        IsSynced = false;
+    }
+
+    /// <summary>
     /// Validates the breeding record before saving
     /// </summary>
     /// <returns>List of validation errors, empty if valid</returns>
@@ -190,6 +258,17 @@ public class BreedingRecord : BaseEntity
                 if (!AIDate.HasValue && (!NaturalMatingStart.HasValue || !NaturalMatingEnd.HasValue))
                     errors.Add("Either AI date or natural mating dates are required for mixed mating");
                 break;
+        }
+
+        // Validate follow-up rams dates if used
+        if (UsedFollowUpRams == true)
+        {
+            if (!FollowUpRamsIn.HasValue)
+                errors.Add("Follow-up rams in date is required when follow-up rams are used");
+            if (!FollowUpRamsOut.HasValue)
+                errors.Add("Follow-up rams out date is required when follow-up rams are used");
+            if (FollowUpRamsIn.HasValue && FollowUpRamsOut.HasValue && FollowUpRamsOut < FollowUpRamsIn)
+                errors.Add("Follow-up rams out date cannot be before follow-up rams in date");
         }
 
         if (Cost.HasValue && Cost < 0)

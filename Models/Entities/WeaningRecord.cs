@@ -27,6 +27,30 @@ public class WeaningRecord : BaseEntity
     /// </summary>
     [Range(0, 30000)]
     public int LambsWeaned { get; set; }
+    
+    /// <summary>
+    /// Number of rams weaned
+    /// </summary>
+    [Range(0, 10000)]
+    public int RamsWeaned { get; set; }
+    
+    /// <summary>
+    /// Number of breeding ewes that died after scanning
+    /// </summary>
+    [Range(0, 10000)]
+    public int BreedingEwesDeadFromScan { get; set; }
+    
+    /// <summary>
+    /// Other mortalities with category
+    /// </summary>
+    [Range(0, 10000)]
+    public int OtherMortalities { get; set; }
+    
+    /// <summary>
+    /// Category for other mortalities
+    /// </summary>
+    [MaxLength(100)]
+    public string? OtherMortalityCategory { get; set; }
 
     /// <summary>
     /// Number of male lambs weaned

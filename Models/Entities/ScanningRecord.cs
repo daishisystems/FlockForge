@@ -29,6 +29,12 @@ public class ScanningRecord : BaseEntity
     public int EwesScanned { get; set; }
 
     /// <summary>
+    /// Number of ewes mated (from breeding records)
+    /// </summary>
+    [Range(0, 10000)]
+    public int? EwesMated { get; set; }
+
+    /// <summary>
     /// Number of ewes found to be pregnant
     /// </summary>
     [Range(0, 10000)]
@@ -57,6 +63,12 @@ public class ScanningRecord : BaseEntity
     /// </summary>
     [Range(0, 10000)]
     public int EwesEmpty { get; set; }
+
+    /// <summary>
+    /// Total number of fetuses scanned
+    /// </summary>
+    [Range(0, 30000)]
+    public int? ScannedFetuses { get; set; }
 
     /// <summary>
     /// Method used for scanning
@@ -161,6 +173,32 @@ public class ScanningRecord : BaseEntity
         }
     }
 
+    /// <summary>
+    /// Expected lambing percentage of ewes pregnant
+    /// </summary>
+    [NotMapped]
+    public decimal ExpectedLambingPercentageOfPregnant
+    {
+        get
+        {
+            if (EwesPregnant == 0) return 0;
+            return Math.Round((decimal)ExpectedLambs / EwesPregnant * 100, 1);
+        }
+    }
+
+    /// <summary>
+    /// Expected lambing percentage of ewes mated
+    /// </summary>
+    [NotMapped]
+    public decimal ExpectedLambingPercentageOfMated
+    {
+        get
+        {
+            if (!EwesMated.HasValue || EwesMated == 0) return 0;
+            return Math.Round((decimal)ExpectedLambs / EwesMated.Value * 100, 1);
+        }
+    }
+
     // Business methods
     /// <summary>
     /// Updates the scanning results
@@ -209,6 +247,30 @@ public class ScanningRecord : BaseEntity
     }
 
     /// <summary>
+    /// Updates the ewes mated count
+    /// </summary>
+    /// <param name="ewesMated">Number of ewes mated</param>
+    public void UpdateEwesMated(int? ewesMated)
+    {
+        EwesMated = ewesMated;
+        
+        UpdatedAt = DateTimeOffset.UtcNow;
+        IsSynced = false;
+    }
+
+    /// <summary>
+    /// Updates the scanned fetuses count
+    /// </summary>
+    /// <param name="scannedFetuses">Total number of fetuses scanned</param>
+    public void UpdateScannedFetuses(int? scannedFetuses)
+    {
+        ScannedFetuses = scannedFetuses;
+        
+        UpdatedAt = DateTimeOffset.UtcNow;
+        IsSynced = false;
+    }
+
+    /// <summary>
     /// Validates the scanning record before saving
     /// </summary>
     /// <returns>List of validation errors, empty if valid</returns>
@@ -243,6 +305,9 @@ public class ScanningRecord : BaseEntity
         var pregnantCount = EwesSingles + EwesTwins + EwesMultiples;
         if (pregnantCount != EwesPregnant)
             errors.Add($"Pregnant ewes count ({EwesPregnant}) must equal sum of singles, twins, and multiples ({pregnantCount})");
+
+        if (ScannedFetuses.HasValue && ScannedFetuses < 0)
+            errors.Add("Scanned fetuses count cannot be negative");
 
         if (Cost.HasValue && Cost < 0)
             errors.Add("Cost cannot be negative");
