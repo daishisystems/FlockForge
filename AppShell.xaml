@@ -4,12 +4,29 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:FlockForge"
+    xmlns:pages="clr-namespace:FlockForge.Views.Pages"
     Title="FlockForge">
 
+    <!-- Login/Registration Routes -->
     <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+        x:Name="LoginPage"
+        ContentTemplate="{DataTemplate pages:LoginPage}"
+        Route="LoginPage" />
+        
+    <ShellContent
+        x:Name="RegisterPage"
+        ContentTemplate="{DataTemplate pages:RegisterPage}"
+        Route="RegisterPage" />
+    
+    <!-- Main Application Content (protected by authentication) -->
+    <FlyoutItem Title="Home" FlyoutDisplayOptions="AsMultipleItems">
+        <Tab Title="Dashboard">
+            <ShellContent
+                Title="Home"
+                ContentTemplate="{DataTemplate local:MainPage}"
+                Route="MainPage" />
+        </Tab>
+    </FlyoutItem>
 
 </Shell>
 

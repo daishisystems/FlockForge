@@ -1,13 +1,10 @@
 using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore;
-using FlockForge.Data.Local;
-using FlockForge.Services.Database;
 using FlockForge.Services.Firebase;
 using FlockForge.Services.Navigation;
-using FlockForge.Services.Sync;
 using FlockForge.Services.Performance;
 using FlockForge.Services.Platform;
 using FlockForge.ViewModels.Base;
+using FlockForge.ViewModels.Pages;
 using System.Reflection;
 
 namespace FlockForge;
@@ -25,9 +22,6 @@ public static class MauiProgram
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 			});
 
-		// Configure database
-		ConfigureDatabase(builder);
-		
 		// Register services
 		RegisterServices(builder);
 		
@@ -47,32 +41,17 @@ public static class MauiProgram
 		return builder.Build();
 	}
 	
-	private static void ConfigureDatabase(MauiAppBuilder builder)
-	{
-		var dbPath = Path.Combine(FileSystem.AppDataDirectory, "flockforge.db");
-		
-		builder.Services.AddDbContext<FlockForgeDbContext>(options =>
-		{
-			options.UseSqlite($"Data Source={dbPath}")
-				   .EnableServiceProviderCaching();
-				   
-#if DEBUG
-			options.EnableSensitiveDataLogging(true)
-				   .EnableDetailedErrors(true);
-#else
-			options.EnableSensitiveDataLogging(false)
-				   .EnableDetailedErrors(false);
-#endif
-		}, ServiceLifetime.Scoped);
-	}
-	
 	private static void RegisterServices(MauiAppBuilder builder)
 	{
 		// Core services
+		builder.Services.AddSingleton<TokenManager>();
 		builder.Services.AddSingleton<INavigationService, NavigationService>();
-		builder.Services.AddSingleton<IFirebaseService, FirebaseService>();
-		builder.Services.AddScoped<IDatabaseService, DatabaseService>();
-		builder.Services.AddSingleton<IBackgroundSyncService, BackgroundSyncService>();
+		builder.Services.AddSingleton<IFirebaseService>(serviceProvider =>
+		{
+			var logger = serviceProvider.GetRequiredService<ILogger<FirebaseService>>();
+			var tokenManager = serviceProvider.GetRequiredService<TokenManager>();
+			return new FirebaseService(logger, tokenManager);
+		});
 		builder.Services.AddSingleton<IPerformanceMonitor, PerformanceMonitor>();
 		
 		// Platform-specific services
@@ -82,6 +61,10 @@ public static class MauiProgram
 	private static void RegisterViewModels(MauiAppBuilder builder)
 	{
 		// Register all ViewModels as transient
+		builder.Services.AddTransient<LoginViewModel>();
+		builder.Services.AddTransient<RegisterViewModel>();
+		
+		// Also register any other ViewModels from the assembly
 		var assembly = Assembly.GetExecutingAssembly();
 		var viewModelTypes = assembly.GetTypes()
 			.Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(BaseViewModel)))
@@ -89,7 +72,11 @@ public static class MauiProgram
 			
 		foreach (var viewModelType in viewModelTypes)
 		{
-			builder.Services.AddTransient(viewModelType);
+			// Only register if not already registered
+			if (!builder.Services.Any(s => s.ServiceType == viewModelType))
+			{
+				builder.Services.AddTransient(viewModelType);
+			}
 		}
 	}
 	
@@ -111,4 +98,3 @@ public static class MauiProgram
 	}
 #endif
 }
-

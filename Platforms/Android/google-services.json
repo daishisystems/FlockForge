@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "717823882706",
+    "project_id": "flockforge-ac0b9",
+    "storage_bucket": "flockforge-ac0b9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:717823882706:android:6d30877be18d2f36ee040b",
+        "android_client_info": {
+          "package_name": "io.nexair.flockforge"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "717823882706-le3b588jl9251unuijgq6j6lr9nmbo01.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWir-B9kgti50XfiePZ0kXQVitRS3EuyE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "717823882706-le3b588jl9251unuijgq6j6lr9nmbo01.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "717823882706-2l2nvjg4rfeosgikvf2me3mtqekudj78.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "io.nexair.flockforge"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

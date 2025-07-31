@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FlockForge.Views.Pages.LoginPage"
+             Title="Sign In">
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="30,0"
+            Spacing="20"
+            VerticalOptions="Center">
+            
+            <!-- App Logo -->
+            <Image
+                Source="appicon.png"
+                HeightRequest="120"
+                WidthRequest="120"
+                HorizontalOptions="Center"
+                Margin="0,0,0,20"/>
+            
+            <!-- Welcome Message -->
+            <Label
+                Text="Welcome to FlockForge"
+                FontSize="24"
+                FontAttributes="Bold"
+                HorizontalOptions="Center"
+                HorizontalTextAlignment="Center"
+                Margin="0,0,0,10"/>
+            
+            <Label
+                Text="Sign in to continue"
+                FontSize="16"
+                HorizontalOptions="Center"
+                HorizontalTextAlignment="Center"
+                TextColor="Gray"
+                Margin="0,0,0,30"/>
+            
+            <!-- Email Input -->
+            <Entry
+                x:Name="EmailEntry"
+                Text="{Binding Email}"
+                Placeholder="Email"
+                Keyboard="Email"
+                ReturnType="Next"
+                Margin="0,0,0,10"/>
+            
+            <!-- Password Input -->
+            <Entry
+                x:Name="PasswordEntry"
+                Text="{Binding Password}"
+                Placeholder="Password"
+                IsPassword="True"
+                ReturnType="Done"
+                Margin="0,0,0,20"/>
+            
+            <!-- Error Message -->
+            <Label
+                Text="{Binding ErrorMessage}"
+                TextColor="Red"
+                IsVisible="{Binding HasError}"
+                HorizontalOptions="Center"
+                HorizontalTextAlignment="Center"
+                Margin="0,0,0,10"/>
+            
+            <!-- Login Button -->
+            <Button
+                Text="Sign In"
+                Command="{Binding LoginCommand}"
+                BackgroundColor="#512BD4"
+                TextColor="White"
+                CornerRadius="10"
+                HeightRequest="50"
+                Margin="0,0,0,10"/>
+            
+            <!-- Google Sign In Button -->
+            <Button
+                Text="Sign in with Google"
+                Command="{Binding LoginWithGoogleCommand}"
+                BackgroundColor="#4285F4"
+                TextColor="White"
+                CornerRadius="10"
+                HeightRequest="50"
+                Margin="0,0,0,20"/>
+            
+            <!-- Forgot Password -->
+            <Button
+                Text="Forgot Password?"
+                Command="{Binding ResetPasswordCommand}"
+                TextColor="#512BD4"
+                BackgroundColor="Transparent"
+                HeightRequest="40"
+                Margin="0,0,0,10"/>
+            
+            <!-- Register Link -->
+            <Button
+                Text="Don't have an account? Register"
+                Command="{Binding RegisterCommand}"
+                TextColor="#512BD4"
+                BackgroundColor="Transparent"
+                HeightRequest="40"/>
+            
+            <!-- Busy Indicator -->
+            <StackLayout
+                IsVisible="{Binding IsBusy}"
+                Orientation="Horizontal"
+                HorizontalOptions="Center"
+                Spacing="10">
+                <ActivityIndicator
+                    IsRunning="{Binding IsBusy}"
+                    Color="#512BD4"/>
+                <Label Text="{Binding BusyMessage}"
+                   IsVisible="{Binding IsBusy}"
+                   HorizontalOptions="Center" />
+            </StackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
