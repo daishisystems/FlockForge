@@ -70,7 +70,7 @@ public partial class LoginViewModel : BaseViewModel
             if (result.Success)
             {
                 // Navigate to main application
-                await Shell.Current.GoToAsync("//MainPage");
+                await Shell.Current.GoToAsync("///MainPage");
             }
             else
             {
@@ -93,7 +93,7 @@ public partial class LoginViewModel : BaseViewModel
             if (result.Success)
             {
                 // Navigate to main application
-                await Shell.Current.GoToAsync("//MainPage");
+                await Shell.Current.GoToAsync("///MainPage");
             }
             else
             {
@@ -107,7 +107,7 @@ public partial class LoginViewModel : BaseViewModel
     private async Task RegisterAsync()
     {
         // Navigate to registration page
-        await Shell.Current.GoToAsync("RegisterPage");
+        await Shell.Current.GoToAsync("///RegisterPage");
     }
     
     [RelayCommand]

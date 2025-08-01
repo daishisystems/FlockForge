@@ -138,29 +138,74 @@ namespace FlockForge
         {
             try
             {
-                if (isAuthenticated)
+                // Always use AppShell for consistent navigation
+                if (MainPage is not AppShell)
                 {
-                    if (MainPage is not AppShell)
-                    {
-                        MainPage = new AppShell();
-                    }
+                    MainPage = new AppShell();
                 }
-                else
+                
+                // Use MainThread to ensure Shell is ready, then navigate
+                MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    if (MainPage is not NavigationPage navPage ||
-                        navPage.CurrentPage is not LoginPage)
+                    try
                     {
-                        // Get the LoginPage from stored service provider
-                        var loginPage = _serviceProvider.GetRequiredService<LoginPage>();
-                        MainPage = new NavigationPage(loginPage);
+                        // Wait a moment for Shell to initialize
+                        await Task.Delay(100);
+                        
+                        // Navigate to appropriate page based on authentication state
+                        if (isAuthenticated)
+                        {
+                            // Navigate to main page
+                            await Shell.Current.GoToAsync("///MainPage");
+                        }
+                        else
+                        {
+                            // Navigate to login page
+                            await Shell.Current.GoToAsync("///LoginPage");
+                        }
                     }
-                }
+                    catch (Exception navEx)
+                    {
+                        _logger.LogError(navEx, "Error during Shell navigation");
+                    }
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error setting main page");
-                // Fallback to a simple content page
-                MainPage = new ContentPage { Title = "FlockForge - Error" };
+                // Fallback to AppShell with error handling - maintain Shell architecture
+                try
+                {
+                    MainPage = new AppShell();
+                    // Try to navigate to login page as safe fallback
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        await Task.Delay(200); // Give more time for Shell initialization
+                        try
+                        {
+                            await Shell.Current.GoToAsync("///LoginPage");
+                        }
+                        catch (Exception navEx)
+                        {
+                            _logger.LogError(navEx, "Error during fallback navigation");
+                        }
+                    });
+                }
+                catch (Exception shellEx)
+                {
+                    _logger.LogCritical(shellEx, "Critical error: Cannot create AppShell");
+                    // Last resort fallback - but still try to maintain some structure
+                    MainPage = new NavigationPage(new ContentPage
+                    {
+                        Title = "FlockForge - Critical Error",
+                        Content = new Label
+                        {
+                            Text = "Application error occurred. Please restart the app.",
+                            HorizontalOptions = LayoutOptions.Center,
+                            VerticalOptions = LayoutOptions.Center
+                        }
+                    });
+                }
             }
         }
         

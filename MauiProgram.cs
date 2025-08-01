@@ -57,9 +57,11 @@ public static class MauiProgram
 		
 		// ViewModels
 		builder.Services.AddTransient<ViewModels.Pages.LoginViewModel>();
+		builder.Services.AddTransient<ViewModels.Pages.RegisterViewModel>();
 		
 		// Pages
 		builder.Services.AddTransient<Views.Pages.LoginPage>();
+		builder.Services.AddTransient<Views.Pages.RegisterPage>();
 		
 		// Configure logging
 #if DEBUG

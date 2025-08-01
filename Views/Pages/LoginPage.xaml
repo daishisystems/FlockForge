@@ -13,11 +13,12 @@
             
             <!-- App Logo -->
             <Image
-                Source="appicon.png"
+                Source="flockforge_logo.png"
                 HeightRequest="120"
                 WidthRequest="120"
                 HorizontalOptions="Center"
-                Margin="0,0,0,20"/>
+                Margin="0,0,0,20"
+                Aspect="AspectFit"/>
             
             <!-- Welcome Message -->
             <Label
