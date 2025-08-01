@@ -1,6 +1,7 @@
 using Foundation;
 using UIKit;
 using FlockForge.Services.Platform;
+using FlockForge.Platforms.iOS.Services;
 using Microsoft.Extensions.Logging;
 
 namespace FlockForge;
@@ -16,6 +17,10 @@ public class AppDelegate : MauiUIApplicationDelegate
 
     public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
     {
+        // Initialize Firebase before creating the app
+        var firebaseInitializer = new iOSFirebaseInitializer();
+        firebaseInitializer.Initialize();
+        
         // Register custom fonts manually to avoid conflicts
         RegisterCustomFonts();
         

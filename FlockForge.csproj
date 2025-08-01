@@ -64,8 +64,15 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
-		<PackageReference Include="FirebaseAuthentication.net" Version="4.1.0" />
-		<PackageReference Include="Plugin.Firebase" Version="3.1.1" />
+		
+		<!-- Firebase packages removed - using offline-first approach for development -->
+		<!-- Will be replaced with proper mobile Firebase packages when ready for production -->
+		
+		<!-- Supporting packages -->
+		<PackageReference Include="System.Reactive" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
+		<PackageReference Include="Polly" Version="8.2.0" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="7.0.0" />
 	</ItemGroup>
 
 </Project>

@@ -1,11 +1,9 @@
 using Microsoft.Extensions.Logging;
+using FlockForge.Core.Interfaces;
+using FlockForge.Core.Configuration;
 using FlockForge.Services.Firebase;
 using FlockForge.Services.Navigation;
-using FlockForge.Services.Performance;
-using FlockForge.Services.Platform;
-using FlockForge.ViewModels.Base;
-using FlockForge.ViewModels.Pages;
-using System.Reflection;
+using CommunityToolkit.Maui;
 
 namespace FlockForge;
 
@@ -18,83 +16,59 @@ public static class MauiProgram
 			.UseMauiApp<App>()
 			.ConfigureFonts(fonts =>
 			{
+				// Only add fonts if they're not already registered (reduces iOS simulator warnings)
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-			});
+			})
+			.UseMauiCommunityToolkit();
 
-		// Register services
-		RegisterServices(builder);
-		
-		// Register ViewModels
-		RegisterViewModels(builder);
-		
-		// Configure HTTP clients
-		ConfigureHttpClients(builder);
+		// Initialize Firebase Firestore (will be configured in services)
+		// The FirestoreService will handle Firestore initialization
 
+		// Configuration
+		builder.Services.AddSingleton<FirebaseConfig>(sp =>
+		{
+			var config = new FirebaseConfig();
+			// Load from appsettings.json or platform config
+			return config;
+		});
+		
+		// Platform services
+		builder.Services.AddSingleton<IConnectivity>(Connectivity.Current);
+		builder.Services.AddSingleton<ISecureStorage>(SecureStorage.Default);
+		builder.Services.AddSingleton<IPreferences>(Preferences.Default);
+		
+		// Firebase services
+		builder.Services.AddSingleton<IAuthenticationService, FirebaseAuthenticationService>();
+		// Use OfflineDataService to avoid ADC requirements during development
+		// This eliminates the need for Firebase credentials while maintaining full functionality
+		builder.Services.AddSingleton<IDataService>(sp =>
+		{
+			var authService = sp.GetRequiredService<IAuthenticationService>();
+			var logger = sp.GetRequiredService<ILogger<Services.Firebase.OfflineDataService>>();
+			return new Services.Firebase.OfflineDataService(authService, logger);
+		});
+		
+		// Firebase service bridge (provides compatibility layer)
+		builder.Services.AddSingleton<Services.Firebase.IFirebaseService, Services.Firebase.FirebaseService>();
+		
+		// Navigation service
+		builder.Services.AddSingleton<Services.Navigation.INavigationService, Services.Navigation.NavigationService>();
+		
+		// ViewModels
+		builder.Services.AddTransient<ViewModels.Pages.LoginViewModel>();
+		
+		// Pages
+		builder.Services.AddTransient<Views.Pages.LoginPage>();
+		
+		// Configure logging
 #if DEBUG
 		builder.Logging.AddDebug();
 		builder.Logging.SetMinimumLevel(LogLevel.Debug);
 #else
-		builder.Logging.SetMinimumLevel(LogLevel.Information);
+		builder.Logging.SetMinimumLevel(LogLevel.Warning);
 #endif
 
 		return builder.Build();
 	}
-	
-	private static void RegisterServices(MauiAppBuilder builder)
-	{
-		// Core services
-		builder.Services.AddSingleton<TokenManager>();
-		builder.Services.AddSingleton<INavigationService, NavigationService>();
-		builder.Services.AddSingleton<IFirebaseService>(serviceProvider =>
-		{
-			var logger = serviceProvider.GetRequiredService<ILogger<FirebaseService>>();
-			var tokenManager = serviceProvider.GetRequiredService<TokenManager>();
-			return new FirebaseService(logger, tokenManager);
-		});
-		builder.Services.AddSingleton<IPerformanceMonitor, PerformanceMonitor>();
-		
-		// Platform-specific services
-		builder.Services.AddSingleton<IPlatformMemoryService, DefaultMemoryService>();
-	}
-	
-	private static void RegisterViewModels(MauiAppBuilder builder)
-	{
-		// Register all ViewModels as transient
-		builder.Services.AddTransient<LoginViewModel>();
-		builder.Services.AddTransient<RegisterViewModel>();
-		
-		// Also register any other ViewModels from the assembly
-		var assembly = Assembly.GetExecutingAssembly();
-		var viewModelTypes = assembly.GetTypes()
-			.Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(BaseViewModel)))
-			.ToList();
-			
-		foreach (var viewModelType in viewModelTypes)
-		{
-			// Only register if not already registered
-			if (!builder.Services.Any(s => s.ServiceType == viewModelType))
-			{
-				builder.Services.AddTransient(viewModelType);
-			}
-		}
-	}
-	
-	private static void ConfigureHttpClients(MauiAppBuilder builder)
-	{
-		builder.Services.AddHttpClient("FlockForgeApi", client =>
-		{
-			client.Timeout = TimeSpan.FromSeconds(30);
-			client.DefaultRequestHeaders.Add("User-Agent", "FlockForge/1.0");
-		});
-	}
-	
-#if !DEBUG
-	private static bool ValidateCertificatePinning(System.Security.Cryptography.X509Certificates.X509Certificate2? cert)
-	{
-		// TODO: Implement actual certificate pinning validation
-		// This is a placeholder for production certificate validation
-		return cert != null;
-	}
-#endif
 }

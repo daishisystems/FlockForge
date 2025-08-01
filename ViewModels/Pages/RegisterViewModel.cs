@@ -3,6 +3,8 @@ using CommunityToolkit.Mvvm.Input;
 using FlockForge.Models.Authentication;
 using FlockForge.Services.Firebase;
 using FlockForge.ViewModels.Base;
+using FlockForge.Core.Interfaces;
+using Microsoft.Extensions.Logging;
 using System.Security;
 
 namespace FlockForge.ViewModels.Pages;
@@ -23,7 +25,22 @@ public partial class RegisterViewModel : BaseViewModel
     [ObservableProperty]
     private string _displayName = string.Empty;
     
-    public RegisterViewModel(IFirebaseService firebaseService)
+    [ObservableProperty]
+    private string _title = "Create Account";
+    
+    [ObservableProperty]
+    private string? _busyMessage;
+    
+    [ObservableProperty]
+    private bool _hasError;
+    
+    public RegisterViewModel(
+        IFirebaseService firebaseService,
+        IAuthenticationService authService,
+        IDataService dataService,
+        IConnectivity connectivity,
+        ILogger<RegisterViewModel> logger)
+        : base(authService, dataService, connectivity, logger)
     {
         _firebaseService = firebaseService;
         Title = "Create Account";
@@ -35,32 +52,24 @@ public partial class RegisterViewModel : BaseViewModel
         if (!ValidateInput())
             return;
         
-        await ExecuteAsync(async (cancellationToken) =>
+        await ExecuteSafelyAsync(async (cancellationToken) =>
         {
             BusyMessage = "Creating account...";
             
-            try
+            // Register with Firebase using the actual service method
+            var result = await _firebaseService.RegisterAsync(Email, Password, DisplayName);
+            
+            if (result.Success)
             {
-                // Register with Firebase using the actual service method
-                var result = await _firebaseService.RegisterAsync(Email, Password, DisplayName);
-                
-                if (result.Success)
-                {
-                    // Navigate to main application or profile completion
-                    await Shell.Current.GoToAsync("//MainPage");
-                }
-                else
-                {
-                    ErrorMessage = result.ErrorMessage ?? "Registration failed";
-                    HasError = true;
-                }
+                // Navigate to main application or profile completion
+                await Shell.Current.GoToAsync("//MainPage");
             }
-            catch (Exception)
+            else
             {
-                ErrorMessage = "An error occurred during registration. Please try again.";
+                ErrorMessage = result.ErrorMessage ?? "Registration failed";
                 HasError = true;
             }
-        }, "Creating account...");
+        }, "An error occurred during registration. Please try again.");
     }
     
     private bool ValidateInput()

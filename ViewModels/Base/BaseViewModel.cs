@@ -1,140 +1,150 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Logging;
+using FlockForge.Core.Interfaces;
 
-namespace FlockForge.ViewModels.Base;
-
-/// <summary>
-/// Base ViewModel with improved busy state management and progress reporting
-/// </summary>
-public abstract partial class BaseViewModel : ObservableObject, IDisposable
+namespace FlockForge.ViewModels.Base
 {
-    private readonly SemaphoreSlim _busySemaphore = new(1, 1);
-    private readonly CancellationTokenSource _disposalCts = new();
-    private bool _disposed;
-    
-    [ObservableProperty]
-    private bool _isBusy;
-    
-    [ObservableProperty]
-    private bool _isRefreshing;
-
-    [ObservableProperty]
-    private string _title = string.Empty;
-    
-    [ObservableProperty]
-    private string? _busyMessage;
-    
-    [ObservableProperty]
-    private double _progress;
-    
-    [ObservableProperty]
-    private bool _hasError;
-    
-    [ObservableProperty]
-    private string? _errorMessage;
-    
-    protected CancellationToken DisposalToken => _disposalCts.Token;
-    
-    /// <summary>
-    /// Executes an action with busy state management and error handling
-    /// </summary>
-    protected async Task<bool> ExecuteAsync(
-        Func<CancellationToken, Task> action,
-        string? busyMessage = null,
-        [CallerMemberName] string? caller = null)
+    public abstract partial class BaseViewModel : ObservableObject, IDisposable
     {
-        if (_disposed) return false;
+        protected readonly IAuthenticationService AuthService;
+        protected readonly IDataService DataService;
+        protected readonly ILogger Logger;
         
-        await _busySemaphore.WaitAsync(DisposalToken);
-        try
-        {
-            if (IsBusy) return false;
-            
-            HasError = false;
-            ErrorMessage = null;
-            IsBusy = true;
-            BusyMessage = busyMessage;
-            Progress = 0;
-            
-            await action(DisposalToken);
-            return true;
-        }
-        catch (OperationCanceledException)
-        {
-            // Silently handle cancellation
-            return false;
-        }
-        catch (Exception ex)
-        {
-            HasError = true;
-            ErrorMessage = GetUserFriendlyMessage(ex);
-            OnError(ex, caller);
-            return false;
-        }
-        finally
-        {
-            IsBusy = false;
-            BusyMessage = null;
-            Progress = 0;
-            _busySemaphore.Release();
-        }
-    }
-    
-    /// <summary>
-    /// Reports progress for long-running operations
-    /// </summary>
-    protected void ReportProgress(double value, string? message = null)
-    {
-        Progress = Math.Clamp(value, 0, 1);
-        if (message != null)
-            BusyMessage = message;
-    }
-    
-    [RelayCommand]
-    protected virtual async Task RefreshAsync()
-    {
-        if (IsRefreshing) return;
+        private readonly List<IDisposable> _subscriptions = new();
+        private readonly SemaphoreSlim _operationLock = new(1, 1);
+        private CancellationTokenSource? _cancellationTokenSource;
         
-        IsRefreshing = true;
-        try
+        [ObservableProperty]
+        private bool isBusy;
+        
+        [ObservableProperty]
+        private string? errorMessage;
+        
+        [ObservableProperty]
+        private bool isOffline;
+        
+        protected bool IsDisposed { get; private set; }
+        
+        public IRelayCommand RefreshCommand { get; }
+        
+        protected BaseViewModel(
+            IAuthenticationService authService,
+            IDataService dataService,
+            IConnectivity connectivity,
+            ILogger logger)
         {
-            await OnRefreshAsync(DisposalToken);
-        }
-        finally
-        {
-            IsRefreshing = false;
-        }
-    }
-    
-    protected virtual Task OnRefreshAsync(CancellationToken cancellationToken) 
-        => Task.CompletedTask;
-    
-    protected virtual void OnError(Exception ex, string? caller) 
-    {
-        // Override for logging
-    }
-    
-    protected virtual string GetUserFriendlyMessage(Exception ex) 
-        => "An error occurred. Please try again.";
-    
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposed)
-        {
-            if (disposing)
+            AuthService = authService;
+            DataService = dataService;
+            Logger = logger;
+            
+            _cancellationTokenSource = new CancellationTokenSource();
+            
+            // Initialize commands
+            RefreshCommand = new AsyncRelayCommand(RefreshAsync, () => !IsBusy);
+            
+            // Monitor connectivity with weak event handler
+            connectivity.ConnectivityChanged += OnConnectivityChanged;
+            IsOffline = connectivity.NetworkAccess != NetworkAccess.Internet;
+            
+            // Update command can execute state when IsBusy changes
+            PropertyChanged += (s, e) =>
             {
-                _disposalCts.Cancel();
-                _disposalCts.Dispose();
-                _busySemaphore.Dispose();
-            }
-            _disposed = true;
+                if (e.PropertyName == nameof(IsBusy))
+                {
+                    RefreshCommand.NotifyCanExecuteChanged();
+                }
+            };
         }
-    }
-    
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
+        
+        private void OnConnectivityChanged(object? sender, ConnectivityChangedEventArgs e)
+        {
+            IsOffline = e.NetworkAccess != NetworkAccess.Internet;
+        }
+        
+        protected async Task ExecuteSafelyAsync(
+            Func<CancellationToken, Task> operation, 
+            string? errorMessage = null,
+            int timeoutMs = 30000)
+        {
+            if (IsDisposed) return;
+            
+            if (!await _operationLock.WaitAsync(100))
+            {
+                Logger.LogWarning("Operation already in progress");
+                return;
+            }
+            
+            try
+            {
+                IsBusy = true;
+                ErrorMessage = null;
+                
+                using var cts = CancellationTokenSource.CreateLinkedTokenSource(_cancellationTokenSource!.Token);
+                cts.CancelAfter(timeoutMs);
+                
+                await operation(cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                ErrorMessage = "Operation timed out";
+                Logger.LogWarning("Operation timed out");
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = errorMessage ?? "An error occurred";
+                Logger.LogError(ex, "Operation failed");
+            }
+            finally
+            {
+                IsBusy = false;
+                _operationLock.Release();
+            }
+        }
+        
+        protected virtual async Task RefreshAsync()
+        {
+            // Default implementation - override in derived classes
+            await Task.CompletedTask;
+        }
+        
+        protected void RegisterSubscription(IDisposable subscription)
+        {
+            _subscriptions.Add(subscription);
+        }
+        
+        public virtual void Dispose()
+        {
+            if (IsDisposed) return;
+            IsDisposed = true;
+            
+            try
+            {
+                _cancellationTokenSource?.Cancel();
+                _cancellationTokenSource?.Dispose();
+                
+                foreach (var subscription in _subscriptions)
+                {
+                    subscription?.Dispose();
+                }
+                _subscriptions.Clear();
+                
+                _operationLock?.Dispose();
+                
+                // Unsubscribe from events
+                if (Connectivity.Current != null)
+                {
+                    Connectivity.Current.ConnectivityChanged -= OnConnectivityChanged;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error during view model disposal");
+            }
+        }
     }
 }

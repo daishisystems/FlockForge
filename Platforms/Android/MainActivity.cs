@@ -4,6 +4,7 @@ using Android.OS;
 using Android.Views;
 using Android.Content;
 using FlockForge.Services.Platform;
+using FlockForge.Platforms.Android.Services;
 using Microsoft.Extensions.Logging;
 
 namespace FlockForge;
@@ -24,6 +25,10 @@ public class MainActivity : MauiAppCompatActivity
         
         try
         {
+            // Initialize Firebase
+            var firebaseInitializer = new AndroidFirebaseInitializer();
+            firebaseInitializer.Initialize();
+            
             // Get services from DI container
             var serviceProvider = IPlatformApplication.Current?.Services;
             _logger = serviceProvider?.GetService<ILogger<MainActivity>>();

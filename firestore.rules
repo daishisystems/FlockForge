@@ -1,0 +1,192 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions for authentication and authorization
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isValidUser() {
+      return isAuthenticated() && request.auth.uid != null;
+    }
+    
+    function isValidTimestamp(timestamp) {
+      return timestamp is timestamp;
+    }
+    
+    function hasValidBaseFields() {
+      return request.resource.data.keys().hasAll(['id', 'createdAt', 'updatedAt', 'isDeleted']) &&
+             request.resource.data.id is string &&
+             request.resource.data.id.size() > 0 &&
+             isValidTimestamp(request.resource.data.createdAt) &&
+             isValidTimestamp(request.resource.data.updatedAt) &&
+             request.resource.data.isDeleted is bool;
+    }
+    
+    // Farmers collection - users can only access their own farmer profile
+    match /farmers/{farmerId} {
+      allow read, write: if isOwner(farmerId) && 
+                           (request.resource == null || 
+                            (hasValidBaseFields() && 
+                             request.resource.data.userId == request.auth.uid));
+      
+      allow create: if isOwner(farmerId) && 
+                      hasValidBaseFields() && 
+                      request.resource.data.userId == request.auth.uid &&
+                      request.resource.data.keys().hasAll(['name', 'email', 'phoneNumber']) &&
+                      request.resource.data.name is string &&
+                      request.resource.data.name.size() > 0 &&
+                      request.resource.data.email is string &&
+                      request.resource.data.email.matches('.*@.*\\..*') &&
+                      request.resource.data.phoneNumber is string;
+    }
+    
+    // Farms collection - users can only access farms they own
+    match /farms/{farmId} {
+      allow read, write: if isAuthenticated() && 
+                           resource.data.farmerId == request.auth.uid &&
+                           (request.resource == null || 
+                            (hasValidBaseFields() && 
+                             request.resource.data.farmerId == request.auth.uid));
+      
+      allow create: if isAuthenticated() && 
+                      hasValidBaseFields() && 
+                      request.resource.data.farmerId == request.auth.uid &&
+                      request.resource.data.keys().hasAll(['name', 'location', 'size', 'farmType']) &&
+                      request.resource.data.name is string &&
+                      request.resource.data.name.size() > 0 &&
+                      request.resource.data.location is string &&
+                      request.resource.data.size is number &&
+                      request.resource.data.size > 0 &&
+                      request.resource.data.farmType is string;
+    }
+    
+    // Breeding records - users can only access breeding records for their farms
+    match /breeding/{breedingId} {
+      allow read, write: if isAuthenticated() && 
+                           resource.data.farmerId == request.auth.uid &&
+                           (request.resource == null || 
+                            (hasValidBaseFields() && 
+                             request.resource.data.farmerId == request.auth.uid));
+      
+      allow create: if isAuthenticated() && 
+                      hasValidBaseFields() && 
+                      request.resource.data.farmerId == request.auth.uid &&
+                      request.resource.data.keys().hasAll(['farmId', 'ramId', 'eweId', 'breedingDate', 'expectedLambingDate']) &&
+                      request.resource.data.farmId is string &&
+                      request.resource.data.ramId is string &&
+                      request.resource.data.eweId is string &&
+                      isValidTimestamp(request.resource.data.breedingDate) &&
+                      isValidTimestamp(request.resource.data.expectedLambingDate);
+    }
+    
+    // Scanning records - users can only access scanning records for their farms
+    match /scanning/{scanningId} {
+      allow read, write: if isAuthenticated() && 
+                           resource.data.farmerId == request.auth.uid &&
+                           (request.resource == null || 
+                            (hasValidBaseFields() && 
+                             request.resource.data.farmerId == request.auth.uid));
+      
+      allow create: if isAuthenticated() && 
+                      hasValidBaseFields() && 
+                      request.resource.data.farmerId == request.auth.uid &&
+                      request.resource.data.keys().hasAll(['farmId', 'eweId', 'scanningDate', 'lambCount', 'scanningResult']) &&
+                      request.resource.data.farmId is string &&
+                      request.resource.data.eweId is string &&
+                      isValidTimestamp(request.resource.data.scanningDate) &&
+                      request.resource.data.lambCount is int &&
+                      request.resource.data.lambCount >= 0 &&
+                      request.resource.data.scanningResult is string;
+    }
+    
+    // Lambing records - users can only access lambing records for their farms
+    match /lambing/{lambingId} {
+      allow read, write: if isAuthenticated() && 
+                           resource.data.farmerId == request.auth.uid &&
+                           (request.resource == null || 
+                            (hasValidBaseFields() && 
+                             request.resource.data.farmerId == request.auth.uid));
+      
+      allow create: if isAuthenticated() && 
+                      hasValidBaseFields() && 
+                      request.resource.data.farmerId == request.auth.uid &&
+                      request.resource.data.keys().hasAll(['farmId', 'eweId', 'lambingDate', 'lambsAlive', 'lambsDead', 'complications']) &&
+                      request.resource.data.farmId is string &&
+                      request.resource.data.eweId is string &&
+                      isValidTimestamp(request.resource.data.lambingDate) &&
+                      request.resource.data.lambsAlive is int &&
+                      request.resource.data.lambsAlive >= 0 &&
+                      request.resource.data.lambsDead is int &&
+                      request.resource.data.lambsDead >= 0 &&
+                      request.resource.data.complications is string;
+    }
+    
+    // Weaning records - users can only access weaning records for their farms
+    match /weaning/{weaningId} {
+      allow read, write: if isAuthenticated() && 
+                           resource.data.farmerId == request.auth.uid &&
+                           (request.resource == null || 
+                            (hasValidBaseFields() && 
+                             request.resource.data.farmerId == request.auth.uid));
+      
+      allow create: if isAuthenticated() && 
+                      hasValidBaseFields() && 
+                      request.resource.data.farmerId == request.auth.uid &&
+                      request.resource.data.keys().hasAll(['farmId', 'lambId', 'weaningDate', 'weaningWeight', 'healthStatus']) &&
+                      request.resource.data.farmId is string &&
+                      request.resource.data.lambId is string &&
+                      isValidTimestamp(request.resource.data.weaningDate) &&
+                      request.resource.data.weaningWeight is number &&
+                      request.resource.data.weaningWeight > 0 &&
+                      request.resource.data.healthStatus is string;
+    }
+    
+    // Lambing seasons - users can only access lambing seasons for their farms
+    match /lambingSeasons/{seasonId} {
+      allow read, write: if isAuthenticated() && 
+                           resource.data.farmerId == request.auth.uid &&
+                           (request.resource == null || 
+                            (hasValidBaseFields() && 
+                             request.resource.data.farmerId == request.auth.uid));
+      
+      allow create: if isAuthenticated() && 
+                      hasValidBaseFields() && 
+                      request.resource.data.farmerId == request.auth.uid &&
+                      request.resource.data.keys().hasAll(['farmId', 'seasonName', 'startDate', 'endDate', 'isActive']) &&
+                      request.resource.data.farmId is string &&
+                      request.resource.data.seasonName is string &&
+                      request.resource.data.seasonName.size() > 0 &&
+                      isValidTimestamp(request.resource.data.startDate) &&
+                      isValidTimestamp(request.resource.data.endDate) &&
+                      request.resource.data.startDate < request.resource.data.endDate &&
+                      request.resource.data.isActive is bool;
+    }
+    
+    // User settings and preferences (optional collection for app settings)
+    match /userSettings/{userId} {
+      allow read, write: if isOwner(userId);
+      
+      allow create: if isOwner(userId) && 
+                      hasValidBaseFields() &&
+                      request.resource.data.userId == request.auth.uid;
+    }
+    
+    // App metadata (read-only for authenticated users, write for admin only)
+    match /appMetadata/{document=**} {
+      allow read: if isAuthenticated();
+      // Write access would be granted to admin users only (not implemented here)
+    }
+    
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
