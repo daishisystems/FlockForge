@@ -25,9 +25,8 @@ public class MainActivity : MauiAppCompatActivity
         
         try
         {
-            // Initialize Firebase
-            var firebaseInitializer = new AndroidFirebaseInitializer();
-            firebaseInitializer.Initialize();
+            // Firebase initialization will be handled by the service container
+            // No manual initialization needed here
             
             // Get services from DI container
             var serviceProvider = IPlatformApplication.Current?.Services;

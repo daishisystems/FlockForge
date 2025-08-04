@@ -4,102 +4,86 @@
              xmlns:vm="clr-namespace:FlockForge.ViewModels.Pages"
              x:Class="FlockForge.Views.Pages.LoginPage"
              x:DataType="vm:LoginViewModel"
-             Title="Sign In">
+             Title="Sign In"
+             BackgroundColor="White">
+    
     <ScrollView>
-        <VerticalStackLayout
-            Padding="30,0"
-            Spacing="20"
-            VerticalOptions="Center">
+        <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
             
-            <!-- App Logo -->
-            <Image
-                Source="flockforge_logo.png"
-                HeightRequest="120"
-                WidthRequest="120"
-                HorizontalOptions="Center"
-                Margin="0,0,0,20"
-                Aspect="AspectFit"/>
+            <!-- Logo/Image -->
+            <Image Source="flockforge_logo.png" HeightRequest="120" HorizontalOptions="Center" />
             
-            <!-- Welcome Message -->
-            <Label
-                Text="Welcome to FlockForge"
-                FontSize="24"
-                FontAttributes="Bold"
-                HorizontalOptions="Center"
-                HorizontalTextAlignment="Center"
-                Margin="0,0,0,10"/>
+            <Label Text="Welcome to FlockForge"
+                   FontSize="28"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center" />
             
-            <Label
-                Text="Sign in to continue"
-                FontSize="16"
-                HorizontalOptions="Center"
-                HorizontalTextAlignment="Center"
-                TextColor="Gray"
-                Margin="0,0,0,30"/>
+            <Label Text="Sign in to continue"
+                   FontSize="16"
+                   TextColor="Gray"
+                   HorizontalOptions="Center" />
             
-            <!-- Email Input -->
-            <Entry
-                x:Name="EmailEntry"
-                Text="{Binding Email}"
-                Placeholder="Email"
-                Keyboard="Email"
-                ReturnType="Next"
-                Margin="0,0,0,10"/>
+            <!-- Email Entry without black bars -->
+            <Border Stroke="LightGray"
+                    StrokeThickness="1"
+                    BackgroundColor="White"
+                    Padding="5">
+                <Entry x:Name="EmailEntry"
+                       Text="{Binding Email}"
+                       Placeholder="Email"
+                       Keyboard="Email"
+                       BackgroundColor="Transparent"
+                       HeightRequest="45" />
+            </Border>
             
-            <!-- Password Input -->
-            <Entry
-                x:Name="PasswordEntry"
-                Text="{Binding Password}"
-                Placeholder="Password"
-                IsPassword="True"
-                ReturnType="Done"
-                Margin="0,0,0,20"/>
+            <!-- Password Entry without black bars -->
+            <Border Stroke="LightGray"
+                    StrokeThickness="1"
+                    BackgroundColor="White"
+                    Padding="5">
+                <Entry x:Name="PasswordEntry"
+                       Text="{Binding Password}"
+                       Placeholder="Password"
+                       IsPassword="True"
+                       BackgroundColor="Transparent"
+                       HeightRequest="45" />
+            </Border>
             
-            <!-- Error Message -->
-            <Label
-                Text="{Binding ErrorMessage}"
-                TextColor="Red"
-                IsVisible="{Binding HasError}"
-                HorizontalOptions="Center"
-                HorizontalTextAlignment="Center"
-                Margin="0,0,0,10"/>
+            <!-- Error message label -->
+            <Label Text="{Binding ErrorMessage}"
+                   TextColor="Red"
+                   IsVisible="{Binding HasError}"
+                   HorizontalOptions="Center" />
             
-            <!-- Login Button -->
-            <Button
-                Text="Sign In"
-                Command="{Binding LoginCommand}"
-                BackgroundColor="#512BD4"
-                TextColor="White"
-                CornerRadius="10"
-                HeightRequest="50"
-                Margin="0,0,0,10"/>
+            <!-- Sign In Button -->
+            <Button Text="Sign In"
+                    BackgroundColor="#5B4CF5"
+                    TextColor="White"
+                    HeightRequest="50"
+                    CornerRadius="8"
+                    Command="{Binding LoginCommand}" />
             
-            <!-- Google Sign In Button -->
-            <Button
-                Text="Sign in with Google"
-                Command="{Binding LoginWithGoogleCommand}"
-                BackgroundColor="#4285F4"
-                TextColor="White"
-                CornerRadius="10"
-                HeightRequest="50"
-                Margin="0,0,0,20"/>
+            <!-- Google Sign In -->
+            <Button Text="Sign in with Google"
+                    BackgroundColor="#4285F4"
+                    TextColor="White"
+                    HeightRequest="50"
+                    CornerRadius="8"
+                    Command="{Binding LoginWithGoogleCommand}" />
             
-            <!-- Forgot Password -->
-            <Button
-                Text="Forgot Password?"
-                Command="{Binding ResetPasswordCommand}"
-                TextColor="#512BD4"
-                BackgroundColor="Transparent"
-                HeightRequest="40"
-                Margin="0,0,0,10"/>
-            
-            <!-- Register Link -->
-            <Button
-                Text="Don't have an account? Register"
-                Command="{Binding RegisterCommand}"
-                TextColor="#512BD4"
-                BackgroundColor="Transparent"
-                HeightRequest="40"/>
+            <!-- Links -->
+            <Label HorizontalOptions="Center">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Don't have an account? " TextColor="Gray" />
+                        <Span Text="Register" TextColor="#5B4CF5" TextDecorations="Underline">
+                            <Span.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding RegisterCommand}" />
+                            </Span.GestureRecognizers>
+                        </Span>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
             
             <!-- Busy Indicator -->
             <StackLayout
@@ -109,11 +93,12 @@
                 Spacing="10">
                 <ActivityIndicator
                     IsRunning="{Binding IsBusy}"
-                    Color="#512BD4"/>
+                    Color="#5B4CF5"/>
                 <Label Text="{Binding BusyMessage}"
                    IsVisible="{Binding IsBusy}"
                    HorizontalOptions="Center" />
             </StackLayout>
+            
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

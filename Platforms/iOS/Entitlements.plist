@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Application Identifier -->
+    <key>application-identifier</key>
+    <string>$(AppIdentifierPrefix)io.nexair.flockforge</string>
+    
+    <!-- Team Identifier -->
+    <key>com.apple.developer.team-identifier</key>
+    <string>$(AppIdentifierPrefix)</string>
+    
+    <!-- Keychain Access Groups for Secure Storage -->
+    <key>keychain-access-groups</key>
+    <array>
+        <string>$(AppIdentifierPrefix)io.nexair.flockforge</string>
+    </array>
+    
+    <!-- Background Modes for Firebase -->
+    <key>com.apple.developer.background-modes</key>
+    <array>
+        <string>background-fetch</string>
+        <string>remote-notification</string>
+    </array>
+    
+    <!-- Associated Domains (for Firebase Dynamic Links) -->
+    <key>com.apple.developer.associated-domains</key>
+    <array>
+        <string>applinks:flockforge.page.link</string>
+        <string>applinks:flockforge-app.firebaseapp.com</string>
+    </array>
+    
+    <!-- Push Notifications (Will be added automatically by Xcode when provisioning is set up) -->
+    <!-- <key>aps-environment</key> -->
+    <!-- <string>production</string> -->
+    
+    <!-- Data Protection -->
+    <key>com.apple.developer.default-data-protection</key>
+    <string>NSFileProtectionComplete</string>
+    
+    <!-- App Groups (for sharing data between app and extensions) -->
+    <key>com.apple.security.application-groups</key>
+    <array>
+        <string>group.io.nexair.flockforge</string>
+    </array>
+</dict>
+</plist>

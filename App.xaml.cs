@@ -138,37 +138,28 @@ namespace FlockForge
         {
             try
             {
-                // Always use AppShell for consistent navigation
-                if (MainPage is not AppShell)
+                // Use modern .NET MAUI approach with Windows
+                var mainWindow = Windows.FirstOrDefault();
+                if (mainWindow != null)
                 {
-                    MainPage = new AppShell();
+                    if (mainWindow.Page is not AppShell)
+                    {
+                        var appShell = _serviceProvider.GetRequiredService<AppShell>();
+                        mainWindow.Page = appShell;
+                    }
+                }
+                else
+                {
+                    // Fallback for older approach if Windows collection is empty
+                    if (MainPage is not AppShell)
+                    {
+                        var appShell = _serviceProvider.GetRequiredService<AppShell>();
+                        MainPage = appShell;
+                    }
                 }
                 
-                // Use MainThread to ensure Shell is ready, then navigate
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    try
-                    {
-                        // Wait a moment for Shell to initialize
-                        await Task.Delay(100);
-                        
-                        // Navigate to appropriate page based on authentication state
-                        if (isAuthenticated)
-                        {
-                            // Navigate to main page
-                            await Shell.Current.GoToAsync("///MainPage");
-                        }
-                        else
-                        {
-                            // Navigate to login page
-                            await Shell.Current.GoToAsync("///LoginPage");
-                        }
-                    }
-                    catch (Exception navEx)
-                    {
-                        _logger.LogError(navEx, "Error during Shell navigation");
-                    }
-                });
+                // The AppShell will handle navigation automatically based on auth state
+                // No need for manual navigation here since AppShell subscribes to auth changes
             }
             catch (Exception ex)
             {
@@ -176,26 +167,22 @@ namespace FlockForge
                 // Fallback to AppShell with error handling - maintain Shell architecture
                 try
                 {
-                    MainPage = new AppShell();
-                    // Try to navigate to login page as safe fallback
-                    MainThread.BeginInvokeOnMainThread(async () =>
+                    var appShell = _serviceProvider.GetRequiredService<AppShell>();
+                    var mainWindow = Windows.FirstOrDefault();
+                    if (mainWindow != null)
                     {
-                        await Task.Delay(200); // Give more time for Shell initialization
-                        try
-                        {
-                            await Shell.Current.GoToAsync("///LoginPage");
-                        }
-                        catch (Exception navEx)
-                        {
-                            _logger.LogError(navEx, "Error during fallback navigation");
-                        }
-                    });
+                        mainWindow.Page = appShell;
+                    }
+                    else
+                    {
+                        MainPage = appShell;
+                    }
                 }
                 catch (Exception shellEx)
                 {
                     _logger.LogCritical(shellEx, "Critical error: Cannot create AppShell");
                     // Last resort fallback - but still try to maintain some structure
-                    MainPage = new NavigationPage(new ContentPage
+                    var errorPage = new NavigationPage(new ContentPage
                     {
                         Title = "FlockForge - Critical Error",
                         Content = new Label
@@ -205,6 +192,16 @@ namespace FlockForge
                             VerticalOptions = LayoutOptions.Center
                         }
                     });
+                    
+                    var mainWindow = Windows.FirstOrDefault();
+                    if (mainWindow != null)
+                    {
+                        mainWindow.Page = errorPage;
+                    }
+                    else
+                    {
+                        MainPage = errorPage;
+                    }
                 }
             }
         }

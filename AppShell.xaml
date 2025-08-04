@@ -5,28 +5,50 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:FlockForge"
     xmlns:pages="clr-namespace:FlockForge.Views.Pages"
-    Title="FlockForge">
+    Title="FlockForge"
+    FlyoutBehavior="Disabled">
 
-    <!-- Login/Registration Routes -->
+    <!-- Authentication Routes (always accessible) -->
     <ShellContent
         x:Name="LoginPage"
         ContentTemplate="{DataTemplate pages:LoginPage}"
-        Route="LoginPage" />
+        Route="login" />
         
     <ShellContent
         x:Name="RegisterPage"
         ContentTemplate="{DataTemplate pages:RegisterPage}"
-        Route="RegisterPage" />
+        Route="register" />
     
     <!-- Main Application Content (protected by authentication) -->
-    <FlyoutItem Title="Home" FlyoutDisplayOptions="AsMultipleItems">
-        <Tab Title="Dashboard">
+    <TabBar x:Name="MainTabBar" IsVisible="False">
+        <Tab Title="Dashboard" Icon="home.png">
             <ShellContent
                 Title="Home"
                 ContentTemplate="{DataTemplate local:MainPage}"
-                Route="MainPage" />
+                Route="dashboard" />
         </Tab>
-    </FlyoutItem>
+        
+        <Tab Title="Farms" Icon="farm.png">
+            <ShellContent
+                Title="Farms"
+                ContentTemplate="{DataTemplate local:MainPage}"
+                Route="farms" />
+        </Tab>
+        
+        <Tab Title="Reports" Icon="chart.png">
+            <ShellContent
+                Title="Reports"
+                ContentTemplate="{DataTemplate local:MainPage}"
+                Route="reports" />
+        </Tab>
+        
+        <Tab Title="Settings" Icon="settings.png">
+            <ShellContent
+                Title="Settings"
+                ContentTemplate="{DataTemplate local:MainPage}"
+                Route="settings" />
+        </Tab>
+    </TabBar>
 
 </Shell>
 

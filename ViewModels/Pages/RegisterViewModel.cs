@@ -61,8 +61,13 @@ public partial class RegisterViewModel : BaseViewModel
             
             if (result.Success)
             {
-                // Navigate to main application or profile completion
-                await Shell.Current.GoToAsync("//MainPage");
+                await Shell.Current.DisplayAlert(
+                    "Account Created",
+                    "Please check your email and click the verification link before signing in.",
+                    "OK");
+                
+                // Navigate back to login
+                await Shell.Current.GoToAsync("//login");
             }
             else
             {
@@ -72,11 +77,35 @@ public partial class RegisterViewModel : BaseViewModel
         }, "An error occurred during registration. Please try again.");
     }
     
+    private bool IsValidEmail(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return false;
+        
+        try
+        {
+            // Use .NET's built-in email validation
+            var addr = new System.Net.Mail.MailAddress(email.Trim());
+            return addr.Address == email.Trim();
+        }
+        catch
+        {
+            return false;
+        }
+    }
+    
     private bool ValidateInput()
     {
         if (string.IsNullOrWhiteSpace(Email))
         {
             ErrorMessage = "Please enter your email address";
+            HasError = true;
+            return false;
+        }
+        
+        if (!IsValidEmail(Email))
+        {
+            ErrorMessage = "Please enter a valid email address";
             HasError = true;
             return false;
         }
@@ -110,6 +139,6 @@ public partial class RegisterViewModel : BaseViewModel
     [RelayCommand]
     private async Task CancelAsync()
     {
-        await Shell.Current.GoToAsync("//LoginPage");
+        await Shell.Current.GoToAsync("//login");
     }
 }

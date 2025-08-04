@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:FlockForge.Controls"
              x:Class="FlockForge.Views.Pages.RegisterPage"
              Title="Create Account">
     <ScrollView>
         <VerticalStackLayout
-            Padding="30,0"
-            Spacing="20"
-            VerticalOptions="Center">
+            Padding="30,20"
+            Spacing="25"
+            VerticalOptions="Start">
             
-            <!-- App Logo -->
+            <!-- App Logo - Fixed to use correct source -->
             <Image
-                Source="appicon.png"
-                HeightRequest="120"
-                WidthRequest="120"
+                Source="flockforge_logo.png"
+                HeightRequest="100"
+                WidthRequest="100"
                 HorizontalOptions="Center"
                 Margin="0,0,0,20"/>
             
@@ -35,35 +36,41 @@
                 Margin="0,0,0,30"/>
             
             <!-- Display Name Input -->
-            <Entry
-                Text="{Binding DisplayName}"
-                Placeholder="Display Name"
-                ReturnType="Next"
-                Margin="0,0,0,10"/>
+            <Frame Padding="0" HasShadow="False" BorderColor="Transparent">
+                <Entry
+                    Text="{Binding DisplayName}"
+                    Placeholder="Display Name"
+                    ReturnType="Next"
+                    Margin="0,5,0,5"/>
+            </Frame>
             
             <!-- Email Input -->
-            <Entry
-                Text="{Binding Email}"
-                Placeholder="Email"
-                Keyboard="Email"
-                ReturnType="Next"
-                Margin="0,0,0,10"/>
+            <Frame Padding="0" HasShadow="False" BorderColor="Transparent">
+                <Entry
+                    Text="{Binding Email}"
+                    Placeholder="Email"
+                    Keyboard="Email"
+                    ReturnType="Next"
+                    Margin="0,5,0,5"/>
+            </Frame>
             
-            <!-- Password Input -->
-            <Entry
-                Text="{Binding Password}"
-                Placeholder="Password"
-                IsPassword="True"
-                ReturnType="Next"
-                Margin="0,0,0,10"/>
+            <!-- Password Input with AutoFill protection -->
+            <Frame Padding="0" HasShadow="False" BorderColor="Transparent">
+                <controls:SecurePasswordEntry
+                    Text="{Binding Password}"
+                    Placeholder="Password (min 6 characters)"
+                    ReturnType="Next"
+                    Margin="0,10,0,10"/>
+            </Frame>
             
-            <!-- Confirm Password Input -->
-            <Entry
-                Text="{Binding ConfirmPassword}"
-                Placeholder="Confirm Password"
-                IsPassword="True"
-                ReturnType="Done"
-                Margin="0,0,0,20"/>
+            <!-- Confirm Password Input with AutoFill protection -->
+            <Frame Padding="0" HasShadow="False" BorderColor="Transparent">
+                <controls:SecurePasswordEntry
+                    Text="{Binding ConfirmPassword}"
+                    Placeholder="Confirm Password"
+                    ReturnType="Done"
+                    Margin="0,10,0,10"/>
+            </Frame>
             
             <!-- Error Message -->
             <Label
@@ -72,7 +79,10 @@
                 IsVisible="{Binding HasError}"
                 HorizontalOptions="Center"
                 HorizontalTextAlignment="Center"
-                Margin="0,0,0,10"/>
+                Margin="0,10,0,10"/>
+            
+            <!-- Add spacing before button to prevent AutoFill overlay -->
+            <BoxView HeightRequest="20" Color="Transparent"/>
             
             <!-- Register Button -->
             <Button
@@ -82,7 +92,7 @@
                 TextColor="White"
                 CornerRadius="10"
                 HeightRequest="50"
-                Margin="0,0,0,20"/>
+                Margin="0,20,0,20"/>
             
             <!-- Cancel Button -->
             <Button
@@ -90,14 +100,16 @@
                 Command="{Binding CancelCommand}"
                 TextColor="#512BD4"
                 BackgroundColor="Transparent"
-                HeightRequest="40"/>
+                HeightRequest="40"
+                Margin="0,0,0,10"/>
             
             <!-- Busy Indicator -->
             <StackLayout
                 IsVisible="{Binding IsBusy}"
                 Orientation="Horizontal"
                 HorizontalOptions="Center"
-                Spacing="10">
+                Spacing="10"
+                Margin="0,20,0,20">
                 <ActivityIndicator
                     IsRunning="{Binding IsBusy}"
                     Color="#512BD4"/>
@@ -105,6 +117,9 @@
                    IsVisible="{Binding IsBusy}"
                    HorizontalOptions="Center" />
             </StackLayout>
+            
+            <!-- Bottom padding to ensure scrollability -->
+            <BoxView HeightRequest="50" Color="Transparent"/>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

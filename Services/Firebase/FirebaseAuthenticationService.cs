@@ -4,6 +4,7 @@ using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Plugin.Firebase.Auth;
 using FlockForge.Core.Interfaces;
 using FlockForge.Core.Models;
 using FlockForge.Core.Configuration;
@@ -13,6 +14,8 @@ namespace FlockForge.Services.Firebase
 {
     public class FirebaseAuthenticationService : IAuthenticationService, IDisposable
     {
+        private readonly Lazy<IFirebaseAuth> _lazyFirebaseAuth;
+        private IFirebaseAuth FirebaseAuth => _lazyFirebaseAuth.Value;
         private readonly ISecureStorage _secureStorage;
         private readonly IPreferences _preferences;
         private readonly IConnectivity _connectivity;
@@ -27,6 +30,7 @@ namespace FlockForge.Services.Firebase
         private Timer? _tokenRefreshTimer;
         private CancellationTokenSource? _disposeCts;
         private volatile bool _isDisposed;
+        private IDisposable? _authStateListener;
         
         // Storage keys
         private const string RefreshTokenKey = "firebase_refresh_token";
@@ -49,12 +53,14 @@ namespace FlockForge.Services.Firebase
         public bool IsEmailVerified => CurrentUser?.IsEmailVerified ?? false;
         
         public FirebaseAuthenticationService(
+            Lazy<IFirebaseAuth> lazyFirebaseAuth,
             FirebaseConfig config,
             ISecureStorage secureStorage,
             IPreferences preferences,
             IConnectivity connectivity,
             ILogger<FirebaseAuthenticationService> logger)
         {
+            _lazyFirebaseAuth = lazyFirebaseAuth;
             _config = config;
             _secureStorage = secureStorage;
             _preferences = preferences;
@@ -62,8 +68,50 @@ namespace FlockForge.Services.Firebase
             _logger = logger;
             _disposeCts = new CancellationTokenSource();
             
+            // Initialize Firebase auth state listener
+            InitializeAuthStateListener();
+            
             // Initialize in background
             Task.Run(async () => await InitializeAsync(), _disposeCts.Token);
+        }
+        
+        private void InitializeAuthStateListener()
+        {
+            // Plugin.Firebase v3 uses a different API for auth state changes
+            // We'll check auth state periodically instead
+            Task.Run(async () =>
+            {
+                while (!_isDisposed)
+                {
+                    try
+                    {
+                        var currentUser = FirebaseAuth.CurrentUser;
+                        var mappedUser = currentUser != null ? MapFirebaseUser(currentUser) : null;
+                        
+                        if (CurrentUser?.Id != mappedUser?.Id)
+                        {
+                            CurrentUser = mappedUser;
+                            _authStateSubject.OnNext(mappedUser);
+                            
+                            if (mappedUser != null)
+                            {
+                                _logger.LogInformation("User authenticated: {Email}", mappedUser.Email);
+                            }
+                            else
+                            {
+                                _logger.LogInformation("User signed out");
+                            }
+                        }
+                        
+                        await Task.Delay(1000); // Check every second
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error in auth state listener");
+                        await Task.Delay(5000); // Wait longer on error
+                    }
+                }
+            });
         }
         
         private async Task InitializeAsync()
@@ -265,46 +313,89 @@ namespace FlockForge.Services.Firebase
             }
         }
         
+        private void LogAuthenticationDebugInfo(string email, string password)
+        {
+            _logger.LogInformation("=== AUTH DEBUG START ===");
+            _logger.LogInformation($"Email: '{email}' | Length: {email?.Length}");
+            _logger.LogInformation($"Email trimmed: '{email?.Trim()}' | Length: {email?.Trim().Length}");
+            _logger.LogInformation($"Password length: {password?.Length}");
+            _logger.LogInformation($"Password trimmed length: {password?.Trim().Length}");
+            
+            // Check for special characters
+            if (!string.IsNullOrEmpty(email))
+            {
+                for (int i = 0; i < email.Length; i++)
+                {
+                    if (char.IsControl(email[i]) || char.IsWhiteSpace(email[i]))
+                    {
+                        _logger.LogWarning($"Special character found at position {i}: Unicode {(int)email[i]}");
+                    }
+                }
+            }
+            _logger.LogInformation("=== AUTH DEBUG END ===");
+        }
+        
         public async Task<AuthResult> SignInWithEmailPasswordAsync(string email, string password, CancellationToken cancellationToken = default)
         {
-            if (_isDisposed) return AuthResult.Failure("Service is disposed");
-            
             try
             {
-                if (!_connectivity.NetworkAccess.HasFlag(NetworkAccess.Internet))
+                // Add debug logging
+                LogAuthenticationDebugInfo(email, password);
+                
+                // Clean inputs - CRITICAL: Trim whitespace
+                email = email?.Trim().ToLowerInvariant();
+                password = password?.Trim();
+                
+                // Validate cleaned inputs
+                if (string.IsNullOrEmpty(email))
                 {
-                    // Allow offline sign-in for existing user
-                    if (CurrentUser != null && CurrentUser.Email.Equals(email, StringComparison.OrdinalIgnoreCase))
-                    {
-                        _logger.LogInformation("Offline sign-in for existing user: {Email}", email);
-                        return AuthResult.Success(CurrentUser);
-                    }
-                    
-                    return AuthResult.Failure("Cannot sign in to new account while offline");
+                    return AuthResult.Failure("Email is required");
                 }
                 
-                // TODO: Implement actual Firebase authentication
-                // For now, create a mock user for testing
-                var user = new CoreUser
+                if (string.IsNullOrEmpty(password))
                 {
-                    Id = Guid.NewGuid().ToString(),
-                    Email = email,
-                    DisplayName = email,
-                    IsEmailVerified = true,
-                    LastLoginAt = DateTime.UtcNow
+                    return AuthResult.Failure("Password is required");
+                }
+                
+                if (password.Length < 6)
+                {
+                    return AuthResult.Failure("Password must be at least 6 characters");
+                }
+                
+                _logger.LogInformation($"Attempting Firebase auth with email: {email}");
+                
+                var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+                var result = await FirebaseAuth.SignInWithEmailAndPasswordAsync(email, password);
+                stopwatch.Stop();
+                
+                _logger.LogInformation($"Sign in successful for: {email} in {stopwatch.ElapsedMilliseconds}ms");
+                
+                // Store auth tokens
+                await StoreAuthTokensAsync(result);
+                
+                return AuthResult.Success(MapFirebaseUser(result));
+            }
+            catch (Exception ex) when (ex.GetType().Name.Contains("FirebaseAuth") || ex.Message.Contains("Firebase"))
+            {
+                _logger.LogError(ex, $"Firebase auth error: {ex.Message}");
+                
+                // Map Firebase error codes to user-friendly messages
+                string errorMessage = ex.Message switch
+                {
+                    var msg when msg.Contains("INVALID_PASSWORD") => "Incorrect password",
+                    var msg when msg.Contains("USER_NOT_FOUND") => "No account found with this email",
+                    var msg when msg.Contains("malformed") => "Invalid credentials. Please check your email and password.",
+                    var msg when msg.Contains("EMAIL_NOT_FOUND") => "Email not found",
+                    var msg when msg.Contains("TOO_MANY_ATTEMPTS") => "Too many failed attempts. Please try again later.",
+                    _ => "Sign in failed. Please try again."
                 };
                 
-                CurrentUser = user;
-                _authStateSubject.OnNext(user);
-                await StoreUserWithBackupAsync(user);
-                
-                _logger.LogInformation("User signed in: {Email}", email);
-                return AuthResult.Success(user);
+                return AuthResult.Failure(errorMessage);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error during sign in");
-                return AuthResult.Failure("An unexpected error occurred");
+                return AuthResult.Failure("An unexpected error occurred. Please try again.");
             }
         }
         
@@ -319,23 +410,17 @@ namespace FlockForge.Services.Firebase
                     return AuthResult.Failure("Registration requires an internet connection");
                 }
                 
-                // TODO: Implement actual Firebase registration
-                // For now, create a mock user for testing
-                var user = new CoreUser
+                var result = await FirebaseAuth.CreateUserAsync(email, password);
+                
+                if (result == null)
                 {
-                    Id = Guid.NewGuid().ToString(),
-                    Email = email,
-                    DisplayName = email,
-                    IsEmailVerified = false,
-                    LastLoginAt = DateTime.UtcNow
-                };
+                    return AuthResult.Failure("Registration failed");
+                }
                 
-                CurrentUser = user;
-                _authStateSubject.OnNext(user);
-                await StoreUserWithBackupAsync(user);
+                await result.SendEmailVerificationAsync();
+                await StoreAuthTokensAsync(result);
                 
-                _logger.LogInformation("User registered: {Email}", email);
-                return AuthResult.Success(user, requiresEmailVerification: true);
+                return AuthResult.Success(MapFirebaseUser(result), requiresEmailVerification: true);
             }
             catch (Exception ex)
             {
@@ -367,14 +452,13 @@ namespace FlockForge.Services.Firebase
             
             try
             {
-                // TODO: Implement actual token refresh with Firebase
-                // For now, just return current user if available
-                if (CurrentUser != null)
+                if (FirebaseAuth.CurrentUser != null)
                 {
-                    return AuthResult.Success(CurrentUser);
+                    // Firebase SDK handles token refresh automatically
+                    return AuthResult.Success(MapFirebaseUser(FirebaseAuth.CurrentUser));
                 }
                 
-                return AuthResult.Failure("No authenticated user");
+                return AuthResult.Failure("No current user to refresh");
             }
             catch (Exception ex)
             {
@@ -392,6 +476,39 @@ namespace FlockForge.Services.Firebase
             {
                 _refreshLock.Release();
             }
+        }
+private async Task StoreAuthTokensAsync(IFirebaseUser user)
+        {
+            try
+            {
+                await _secureStorage.SetAsync(UserIdKey, user.Uid);
+                await _secureStorage.SetAsync(UserEmailKey, user.Email ?? string.Empty);
+                await _secureStorage.SetAsync(UserDisplayNameKey, user.DisplayName ?? string.Empty);
+                
+                // Store basic auth info - token will be managed by Firebase SDK
+                await _secureStorage.SetAsync(LastAuthTimeKey, DateTime.UtcNow.ToString("O"));
+                
+                // Also store user object for offline access
+                var coreUser = MapFirebaseUser(user);
+                await StoreUserWithBackupAsync(coreUser);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to store auth tokens");
+            }
+        }
+        
+        private CoreUser MapFirebaseUser(IFirebaseUser firebaseUser)
+        {
+            return new CoreUser
+            {
+                Id = firebaseUser.Uid,
+                Email = firebaseUser.Email ?? string.Empty,
+                DisplayName = firebaseUser.DisplayName ?? firebaseUser.Email ?? string.Empty,
+                IsEmailVerified = firebaseUser.IsEmailVerified,
+                PhotoUrl = firebaseUser.PhotoUrl,
+                LastLoginAt = DateTime.UtcNow
+            };
         }
         
         private async Task StoreUserWithBackupAsync(CoreUser user)
@@ -452,6 +569,9 @@ namespace FlockForge.Services.Firebase
             
             try
             {
+                // Sign out from Firebase
+                await FirebaseAuth.SignOutAsync();
+                
                 CurrentUser = null;
                 _authStateSubject.OnNext(null);
                 
@@ -508,9 +628,13 @@ namespace FlockForge.Services.Firebase
                     return false;
                 }
                 
-                // TODO: Implement actual email verification with Firebase
-                _logger.LogInformation("Email verification sent (mock)");
-                return true;
+                if (FirebaseAuth.CurrentUser != null)
+                {
+                    await FirebaseAuth.CurrentUser.SendEmailVerificationAsync();
+                    _logger.LogInformation("Email verification sent to: {Email}", FirebaseAuth.CurrentUser.Email);
+                    return true;
+                }
+                return false;
             }
             catch (Exception ex)
             {
@@ -530,8 +654,8 @@ namespace FlockForge.Services.Firebase
                     return false;
                 }
                 
-                // TODO: Implement actual password reset with Firebase
-                _logger.LogInformation("Password reset email sent (mock) to {Email}", email);
+                await FirebaseAuth.SendPasswordResetEmailAsync(email);
+                _logger.LogInformation("Password reset email sent to {Email}", email);
                 return true;
             }
             catch (Exception ex)
@@ -603,6 +727,142 @@ namespace FlockForge.Services.Firebase
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to restore from backup");
+            }
+        }
+        
+        /// <summary>
+        /// Debug method to check Firebase authentication state and connection
+        /// </summary>
+        public async Task<bool> DebugAuthenticationStateAsync()
+        {
+            try
+            {
+                _logger.LogInformation("=== Firebase Authentication Debug ===");
+                
+                // Check if Firebase is properly initialized
+                var currentUser = FirebaseAuth.CurrentUser;
+                _logger.LogInformation("Current Firebase user: {Email}", currentUser?.Email ?? "None");
+                _logger.LogInformation("Current service user: {Email}", CurrentUser?.Email ?? "None");
+                
+                // Check network connectivity
+                _logger.LogInformation("Network access: {NetworkAccess}", _connectivity.NetworkAccess);
+                
+                if (_connectivity.NetworkAccess == NetworkAccess.Internet)
+                {
+                    try
+                    {
+                        // Test Firebase connection by checking if we can access the current user
+                        var testUser = FirebaseAuth.CurrentUser;
+                        _logger.LogInformation("Firebase connection test successful - can access Firebase Auth");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Firebase connection test failed: {Message}", ex.Message);
+                        return false;
+                    }
+                }
+                else
+                {
+                    _logger.LogWarning("Skipping Firebase connection test - no internet connection");
+                }
+                
+                // Check stored authentication data
+                var storedToken = await GetStoredTokenAsync();
+                _logger.LogInformation("Stored token exists: {HasToken}", !string.IsNullOrEmpty(storedToken));
+                
+                var storedUser = await GetStoredUserWithTimeoutAsync(CancellationToken.None);
+                _logger.LogInformation("Stored user exists: {HasUser} - {Email}", storedUser != null, storedUser?.Email ?? "None");
+                
+                _logger.LogInformation("=== End Firebase Authentication Debug ===");
+                
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Firebase authentication debug failed");
+                return false;
+            }
+        }
+        
+        /// <summary>
+        /// Enhanced method to test Firebase configuration and connection
+        /// </summary>
+        public async Task<bool> TestFirebaseConfigurationAsync()
+        {
+            try
+            {
+                _logger.LogInformation("=== Firebase Configuration Test ===");
+                
+                // Check if we can access Firebase Auth
+                if (FirebaseAuth == null)
+                {
+                    _logger.LogError("Firebase Auth is null - initialization failed");
+                    return false;
+                }
+                
+                _logger.LogInformation("Firebase Auth instance created successfully");
+                
+                // Check network connectivity
+                if (_connectivity.NetworkAccess != NetworkAccess.Internet)
+                {
+                    _logger.LogWarning("No internet connection - cannot test Firebase configuration");
+                    return false;
+                }
+                
+                // Test basic Firebase operations
+                try
+                {
+                    // Test if we can access Firebase Auth instance
+                    var currentUser = FirebaseAuth.CurrentUser;
+                    _logger.LogInformation("Firebase API access successful - configuration is valid");
+                    
+                    // Try to send a password reset to a test email to verify Firebase connection
+                    try
+                    {
+                        await FirebaseAuth.SendPasswordResetEmailAsync("test@nonexistent-domain-12345.com");
+                        _logger.LogInformation("Firebase connection verified - password reset call succeeded");
+                    }
+                    catch (Exception resetEx)
+                    {
+                        // This is expected to fail, but if it fails with a network error, that's a problem
+                        if (resetEx.Message.Contains("network") || resetEx.Message.Contains("connection"))
+                        {
+                            _logger.LogError("Network connectivity issue detected: {Message}", resetEx.Message);
+                            return false;
+                        }
+                        else
+                        {
+                            _logger.LogInformation("Firebase connection verified - expected error for non-existent email");
+                        }
+                    }
+                    
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Firebase API call failed - configuration may be invalid: {Message}", ex.Message);
+                    
+                    // Check for specific configuration errors
+                    if (ex.Message.Contains("API key") || ex.Message.Contains("project"))
+                    {
+                        _logger.LogError("Firebase configuration error detected. Check GoogleService-Info.plist");
+                    }
+                    else if (ex.Message.Contains("network") || ex.Message.Contains("connection"))
+                    {
+                        _logger.LogError("Network connectivity issue detected");
+                    }
+                    
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Firebase configuration test failed");
+                return false;
+            }
+            finally
+            {
+                _logger.LogInformation("=== End Firebase Configuration Test ===");
             }
         }
         

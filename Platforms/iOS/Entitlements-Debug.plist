@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Debug/Development Entitlements (Minimal for simulator) -->
+    
+    <!-- Keychain Access Groups for Secure Storage -->
+    <key>keychain-access-groups</key>
+    <array>
+        <string>$(AppIdentifierPrefix)io.nexair.flockforge</string>
+    </array>
+    
+    <!-- Background Modes for Firebase (Development) -->
+    <key>com.apple.developer.background-modes</key>
+    <array>
+        <string>background-fetch</string>
+    </array>
+    
+    <!-- Data Protection (Basic for development) -->
+    <key>com.apple.developer.default-data-protection</key>
+    <string>NSFileProtectionCompleteUntilFirstUserAuthentication</string>
+</dict>
+</plist>

@@ -13,7 +13,8 @@ namespace FlockForge.Services.Navigation
             _logger = logger;
         }
         
-        private INavigation Navigation => Application.Current?.MainPage?.Navigation
+        private INavigation Navigation => Application.Current?.Windows?.FirstOrDefault()?.Page?.Navigation
+            ?? Application.Current?.MainPage?.Navigation
             ?? throw new InvalidOperationException("Navigation is not available");
         
         public async Task NavigateToAsync(string route, IDictionary<string, object>? parameters = null)

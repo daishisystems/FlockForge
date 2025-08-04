@@ -29,16 +29,106 @@
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
+		
+		<!-- App Store Connect Metadata -->
+		<ApplicationDescription>FlockForge - Advanced Farm Management System</ApplicationDescription>
+		<ApplicationCopyright>© 2025 NexAir Solutions</ApplicationCopyright>
+		<ApplicationCategory>Productivity</ApplicationCategory>
+		
+		<!-- Privacy and Permissions -->
+		<NSLocationWhenInUseUsageDescription>FlockForge needs location access to provide location-based farm management features.</NSLocationWhenInUseUsageDescription>
+		<NSCameraUsageDescription>FlockForge needs camera access to capture photos of livestock and farm conditions.</NSCameraUsageDescription>
+		<NSPhotoLibraryUsageDescription>FlockForge needs photo library access to select and save farm-related images.</NSPhotoLibraryUsageDescription>
+		<NSMicrophoneUsageDescription>FlockForge needs microphone access for voice notes and audio recordings.</NSMicrophoneUsageDescription>
+		<NSContactsUsageDescription>FlockForge needs contacts access to share farm data with team members.</NSContactsUsageDescription>
+		<NSCalendarsUsageDescription>FlockForge needs calendar access to schedule farm activities and reminders.</NSCalendarsUsageDescription>
+		<NSRemindersUsageDescription>FlockForge needs reminders access to create farm management tasks.</NSRemindersUsageDescription>
 
 		<!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
 		<WindowsPackageType>None</WindowsPackageType>
 
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">12.2</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
+		
+	</PropertyGroup>
+
+	<!-- iOS Runtime Identifiers for all configurations -->
+	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+		<RuntimeIdentifiers>iossimulator-x64;iossimulator-arm64;ios-arm64</RuntimeIdentifiers>
+	</PropertyGroup>
+
+	<!-- iOS Development Configuration for Simulator (No Provisioning Required) -->
+	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios' and '$(Configuration)' == 'Debug'">
+		<!-- Completely disable code signing for Debug/Simulator builds -->
+		<CodesignKey>-</CodesignKey>
+		<CodesignProvision>Automatic</CodesignProvision>
+		<CodesignEntitlements></CodesignEntitlements>
+		<MtouchLink>None</MtouchLink>
+		<MtouchDebug>true</MtouchDebug>
+		<CreatePackage>false</CreatePackage>
+		<BuildIpa>false</BuildIpa>
+		<!-- Disable provisioning profile requirement -->
+		<EnableCodeSigning>false</EnableCodeSigning>
+		<!-- Remove hardcoded RuntimeIdentifier to allow multiple targets -->
+	</PropertyGroup>
+	
+	<!-- iOS Release Configuration for App Store Distribution -->
+	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios' and '$(Configuration)' == 'Release'">
+		<!-- App Store Distribution Settings -->
+		<CodesignEntitlements>Platforms\iOS\Entitlements.plist</CodesignEntitlements>
+		<CodesignProvision>Automatic</CodesignProvision>
+		<CodesignKey>Apple Distribution</CodesignKey>
+		<EnableCodeSigning>true</EnableCodeSigning>
+		
+		<!-- Device Runtime for Physical Devices -->
+		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+		
+		<!-- App Store Optimization -->
+		<MtouchLink>SdkOnly</MtouchLink>
+		<MtouchDebug>false</MtouchDebug>
+		<MtouchProfiling>false</MtouchProfiling>
+		<MtouchUseLlvm>true</MtouchUseLlvm>
+		<MtouchEnableBitcode>true</MtouchEnableBitcode>
+		
+		<!-- Package Settings -->
+		<CreatePackage>true</CreatePackage>
+		<BuildIpa>true</BuildIpa>
+		<ArchiveOnBuild>true</ArchiveOnBuild>
+		
+		<!-- Performance Optimization -->
+		<Optimize>true</Optimize>
+		<DebugType>portable</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+		
+		<!-- App Store Connect Integration -->
+		<EnableOnDemandResources>false</EnableOnDemandResources>
+		<MtouchFloat32>true</MtouchFloat32>
+	</PropertyGroup>
+	
+	<!-- iOS AdHoc/TestFlight Configuration -->
+	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios' and '$(Configuration)' == 'AdHoc'">
+		<!-- TestFlight Distribution Settings -->
+		<CodesignEntitlements>Platforms\iOS\Entitlements.plist</CodesignEntitlements>
+		<CodesignProvision>Automatic</CodesignProvision>
+		<CodesignKey>Apple Distribution</CodesignKey>
+		<EnableCodeSigning>true</EnableCodeSigning>
+		
+		<!-- Device Runtime for TestFlight -->
+		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+		
+		<!-- TestFlight Optimization -->
+		<MtouchLink>SdkOnly</MtouchLink>
+		<MtouchDebug>false</MtouchDebug>
+		<MtouchUseLlvm>true</MtouchUseLlvm>
+		
+		<!-- Package Settings -->
+		<CreatePackage>true</CreatePackage>
+		<BuildIpa>true</BuildIpa>
+		<ArchiveOnBuild>true</ArchiveOnBuild>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -66,14 +156,27 @@
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
 		
-		<!-- Firebase packages removed - using offline-first approach for development -->
-		<!-- Will be replaced with proper mobile Firebase packages when ready for production -->
+		<!-- Firebase packages for production authentication -->
+		<PackageReference Include="Plugin.Firebase" Version="3.1.1" />
+		<PackageReference Include="Plugin.Firebase.Auth" Version="3.1.0" />
+		<PackageReference Include="Plugin.Firebase.Firestore" Version="3.1.0" />
 		
 		<!-- Supporting packages -->
 		<PackageReference Include="System.Reactive" Version="6.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
 		<PackageReference Include="Polly" Version="8.2.0" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="7.0.0" />
+	</ItemGroup>
+
+	<!-- Firebase Configuration Files -->
+	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+		<GoogleServicesJson Include="Platforms\Android\google-services.json" />
+	</ItemGroup>
+
+	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+		<BundleResource Include="Platforms\iOS\GoogleService-Info.plist">
+			<LogicalName>GoogleService-Info.plist</LogicalName>
+		</BundleResource>
 	</ItemGroup>
 
 </Project>

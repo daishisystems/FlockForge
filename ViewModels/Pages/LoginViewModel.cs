@@ -43,12 +43,36 @@ public partial class LoginViewModel : BaseViewModel
         Title = "Sign In";
     }
     
+    private bool IsValidEmail(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return false;
+        
+        try
+        {
+            // Use .NET's built-in email validation
+            var addr = new System.Net.Mail.MailAddress(email.Trim());
+            return addr.Address == email.Trim();
+        }
+        catch
+        {
+            return false;
+        }
+    }
+    
     [RelayCommand]
     private async Task LoginAsync()
     {
         if (string.IsNullOrWhiteSpace(Email))
         {
             ErrorMessage = "Please enter your email address";
+            HasError = true;
+            return;
+        }
+        
+        if (!IsValidEmail(Email))
+        {
+            ErrorMessage = "Please enter a valid email address";
             HasError = true;
             return;
         }
@@ -69,8 +93,8 @@ public partial class LoginViewModel : BaseViewModel
             
             if (result.Success)
             {
-                // Navigate to main application
-                await Shell.Current.GoToAsync("///MainPage");
+                // Navigation will be handled automatically by AppShell auth state change
+                // The AppShell will detect the authentication and show the main application
             }
             else
             {
@@ -92,8 +116,8 @@ public partial class LoginViewModel : BaseViewModel
             
             if (result.Success)
             {
-                // Navigate to main application
-                await Shell.Current.GoToAsync("///MainPage");
+                // Navigation will be handled automatically by AppShell auth state change
+                // The AppShell will detect the authentication and show the main application
             }
             else
             {
@@ -107,7 +131,7 @@ public partial class LoginViewModel : BaseViewModel
     private async Task RegisterAsync()
     {
         // Navigate to registration page
-        await Shell.Current.GoToAsync("///RegisterPage");
+        await Shell.Current.GoToAsync("//register");
     }
     
     [RelayCommand]

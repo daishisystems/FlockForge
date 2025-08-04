@@ -3,6 +3,7 @@ using UIKit;
 using FlockForge.Services.Platform;
 using FlockForge.Platforms.iOS.Services;
 using Microsoft.Extensions.Logging;
+using Firebase.Core;
 
 namespace FlockForge;
 
@@ -17,17 +18,17 @@ public class AppDelegate : MauiUIApplicationDelegate
 
     public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
     {
-        // Initialize Firebase before creating the app
-        var firebaseInitializer = new iOSFirebaseInitializer();
-        firebaseInitializer.Initialize();
-        
-        // Register custom fonts manually to avoid conflicts
-        RegisterCustomFonts();
-        
-        var result = base.FinishedLaunching(application, launchOptions);
-        
         try
         {
+            // Initialize Firebase BEFORE creating the MAUI app
+            InitializeFirebase();
+            
+            // Register custom fonts manually to avoid conflicts
+            RegisterCustomFonts();
+            
+            // Create the MAUI app - Firebase is now properly initialized
+            var result = base.FinishedLaunching(application, launchOptions);
+            
             // Get services from DI container after MAUI app is created
             var mauiApp = IPlatformApplication.Current?.Services;
             if (mauiApp != null)
@@ -40,13 +41,32 @@ public class AppDelegate : MauiUIApplicationDelegate
             ConfigureForPerformance();
             
             _logger?.LogInformation("iOS AppDelegate finished launching successfully");
+            
+            return result;
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Error during iOS app launch");
+            // Use System.Diagnostics.Debug since _logger might not be available yet
+            System.Diagnostics.Debug.WriteLine($"Critical error during iOS app launch: {ex}");
+            _logger?.LogError(ex, "Critical error during iOS app launch");
+            throw;
         }
-        
-        return result;
+    }
+    
+    private void InitializeFirebase()
+    {
+        try
+        {
+            // Initialize Firebase Core - this must happen before any Firebase services are used
+            Firebase.Core.App.Configure();
+            System.Diagnostics.Debug.WriteLine("Firebase initialized successfully for iOS");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Firebase initialization failed: {ex}");
+            // Don't throw here - let the app continue but log the error
+            System.Diagnostics.Debug.WriteLine("App will continue but Firebase services may not work properly");
+        }
     }
     
     private void RegisterCustomFonts()
