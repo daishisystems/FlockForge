@@ -6,6 +6,7 @@ using Android.Content;
 using FlockForge.Services.Platform;
 using FlockForge.Platforms.Android.Services;
 using Microsoft.Extensions.Logging;
+using Firebase;
 
 namespace FlockForge;
 
@@ -25,8 +26,23 @@ public class MainActivity : MauiAppCompatActivity
         
         try
         {
-            // Firebase initialization will be handled by the service container
-            // No manual initialization needed here
+            // Initialize Firebase early in MainActivity
+            try
+            {
+                if (FirebaseApp.GetApps(this).Count == 0)
+                {
+                    FirebaseApp.InitializeApp(this);
+                    System.Diagnostics.Debug.WriteLine("Firebase initialized in MainActivity");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("Firebase already initialized");
+                }
+            }
+            catch (Exception firebaseEx)
+            {
+                System.Diagnostics.Debug.WriteLine($"Firebase initialization error in MainActivity: {firebaseEx.Message}");
+            }
             
             // Get services from DI container
             var serviceProvider = IPlatformApplication.Current?.Services;

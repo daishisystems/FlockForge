@@ -11,6 +11,7 @@ using Plugin.Firebase.Firestore;
 using FlockForge.Platforms.iOS.Services;
 #elif ANDROID
 using FlockForge.Platforms.Android.Services;
+using Firebase;
 #endif
 
 namespace FlockForge;
@@ -50,16 +51,23 @@ public static class MauiProgram
 		builder.Services.AddSingleton<FlockForge.Core.Interfaces.IFirebaseInitializer, AndroidFirebaseInitializer>();
 #endif
 
-		// Firebase services - using lazy initialization to avoid early access
-		// This prevents Firebase from being accessed during dependency injection setup
+		// Firebase services - ensure Firebase is initialized before accessing services
 		builder.Services.AddSingleton<Lazy<IFirebaseAuth>>(serviceProvider =>
 		{
 			return new Lazy<IFirebaseAuth>(() =>
 			{
 				try
 				{
-					// Plugin.Firebase v3.1.1 handles initialization automatically when config files are present
-					// This will only be called when Firebase Auth is actually needed
+	#if ANDROID
+					// Ensure Firebase is initialized before accessing Auth
+					var context = Platform.CurrentActivity ?? global::Android.App.Application.Context;
+					if (FirebaseApp.GetApps(context).Count == 0)
+					{
+						FirebaseApp.InitializeApp(context);
+						System.Diagnostics.Debug.WriteLine("Firebase initialized for Android before Auth access");
+					}
+	#endif
+					// Now safely access Firebase Auth
 					return CrossFirebaseAuth.Current;
 				}
 				catch (Exception ex)
@@ -77,8 +85,16 @@ public static class MauiProgram
 			{
 				try
 				{
-					// Plugin.Firebase v3.1.1 handles initialization automatically when config files are present
-					// This will only be called when Firebase Firestore is actually needed
+	#if ANDROID
+					// Ensure Firebase is initialized before accessing Firestore
+					var context = Platform.CurrentActivity ?? global::Android.App.Application.Context;
+					if (FirebaseApp.GetApps(context).Count == 0)
+					{
+						FirebaseApp.InitializeApp(context);
+						System.Diagnostics.Debug.WriteLine("Firebase initialized for Android before Firestore access");
+					}
+	#endif
+					// Now safely access Firebase Firestore
 					return CrossFirebaseFirestore.Current;
 				}
 				catch (Exception ex)

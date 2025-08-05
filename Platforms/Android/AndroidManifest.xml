@@ -10,6 +10,23 @@
 		android:roundIcon="@mipmap/appicon_round"
 		android:supportsRtl="true">
 		
+		<!-- Disable Firebase Crashlytics completely -->
+		<meta-data
+			android:name="firebase_crashlytics_collection_enabled"
+			android:value="false" />
+		
+		<!-- Disable Firebase auto-initialization -->
+		<meta-data
+			android:name="firebase_analytics_collection_deactivated"
+			android:value="true" />
+		
+		<!-- Disable Firebase InitProvider to prevent auto-initialization -->
+		<provider
+			android:name="com.google.firebase.provider.FirebaseInitProvider"
+			android:authorities="${applicationId}.firebaseinitprovider"
+			android:enabled="false"
+			android:exported="false" />
+		
 		<!-- Google Sign-In Configuration -->
 		<activity android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
 			android:theme="@android:style/Theme.Translucent.NoTitleBar"

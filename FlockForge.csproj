@@ -156,10 +156,8 @@
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
 		
-		<!-- Firebase packages for production authentication -->
-		<PackageReference Include="Plugin.Firebase" Version="3.1.1" />
-		<PackageReference Include="Plugin.Firebase.Auth" Version="3.1.0" />
-		<PackageReference Include="Plugin.Firebase.Firestore" Version="3.1.0" />
+		<!-- Firebase packages for production authentication (with complete iOS framework bundle) -->
+		<PackageReference Include="Plugin.Firebase" Version="3.1.0" />
 		
 		<!-- Supporting packages -->
 		<PackageReference Include="System.Reactive" Version="6.0.0" />
