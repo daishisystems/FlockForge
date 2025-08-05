@@ -26,10 +26,14 @@
 
             <Button
                 x:Name="CounterBtn"
-                Text="Click me" 
+                Text="Click me"
                 SemanticProperties.Hint="Counts the number of times you click"
                 Clicked="OnCounterClicked"
-                HorizontalOptions="Fill" />
+                HorizontalOptions="Fill"
+                HeightRequest="60"
+                Margin="0,10"
+                SemanticProperties.Description="Button that increments counter"
+                AutomationProperties.Name="Counter" />
         </VerticalStackLayout>
     </ScrollView>
 

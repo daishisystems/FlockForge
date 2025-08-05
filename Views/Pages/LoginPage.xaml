@@ -27,26 +27,32 @@
             <Border Stroke="LightGray"
                     StrokeThickness="1"
                     BackgroundColor="White"
-                    Padding="5">
+                    Padding="5"
+                    Margin="0,10">
                 <Entry x:Name="EmailEntry"
                        Text="{Binding Email}"
                        Placeholder="Email"
                        Keyboard="Email"
                        BackgroundColor="Transparent"
-                       HeightRequest="45" />
+                       HeightRequest="60"
+                       SemanticProperties.Description="Enter your email address"
+                       AutomationProperties.Name="Email" />
             </Border>
             
             <!-- Password Entry without black bars -->
             <Border Stroke="LightGray"
                     StrokeThickness="1"
                     BackgroundColor="White"
-                    Padding="5">
+                    Padding="5"
+                    Margin="0,10">
                 <Entry x:Name="PasswordEntry"
                        Text="{Binding Password}"
                        Placeholder="Password"
                        IsPassword="True"
                        BackgroundColor="Transparent"
-                       HeightRequest="45" />
+                       HeightRequest="60"
+                       SemanticProperties.Description="Enter your password"
+                       AutomationProperties.Name="Password" />
             </Border>
             
             <!-- Error message label -->
@@ -59,17 +65,23 @@
             <Button Text="Sign In"
                     BackgroundColor="#5B4CF5"
                     TextColor="White"
-                    HeightRequest="50"
+                    HeightRequest="70"
+                    Margin="0,10"
                     CornerRadius="8"
-                    Command="{Binding LoginCommand}" />
+                    Command="{Binding LoginCommand}"
+                    SemanticProperties.Description="Submit sign in form"
+                    AutomationProperties.Name="Sign In" />
             
             <!-- Google Sign In -->
             <Button Text="Sign in with Google"
                     BackgroundColor="#4285F4"
                     TextColor="White"
-                    HeightRequest="50"
+                    HeightRequest="70"
+                    Margin="0,10"
                     CornerRadius="8"
-                    Command="{Binding LoginWithGoogleCommand}" />
+                    Command="{Binding LoginWithGoogleCommand}"
+                    SemanticProperties.Description="Sign in using Google account"
+                    AutomationProperties.Name="Google Sign In" />
             
             <!-- Links -->
             <Label HorizontalOptions="Center">
