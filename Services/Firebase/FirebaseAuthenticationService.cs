@@ -77,41 +77,50 @@ namespace FlockForge.Services.Firebase
         
         private void InitializeAuthStateListener()
         {
-            // Plugin.Firebase v3 uses a different API for auth state changes
-            // We'll check auth state periodically instead
-            Task.Run(async () =>
+            try
             {
-                while (!_isDisposed)
+                _authStateListener = FirebaseAuth.IdTokenChanges().Subscribe(
+                    user => OnAuthStateChanged(user),
+                    error => _logger.LogError(error, "Auth state listener error"),
+                    () => _logger.LogInformation("Auth state listener completed"));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to initialize auth state listener");
+            }
+        }
+
+        private void OnAuthStateChanged(IFirebaseUser? firebaseUser)
+        {
+            try
+            {
+                var user = firebaseUser != null ? MapFirebaseUser(firebaseUser) : null;
+
+                if (user != null || _connectivity.NetworkAccess == NetworkAccess.Internet)
                 {
-                    try
+                    CurrentUser = user;
+                    _authStateSubject.OnNext(user);
+
+                    if (user != null)
                     {
-                        var currentUser = FirebaseAuth.CurrentUser;
-                        var mappedUser = currentUser != null ? MapFirebaseUser(currentUser) : null;
-                        
-                        if (CurrentUser?.Id != mappedUser?.Id)
+                        _ = Task.Run(async () =>
                         {
-                            CurrentUser = mappedUser;
-                            _authStateSubject.OnNext(mappedUser);
-                            
-                            if (mappedUser != null)
+                            try
                             {
-                                _logger.LogInformation("User authenticated: {Email}", mappedUser.Email);
+                                await StoreUserWithBackupAsync(user);
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                _logger.LogInformation("User signed out");
+                                _logger.LogError(ex, "Failed to store user");
                             }
-                        }
-                        
-                        await Task.Delay(1000); // Check every second
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Error in auth state listener");
-                        await Task.Delay(5000); // Wait longer on error
+                        });
                     }
                 }
-            });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in auth state change handler");
+            }
         }
         
         private async Task InitializeAsync()
@@ -875,7 +884,8 @@ private async Task StoreAuthTokensAsync(IFirebaseUser user)
             {
                 _disposeCts?.Cancel();
                 _disposeCts?.Dispose();
-                
+
+                _authStateListener?.Dispose();
                 _tokenRefreshTimer?.Dispose();
                 _authStateSubject?.Dispose();
                 _refreshLock?.Dispose();
