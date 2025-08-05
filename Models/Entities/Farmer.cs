@@ -173,7 +173,7 @@ public class Farmer : BaseEntity
     /// Whether the farmer's profile is ready for full application use
     /// </summary>
     [NotMapped]
-    public bool IsReadyForUse => IsProfileComplete && IsEmailVerified && Farms.Any();
+    public bool IsReadyForUse => IsProfileComplete && Farms.Any();
 
     // Business methods
     /// <summary>

@@ -417,10 +417,9 @@ namespace FlockForge.Services.Firebase
                     return AuthResult.Failure("Registration failed");
                 }
                 
-                await result.SendEmailVerificationAsync();
                 await StoreAuthTokensAsync(result);
                 
-                return AuthResult.Success(MapFirebaseUser(result), requiresEmailVerification: true);
+                return AuthResult.Success(MapFirebaseUser(result), requiresEmailVerification: false);
             }
             catch (Exception ex)
             {

@@ -131,7 +131,7 @@ public class FirebaseService : IFirebaseService
                     IsEmailVerified = result.User.IsEmailVerified
                 };
                 
-                return Models.Authentication.AuthResult.Successful(flockForgeUser, AuthAction.VerifyEmail);
+                return Models.Authentication.AuthResult.Successful(flockForgeUser, AuthAction.None);
             }
             else
             {

@@ -61,13 +61,8 @@ public partial class RegisterViewModel : BaseViewModel
             
             if (result.Success)
             {
-                await Shell.Current.DisplayAlert(
-                    "Account Created",
-                    "Please check your email and click the verification link before signing in.",
-                    "OK");
-                
-                // Navigate back to login
-                await Shell.Current.GoToAsync("//login");
+                // Navigate directly to main application since email verification is no longer required
+                await Shell.Current.GoToAsync("//dashboard");
             }
             else
             {

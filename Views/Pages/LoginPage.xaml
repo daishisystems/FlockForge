@@ -97,6 +97,19 @@
                 </Label.FormattedText>
             </Label>
             
+            <!-- Forgot Password Link -->
+            <Label HorizontalOptions="Center" Margin="0,10,0,0">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Forgot Password?" TextColor="#5B4CF5" TextDecorations="Underline">
+                            <Span.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ResetPasswordCommand}" />
+                            </Span.GestureRecognizers>
+                        </Span>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+            
             <!-- Busy Indicator -->
             <StackLayout
                 IsVisible="{Binding IsBusy}"
