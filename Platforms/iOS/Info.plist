@@ -84,5 +84,16 @@
 		<string>fbauth2</string>
 		<string>fbshareextension</string>
 	</array>
+	<!-- Firebase Crashlytics Exclusion Configuration -->
+	<key>FirebaseCrashlyticsCollectionEnabled</key>
+	<false/>
+	<key>firebase_crashlytics_collection_enabled</key>
+	<false/>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
+	<key>FirebaseAutomaticScreenReportingEnabled</key>
+	<false/>
+	<key>FirebaseDataCollectionDefaultEnabled</key>
+	<false/>
 </dict>
 </plist>

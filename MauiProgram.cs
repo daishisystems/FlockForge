@@ -4,14 +4,16 @@ using FlockForge.Core.Configuration;
 using FlockForge.Services.Firebase;
 using FlockForge.Services.Navigation;
 using CommunityToolkit.Maui;
-using Plugin.Firebase.Auth;
-using Plugin.Firebase.Firestore;
 
 #if IOS
 using FlockForge.Platforms.iOS.Services;
+using Plugin.Firebase.Auth;
+using Plugin.Firebase.Firestore;
 #elif ANDROID
 using FlockForge.Platforms.Android.Services;
 using Firebase;
+using Plugin.Firebase.Auth;
+using Plugin.Firebase.Firestore;
 #endif
 
 namespace FlockForge;
@@ -51,28 +53,38 @@ public static class MauiProgram
 		builder.Services.AddSingleton<FlockForge.Core.Interfaces.IFirebaseInitializer, AndroidFirebaseInitializer>();
 #endif
 
-		// Firebase services - ensure Firebase is initialized before accessing services
+		// Firebase services - platform-specific initialization
+#if IOS || ANDROID
 		builder.Services.AddSingleton<Lazy<IFirebaseAuth>>(serviceProvider =>
 		{
 			return new Lazy<IFirebaseAuth>(() =>
 			{
 				try
 				{
-	#if ANDROID
+#if ANDROID
 					// Ensure Firebase is initialized before accessing Auth
 					var context = Platform.CurrentActivity ?? global::Android.App.Application.Context;
 					if (FirebaseApp.GetApps(context).Count == 0)
 					{
-						FirebaseApp.InitializeApp(context);
-						System.Diagnostics.Debug.WriteLine("Firebase initialized for Android before Auth access");
+						// Create custom Firebase options WITHOUT Crashlytics auto-initialization
+						var options = new Firebase.FirebaseOptions.Builder()
+							.SetProjectId("flockforge-ac0b9")
+							.SetApplicationId("1:717823882706:android:6d30877be18d2f36ee040b")
+							.SetApiKey("AIzaSyBWir-B9kgti50XfiePZ0kXQVitRS3EuyE")
+							.SetStorageBucket("flockforge-ac0b9.firebasestorage.app")
+							.Build();
+						
+						// Initialize Firebase with custom options (no Crashlytics)
+						FirebaseApp.InitializeApp(context, options);
+						System.Diagnostics.Debug.WriteLine("Firebase initialized for Android with Crashlytics excluded");
 					}
-	#endif
+#endif
 					// Now safely access Firebase Auth
 					return CrossFirebaseAuth.Current;
 				}
 				catch (Exception ex)
 				{
-					var logger = serviceProvider.GetService<ILogger<IFirebaseAuth>>();
+					var logger = serviceProvider.GetService<ILogger<Lazy<IFirebaseAuth>>>();
 					logger?.LogError(ex, "Failed to initialize Firebase Auth. Ensure Firebase configuration files are properly set up.");
 					throw new InvalidOperationException("Firebase Auth initialization failed. Check Firebase configuration.", ex);
 				}
@@ -85,29 +97,36 @@ public static class MauiProgram
 			{
 				try
 				{
-	#if ANDROID
+#if ANDROID
 					// Ensure Firebase is initialized before accessing Firestore
 					var context = Platform.CurrentActivity ?? global::Android.App.Application.Context;
 					if (FirebaseApp.GetApps(context).Count == 0)
 					{
-						FirebaseApp.InitializeApp(context);
-						System.Diagnostics.Debug.WriteLine("Firebase initialized for Android before Firestore access");
+						// Create custom Firebase options WITHOUT Crashlytics auto-initialization
+						var options = new Firebase.FirebaseOptions.Builder()
+							.SetProjectId("flockforge-ac0b9")
+							.SetApplicationId("1:717823882706:android:6d30877be18d2f36ee040b")
+							.SetApiKey("AIzaSyBWir-B9kgti50XfiePZ0kXQVitRS3EuyE")
+							.SetStorageBucket("flockforge-ac0b9.firebasestorage.app")
+							.Build();
+						
+						// Initialize Firebase with custom options (no Crashlytics)
+						FirebaseApp.InitializeApp(context, options);
+						System.Diagnostics.Debug.WriteLine("Firebase initialized for Android with Crashlytics excluded");
 					}
-	#endif
+#endif
 					// Now safely access Firebase Firestore
 					return CrossFirebaseFirestore.Current;
 				}
 				catch (Exception ex)
 				{
-					var logger = serviceProvider.GetService<ILogger<IFirebaseFirestore>>();
+					var logger = serviceProvider.GetService<ILogger<Lazy<IFirebaseFirestore>>>();
 					logger?.LogError(ex, "Failed to initialize Firebase Firestore. Ensure Firebase configuration files are properly set up.");
 					throw new InvalidOperationException("Firebase Firestore initialization failed. Check Firebase configuration.", ex);
 				}
 			});
 		});
-		
-		// Don't register IFirebaseAuth and IFirebaseFirestore directly
-		// Let the services that need them access the Lazy<T> versions directly
+#endif
 		
 		builder.Services.AddSingleton<IAuthenticationService, FirebaseAuthenticationService>();
 		
@@ -130,6 +149,7 @@ public static class MauiProgram
 		// Pages
 		builder.Services.AddTransient<Views.Pages.LoginPage>();
 		builder.Services.AddTransient<Views.Pages.RegisterPage>();
+		builder.Services.AddTransient<MainPage>();
 		
 		// Configure logging
 #if DEBUG
