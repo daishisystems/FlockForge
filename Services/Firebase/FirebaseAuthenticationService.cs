@@ -80,7 +80,7 @@ namespace FlockForge.Services.Firebase
         {
             try
             {
-                _authStateListener = FirebaseAuth.AuthStateChanged.Subscribe(
+                _authStateListener = FirebaseAuth.AuthStateChanges().Subscribe(
                     auth => OnAuthStateChanged(auth),
                     error => _logger.LogError(error, "Auth state listener error"),
                     () => _logger.LogInformation("Auth state listener completed"));
