@@ -36,40 +36,52 @@
                 Margin="0,0,0,30"/>
             
             <!-- Display Name Input -->
-            <Frame Padding="0" HasShadow="False" BorderColor="Transparent">
+            <Frame Padding="0" HasShadow="False" BorderColor="Transparent" Margin="0,10">
                 <Entry
                     Text="{Binding DisplayName}"
                     Placeholder="Display Name"
                     ReturnType="Next"
-                    Margin="0,5,0,5"/>
+                    HeightRequest="60"
+                    Margin="0,10"
+                    SemanticProperties.Description="Enter display name"
+                    AutomationProperties.Name="Display Name"/>
             </Frame>
             
             <!-- Email Input -->
-            <Frame Padding="0" HasShadow="False" BorderColor="Transparent">
+            <Frame Padding="0" HasShadow="False" BorderColor="Transparent" Margin="0,10">
                 <Entry
                     Text="{Binding Email}"
                     Placeholder="Email"
                     Keyboard="Email"
                     ReturnType="Next"
-                    Margin="0,5,0,5"/>
+                    HeightRequest="60"
+                    Margin="0,10"
+                    SemanticProperties.Description="Enter email address"
+                    AutomationProperties.Name="Email"/>
             </Frame>
             
             <!-- Password Input with AutoFill protection -->
-            <Frame Padding="0" HasShadow="False" BorderColor="Transparent">
+            <Frame Padding="0" HasShadow="False" BorderColor="Transparent" Margin="0,10">
                 <controls:SecurePasswordEntry
                     Text="{Binding Password}"
                     Placeholder="Password (min 6 characters)"
                     ReturnType="Next"
-                    Margin="0,10,0,10"/>
+                    HeightRequest="60"
+                    Margin="0,10"
+                    SemanticProperties.Description="Enter password"
+                    AutomationProperties.Name="Password"/>
             </Frame>
             
             <!-- Confirm Password Input with AutoFill protection -->
-            <Frame Padding="0" HasShadow="False" BorderColor="Transparent">
+            <Frame Padding="0" HasShadow="False" BorderColor="Transparent" Margin="0,10">
                 <controls:SecurePasswordEntry
                     Text="{Binding ConfirmPassword}"
                     Placeholder="Confirm Password"
                     ReturnType="Done"
-                    Margin="0,10,0,10"/>
+                    HeightRequest="60"
+                    Margin="0,10"
+                    SemanticProperties.Description="Re-enter password for confirmation"
+                    AutomationProperties.Name="Confirm Password"/>
             </Frame>
             
             <!-- Error Message -->
@@ -91,8 +103,10 @@
                 BackgroundColor="#512BD4"
                 TextColor="White"
                 CornerRadius="10"
-                HeightRequest="50"
-                Margin="0,20,0,20"/>
+                HeightRequest="70"
+                Margin="0,20"
+                SemanticProperties.Description="Submit registration"
+                AutomationProperties.Name="Create Account"/>
             
             <!-- Cancel Button -->
             <Button
@@ -100,8 +114,10 @@
                 Command="{Binding CancelCommand}"
                 TextColor="#512BD4"
                 BackgroundColor="Transparent"
-                HeightRequest="40"
-                Margin="0,0,0,10"/>
+                HeightRequest="60"
+                Margin="0,10"
+                SemanticProperties.Description="Cancel registration"
+                AutomationProperties.Name="Cancel"/>
             
             <!-- Busy Indicator -->
             <StackLayout
