@@ -1,0 +1,82 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Full square background -->
+  <rect x="0" y="0" width="512" height="512" fill="#2E7D32" />
+  
+  <!-- Inner gradient background -->
+  <defs>
+    <radialGradient id="bgGradient" cx="50%" cy="40%">
+      <stop offset="0%" style="stop-color:#4CAF50;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2E7D32;stop-opacity:1" />
+    </radialGradient>
+    
+    <!-- Shadow filter -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  
+  <rect x="0" y="0" width="512" height="512" fill="url(#bgGradient)" />
+  
+  <!-- Sheep silhouette (main element) -->
+  <g transform="translate(256, 260)" filter="url(#shadow)">
+    <!-- Sheep body -->
+    <ellipse cx="0" cy="0" rx="80" ry="60" fill="#F5F5F5" />
+    <ellipse cx="-20" cy="-5" rx="70" ry="55" fill="#FFFFFF" />
+    
+    <!-- Sheep head -->
+    <ellipse cx="-55" cy="-10" rx="35" ry="30" fill="#E0E0E0" />
+    <ellipse cx="-60" cy="-10" rx="28" ry="25" fill="#F5F5F5" />
+    
+    <!-- Ears -->
+    <ellipse cx="-75" cy="-25" rx="12" ry="8" fill="#424242" transform="rotate(-30 -75 -25)" />
+    <ellipse cx="-45" cy="-25" rx="12" ry="8" fill="#424242" transform="rotate(30 -45 -25)" />
+    
+    <!-- Face details -->
+    <circle cx="-70" cy="-10" r="3" fill="#212121" />
+    <circle cx="-50" cy="-10" r="3" fill="#212121" />
+    
+    <!-- Legs -->
+    <rect x="-50" y="40" width="8" height="30" rx="4" fill="#424242" />
+    <rect x="-30" y="40" width="8" height="30" rx="4" fill="#424242" />
+    <rect x="10" y="40" width="8" height="30" rx="4" fill="#424242" />
+    <rect x="30" y="40" width="8" height="30" rx="4" fill="#424242" />
+    
+    <!-- Wool texture circles -->
+    <circle cx="-10" cy="-20" r="18" fill="#FFFFFF" opacity="0.7" />
+    <circle cx="15" cy="-15" r="16" fill="#FFFFFF" opacity="0.7" />
+    <circle cx="35" cy="-5" r="15" fill="#FFFFFF" opacity="0.7" />
+    <circle cx="20" cy="10" r="17" fill="#FFFFFF" opacity="0.7" />
+    <circle cx="-5" cy="15" r="16" fill="#FFFFFF" opacity="0.7" />
+    <circle cx="40" cy="15" r="14" fill="#FFFFFF" opacity="0.7" />
+  </g>
+  
+  <!-- Fence elements in foreground -->
+  <g opacity="0.9">
+    <rect x="100" y="320" width="12" height="80" fill="#8D6E63" />
+    <rect x="180" y="320" width="12" height="80" fill="#8D6E63" />
+    <rect x="320" y="320" width="12" height="80" fill="#8D6E63" />
+    <rect x="400" y="320" width="12" height="80" fill="#8D6E63" />
+    
+    <!-- Horizontal fence rails -->
+    <rect x="90" y="340" width="332" height="8" fill="#A1887F" />
+    <rect x="90" y="370" width="332" height="8" fill="#A1887F" />
+  </g>
+  
+  <!-- Small additional sheep in background -->
+  <g transform="translate(350, 200) scale(0.5)" opacity="0.7">
+    <ellipse cx="0" cy="0" rx="60" ry="45" fill="#F5F5F5" />
+    <ellipse cx="-40" cy="-5" rx="25" ry="22" fill="#E0E0E0" />
+    <rect x="-35" y="30" width="6" height="20" rx="3" fill="#424242" />
+    <rect x="-20" y="30" width="6" height="20" rx="3" fill="#424242" />
+    <rect x="5" y="30" width="6" height="20" rx="3" fill="#424242" />
+    <rect x="20" y="30" width="6" height="20" rx="3" fill="#424242" />
+  </g>
+  
+  <!-- Subtle hay/grass elements -->
+  <g opacity="0.6">
+    <path d="M 120 380 Q 125 360 130 380" stroke="#FDD835" stroke-width="3" fill="none" />
+    <path d="M 135 385 Q 140 365 145 385" stroke="#FDD835" stroke-width="3" fill="none" />
+    <path d="M 360 385 Q 365 365 370 385" stroke="#FDD835" stroke-width="3" fill="none" />
+    <path d="M 375 380 Q 380 360 385 380" stroke="#FDD835" stroke-width="3" fill="none" />
+  </g>
+</svg>

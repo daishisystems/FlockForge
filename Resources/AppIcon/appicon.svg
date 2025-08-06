@@ -1,35 +1,85 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg width="456" height="456" viewBox="0 0 456 456" version="1.1" xmlns="http://www.w3.org/2000/svg">
-    <!-- Background -->
-    <rect x="0" y="0" width="456" height="456" fill="#2E7D32" rx="80" />
+  <!-- Full square background -->
+  <rect x="0" y="0" width="456" height="456" fill="#2E7D32" rx="80" />
+  
+  <!-- Inner gradient background -->
+  <defs>
+    <radialGradient id="bgGradient" cx="50%" cy="40%">
+      <stop offset="0%" style="stop-color:#4CAF50;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2E7D32;stop-opacity:1" />
+    </radialGradient>
     
-    <!-- Sheep silhouette -->
-    <g transform="translate(228, 228)">
-        <!-- Sheep body -->
-        <ellipse cx="0" cy="20" rx="80" ry="50" fill="#FFFFFF" />
-        
-        <!-- Sheep head -->
-        <circle cx="0" cy="-40" r="35" fill="#FFFFFF" />
-        
-        <!-- Sheep wool texture -->
-        <circle cx="-25" cy="10" r="18" fill="#F5F5F5" />
-        <circle cx="25" cy="10" r="18" fill="#F5F5F5" />
-        <circle cx="0" cy="35" r="20" fill="#F5F5F5" />
-        <circle cx="-15" cy="-25" r="15" fill="#F5F5F5" />
-        <circle cx="15" cy="-25" r="15" fill="#F5F5F5" />
-        
-        <!-- Sheep face -->
-        <ellipse cx="-8" cy="-45" rx="3" ry="4" fill="#333333" />
-        <ellipse cx="8" cy="-45" rx="3" ry="4" fill="#333333" />
-        <ellipse cx="0" cy="-35" rx="2" ry="3" fill="#333333" />
-        
-        <!-- Sheep legs -->
-        <rect x="-30" y="60" width="8" height="25" fill="#333333" rx="4" />
-        <rect x="-10" y="60" width="8" height="25" fill="#333333" rx="4" />
-        <rect x="10" y="60" width="8" height="25" fill="#333333" rx="4" />
-        <rect x="30" y="60" width="8" height="25" fill="#333333" rx="4" />
-    </g>
+    <!-- Shadow filter -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="2" dy="6" stdDeviation="6" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  
+  <rect x="40" y="40" width="376" height="376" fill="url(#bgGradient)" rx="60" />
+  
+  <!-- Sheep silhouette (main element) - made larger and more visible -->
+  <g transform="translate(228, 220)" filter="url(#shadow)">
+    <!-- Sheep body - using pure white with strong contrast -->
+    <ellipse cx="0" cy="0" rx="85" ry="65" fill="#FFFFFF" stroke="#E0E0E0" stroke-width="2" />
+    <ellipse cx="-20" cy="-5" rx="75" ry="60" fill="#FFFFFF" />
     
-    <!-- FlockForge text -->
-    <text x="228" y="380" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="#FFFFFF">FlockForge</text>
+    <!-- Sheep head -->
+    <ellipse cx="-60" cy="-12" rx="38" ry="33" fill="#F8F8F8" stroke="#D0D0D0" stroke-width="1" />
+    <ellipse cx="-65" cy="-12" rx="30" ry="27" fill="#FFFFFF" />
+    
+    <!-- Ears -->
+    <ellipse cx="-82" cy="-28" rx="13" ry="9" fill="#424242" transform="rotate(-30 -82 -28)" />
+    <ellipse cx="-48" cy="-28" rx="13" ry="9" fill="#424242" transform="rotate(30 -48 -28)" />
+    
+    <!-- Face details - made larger and more visible -->
+    <circle cx="-75" cy="-12" r="4" fill="#212121" />
+    <circle cx="-55" cy="-12" r="4" fill="#212121" />
+    <!-- Nose -->
+    <ellipse cx="-65" cy="-2" rx="3" ry="2" fill="#424242" />
+    
+    <!-- Legs -->
+    <rect x="-55" y="45" width="9" height="32" rx="4.5" fill="#424242" />
+    <rect x="-35" y="45" width="9" height="32" rx="4.5" fill="#424242" />
+    <rect x="10" y="45" width="9" height="32" rx="4.5" fill="#424242" />
+    <rect x="35" y="45" width="9" height="32" rx="4.5" fill="#424242" />
+    
+    <!-- Wool texture circles - made more prominent -->
+    <circle cx="-12" cy="-22" r="20" fill="#FFFFFF" stroke="#F0F0F0" stroke-width="1" />
+    <circle cx="18" cy="-16" r="18" fill="#FFFFFF" stroke="#F0F0F0" stroke-width="1" />
+    <circle cx="40" cy="-5" r="16" fill="#FFFFFF" stroke="#F0F0F0" stroke-width="1" />
+    <circle cx="22" cy="12" r="18" fill="#FFFFFF" stroke="#F0F0F0" stroke-width="1" />
+    <circle cx="-5" cy="18" r="17" fill="#FFFFFF" stroke="#F0F0F0" stroke-width="1" />
+    <circle cx="45" cy="18" r="15" fill="#FFFFFF" stroke="#F0F0F0" stroke-width="1" />
+  </g>
+  
+  <!-- Fence elements in foreground -->
+  <g opacity="0.9">
+    <rect x="100" y="320" width="12" height="80" fill="#8D6E63" />
+    <rect x="170" y="320" width="12" height="80" fill="#8D6E63" />
+    <rect x="275" y="320" width="12" height="80" fill="#8D6E63" />
+    <rect x="345" y="320" width="12" height="80" fill="#8D6E63" />
+    
+    <!-- Horizontal fence rails -->
+    <rect x="90" y="340" width="275" height="8" fill="#A1887F" />
+    <rect x="90" y="370" width="275" height="8" fill="#A1887F" />
+  </g>
+  
+  <!-- Small additional sheep in background -->
+  <g transform="translate(340, 160) scale(0.5)" opacity="0.8">
+    <ellipse cx="0" cy="0" rx="60" ry="45" fill="#FFFFFF" stroke="#E0E0E0" stroke-width="1" />
+    <ellipse cx="-40" cy="-5" rx="25" ry="22" fill="#F8F8F8" />
+    <rect x="-35" y="30" width="6" height="20" rx="3" fill="#424242" />
+    <rect x="-20" y="30" width="6" height="20" rx="3" fill="#424242" />
+    <rect x="5" y="30" width="6" height="20" rx="3" fill="#424242" />
+    <rect x="20" y="30" width="6" height="20" rx="3" fill="#424242" />
+  </g>
+  
+  <!-- Subtle hay/grass elements -->
+  <g opacity="0.7">
+    <path d="M 120 385 Q 125 365 130 385" stroke="#FDD835" stroke-width="4" fill="none" />
+    <path d="M 135 390 Q 140 370 145 390" stroke="#FDD835" stroke-width="4" fill="none" />
+    <path d="M 315 390 Q 320 370 325 390" stroke="#FDD835" stroke-width="4" fill="none" />
+    <path d="M 330 385 Q 335 365 340 385" stroke="#FDD835" stroke-width="4" fill="none" />
+  </g>
 </svg>
