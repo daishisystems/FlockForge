@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using FlockForge.Core.Interfaces;
 using FlockForge.Core.Configuration;
 using FlockForge.Services.Firebase;
@@ -22,24 +24,34 @@ public static class MauiProgram
 {
 	public static MauiApp CreateMauiApp()
 	{
-		var builder = MauiApp.CreateBuilder();
-		builder
-			.UseMauiApp<App>()
-			.ConfigureFonts(fonts =>
-			{
-				// Only add fonts if they're not already registered (reduces iOS simulator warnings)
-				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-			})
-			.UseMauiCommunityToolkit();
+                var builder = MauiApp.CreateBuilder();
+                builder
+                        .UseMauiApp<App>()
+                        .ConfigureFonts(fonts =>
+                        {
+                                // Only add fonts if they're not already registered (reduces iOS simulator warnings)
+                                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                        })
+                        .UseMauiCommunityToolkit();
+
+                builder.Configuration
+                        .AddJsonFile("appsettings.json", optional: true)
+                        .AddEnvironmentVariables();
 
 		// Configuration
-		builder.Services.AddSingleton<FirebaseConfig>(sp =>
-		{
-			var config = new FirebaseConfig();
-			// Load from appsettings.json or platform config
-			return config;
-		});
+                builder.Services.AddSingleton<FirebaseConfig>(sp =>
+                {
+                        var section = builder.Configuration.GetSection("Firebase");
+                        var config = new FirebaseConfig
+                        {
+                                ProjectId = section["ProjectId"] ?? string.Empty,
+                                ApplicationId = section["ApplicationId"] ?? string.Empty,
+                                ApiKey = section["ApiKey"] ?? string.Empty,
+                                StorageBucket = section["StorageBucket"] ?? string.Empty
+                        };
+                        return config;
+                });
 		
 		// Platform services
 		builder.Services.AddSingleton<IConnectivity>(Connectivity.Current);
@@ -62,17 +74,18 @@ public static class MauiProgram
 				try
 				{
 #if ANDROID
-					// Ensure Firebase is initialized before accessing Auth
-					var context = Platform.CurrentActivity ?? global::Android.App.Application.Context;
-					if (FirebaseApp.GetApps(context).Count == 0)
-					{
-						// Create custom Firebase options WITHOUT Crashlytics auto-initialization
-						var options = new Firebase.FirebaseOptions.Builder()
-							.SetProjectId("flockforge-ac0b9")
-							.SetApplicationId("1:717823882706:android:6d30877be18d2f36ee040b")
-							.SetApiKey("AIzaSyBWir-B9kgti50XfiePZ0kXQVitRS3EuyE")
-							.SetStorageBucket("flockforge-ac0b9.firebasestorage.app")
-							.Build();
+                                        // Ensure Firebase is initialized before accessing Auth
+                                        var context = Platform.CurrentActivity ?? global::Android.App.Application.Context;
+                                        if (FirebaseApp.GetApps(context).Count == 0)
+                                        {
+                                                // Create custom Firebase options WITHOUT Crashlytics auto-initialization
+                                                var firebaseConfig = serviceProvider.GetRequiredService<FirebaseConfig>();
+                                                var options = new Firebase.FirebaseOptions.Builder()
+                                                        .SetProjectId(firebaseConfig.ProjectId)
+                                                        .SetApplicationId(firebaseConfig.ApplicationId)
+                                                        .SetApiKey(firebaseConfig.ApiKey)
+                                                        .SetStorageBucket(firebaseConfig.StorageBucket)
+                                                        .Build();
 						
 						// Initialize Firebase with custom options (no Crashlytics)
 						FirebaseApp.InitializeApp(context, options);
@@ -98,17 +111,18 @@ public static class MauiProgram
 				try
 				{
 #if ANDROID
-					// Ensure Firebase is initialized before accessing Firestore
-					var context = Platform.CurrentActivity ?? global::Android.App.Application.Context;
-					if (FirebaseApp.GetApps(context).Count == 0)
-					{
-						// Create custom Firebase options WITHOUT Crashlytics auto-initialization
-						var options = new Firebase.FirebaseOptions.Builder()
-							.SetProjectId("flockforge-ac0b9")
-							.SetApplicationId("1:717823882706:android:6d30877be18d2f36ee040b")
-							.SetApiKey("AIzaSyBWir-B9kgti50XfiePZ0kXQVitRS3EuyE")
-							.SetStorageBucket("flockforge-ac0b9.firebasestorage.app")
-							.Build();
+                                        // Ensure Firebase is initialized before accessing Firestore
+                                        var context = Platform.CurrentActivity ?? global::Android.App.Application.Context;
+                                        if (FirebaseApp.GetApps(context).Count == 0)
+                                        {
+                                                // Create custom Firebase options WITHOUT Crashlytics auto-initialization
+                                                var firebaseConfig = serviceProvider.GetRequiredService<FirebaseConfig>();
+                                                var options = new Firebase.FirebaseOptions.Builder()
+                                                        .SetProjectId(firebaseConfig.ProjectId)
+                                                        .SetApplicationId(firebaseConfig.ApplicationId)
+                                                        .SetApiKey(firebaseConfig.ApiKey)
+                                                        .SetStorageBucket(firebaseConfig.StorageBucket)
+                                                        .Build();
 						
 						// Initialize Firebase with custom options (no Crashlytics)
 						FirebaseApp.InitializeApp(context, options);

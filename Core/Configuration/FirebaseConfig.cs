@@ -2,6 +2,12 @@ namespace FlockForge.Core.Configuration
 {
     public class FirebaseConfig
     {
+        // Core Firebase settings
+        public string ProjectId { get; set; } = string.Empty;
+        public string ApplicationId { get; set; } = string.Empty;
+        public string ApiKey { get; set; } = string.Empty;
+        public string StorageBucket { get; set; } = string.Empty;
+
         // Timeout configurations
         public int DefaultOperationTimeoutMs { get; set; } = 30000;
         public int StorageOperationTimeoutMs { get; set; } = 5000;
