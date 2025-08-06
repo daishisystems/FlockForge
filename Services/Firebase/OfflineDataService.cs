@@ -148,25 +148,25 @@ namespace FlockForge.Services.Firebase
             }
         }
 
-        public Task<bool> DeleteAsync<T>(string documentId) where T : BaseEntity
+        public async Task<bool> DeleteAsync<T>(string documentId) where T : BaseEntity
         {
-            if (_disposed) return Task.FromResult(false);
+            if (_disposed) return false;
 
             try
             {
-                var entity = GetAsync<T>(documentId).Result;
-                if (entity == null) return Task.FromResult(false);
+                var entity = await GetAsync<T>(documentId).ConfigureAwait(false);
+                if (entity == null) return false;
 
                 // Soft delete
                 entity.IsDeleted = true;
                 entity.UpdatedAt = DateTime.UtcNow;
 
-                return SaveAsync(entity);
+                return await SaveAsync(entity).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to delete document {DocumentId}", documentId);
-                return Task.FromResult(false);
+                return false;
             }
         }
 
@@ -218,22 +218,22 @@ namespace FlockForge.Services.Firebase
             }
         }
 
-        public Task<IReadOnlyList<T>> QueryAsync<T>(Expression<Func<T, bool>> predicate) where T : BaseEntity
+        public async Task<IReadOnlyList<T>> QueryAsync<T>(Expression<Func<T, bool>> predicate) where T : BaseEntity
         {
-            if (_disposed) return Task.FromResult<IReadOnlyList<T>>(new List<T>());
+            if (_disposed) return new List<T>();
 
             try
             {
-                var allData = GetAllAsync<T>().Result;
+                var allData = await GetAllAsync<T>().ConfigureAwait(false);
                 var compiledPredicate = predicate.Compile();
                 var results = allData.Where(compiledPredicate).ToList();
-                
-                return Task.FromResult<IReadOnlyList<T>>(results);
+
+                return results;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to query documents");
-                return Task.FromResult<IReadOnlyList<T>>(new List<T>());
+                return new List<T>();
             }
         }
 
