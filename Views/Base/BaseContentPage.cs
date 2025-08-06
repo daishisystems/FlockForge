@@ -74,12 +74,12 @@ public abstract class BaseContentPage<TViewModel> : ContentPage
         
         try
         {
-            // Cancel any ongoing operations in the ViewModel
-            if (ViewModel is IDisposable disposableViewModel && _disposed)
+            // Dispose the ViewModel if it implements IDisposable and hasn't been disposed
+            if (ViewModel is IDisposable disposableViewModel && !_disposed)
             {
-                disposableViewModel.Dispose();
+                Dispose();
             }
-            
+
             _logger?.LogDebug("Page {PageType} disappeared", GetType().Name);
         }
         catch (Exception ex)
@@ -213,6 +213,11 @@ public abstract class BaseContentPage<TViewModel> : ContentPage
             {
                 try
                 {
+                    if (ViewModel is IDisposable disposableViewModel)
+                    {
+                        disposableViewModel.Dispose();
+                    }
+
                     _memoryService?.UnregisterMemoryPressureCallback(OnMemoryPressure);
                     PerformCleanup();
                 }
@@ -221,6 +226,7 @@ public abstract class BaseContentPage<TViewModel> : ContentPage
                     _logger?.LogError(ex, "Error during disposal of page {PageType}", GetType().Name);
                 }
             }
+
             _disposed = true;
         }
     }
