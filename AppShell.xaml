@@ -23,37 +23,37 @@
     <TabBar x:Name="MainTabBar" IsVisible="False">
         <Tab Title="Dashboard">
             <Tab.Icon>
-                <FontImageSource Glyph="&#xE88A;" FontFamily="Segoe MDL2 Assets" Size="24" />
+                <FontImageSource Glyph="🏠" Size="24" />
             </Tab.Icon>
             <ShellContent
                 Title="Home"
                 ContentTemplate="{DataTemplate local:MainPage}"
                 Route="dashboard" />
         </Tab>
-        
+
         <Tab Title="Farms">
             <Tab.Icon>
-                <FontImageSource Glyph="&#xE7C8;" FontFamily="Segoe MDL2 Assets" Size="24" />
+                <FontImageSource Glyph="🌾" Size="24" />
             </Tab.Icon>
             <ShellContent
                 Title="Farms"
                 ContentTemplate="{DataTemplate local:MainPage}"
                 Route="farms" />
         </Tab>
-        
+
         <Tab Title="Reports">
             <Tab.Icon>
-                <FontImageSource Glyph="&#xE9D2;" FontFamily="Segoe MDL2 Assets" Size="24" />
+                <FontImageSource Glyph="📊" Size="24" />
             </Tab.Icon>
             <ShellContent
                 Title="Reports"
                 ContentTemplate="{DataTemplate local:MainPage}"
                 Route="reports" />
         </Tab>
-        
+
         <Tab Title="Settings">
             <Tab.Icon>
-                <FontImageSource Glyph="&#xE713;" FontFamily="Segoe MDL2 Assets" Size="24" />
+                <FontImageSource Glyph="⚙" Size="24" />
             </Tab.Icon>
             <ShellContent
                 Title="Settings"
