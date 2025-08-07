@@ -9,4 +9,22 @@
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowDisablePreview">true</item>
     </style>
+    
+    <!-- App splash theme -->
+    <style name="AppSplash" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+    </style>
+    
+    <!-- MaterialButton style -->
+    <style name="Widget.MyApp.MaterialButton" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@color/colorPrimary</item>
+        <item name="shapeAppearance">@style/Shape.MyApp.RoundedCorners</item>
+        <item name="rippleColor">?attr/colorOnPrimary</item>
+    </style>
+    
+    <!-- Rounded corners shape appearance -->
+    <style name="Shape.MyApp.RoundedCorners" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
 </resources>

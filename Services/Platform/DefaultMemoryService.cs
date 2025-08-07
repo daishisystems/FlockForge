@@ -24,13 +24,12 @@ public class DefaultMemoryService : IPlatformMemoryService
                 break;
             case MemoryPressureLevel.Medium:
                 await OptimizeMemoryUsageAsync().ConfigureAwait(false);
-                GC.Collect(0, GCCollectionMode.Optimized);
+                // TODO: Replace forced GC with proper IDisposable patterns
                 break;
             case MemoryPressureLevel.Critical:
                 await OptimizeMemoryUsageAsync().ConfigureAwait(false);
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-                GC.Collect();
+                // TODO: Replace forced GC with proper IDisposable patterns
+                // GC.WaitForPendingFinalizers();
                 break;
         }
 
@@ -54,12 +53,12 @@ public class DefaultMemoryService : IPlatformMemoryService
         {
             _logger.LogDebug("Optimizing memory usage");
             
-            // Force garbage collection
-            GC.Collect(0, GCCollectionMode.Optimized);
+            // TODO: Replace forced GC with proper IDisposable patterns
+            // GC.Collect(0, GCCollectionMode.Optimized);
             
             // Compact large object heap if available (.NET Framework only)
             // GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-            GC.Collect();
+            // GC.Collect();
         });
     }
 

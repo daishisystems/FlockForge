@@ -10,6 +10,10 @@ using Firebase;
 
 namespace FlockForge;
 
+// Note: ACCESS_SURFACE_FLINGER and related permission warnings are expected and safe to ignore.
+// These are internal Android system permissions that are not required for normal app functionality.
+// They appear in debug logs but do not affect app performance or security.
+
 [Activity(
     Theme = "@style/Maui.SplashTheme.NoSplash",
     MainLauncher = true,
@@ -24,16 +28,24 @@ public class MainActivity : MauiAppCompatActivity
     {
         base.OnCreate(savedInstanceState);
         
-        // Move heavy initialization off UI thread
-        Task.Run(async () =>
-        {
-            await Task.Delay(100); // Let UI settle
-            // Move any heavy init here
-        });
+        // Get services from DI container
+        var serviceProvider = IPlatformApplication.Current?.Services;
+        _logger = serviceProvider?.GetService<ILogger<MainActivity>>();
+        _memoryService = serviceProvider?.GetService<IPlatformMemoryService>();
         
+        // Move all heavy initialization off UI thread immediately
+        _ = Task.Run(() => InitializeAsync());
+        
+        _logger?.LogInformation("MainActivity created successfully");
+    }
+    
+    private async Task InitializeAsync()
+    {
         try
         {
-            // Initialize Firebase early in MainActivity
+            await Task.Delay(100); // Let UI settle
+            
+            // Initialize Firebase in background
             try
             {
                 if (FirebaseApp.GetApps(this).Count == 0)
@@ -51,19 +63,13 @@ public class MainActivity : MauiAppCompatActivity
                 System.Diagnostics.Debug.WriteLine($"Firebase initialization error in MainActivity: {firebaseEx.Message}");
             }
             
-            // Get services from DI container
-            var serviceProvider = IPlatformApplication.Current?.Services;
-            _logger = serviceProvider?.GetService<ILogger<MainActivity>>();
-            _memoryService = serviceProvider?.GetService<IPlatformMemoryService>();
-            
+            // Perform other heavy initialization tasks here
             ConfigureForPerformance();
             SetupMemoryManagement();
-            
-            _logger?.LogInformation("MainActivity created successfully");
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Error during MainActivity creation");
+            _logger?.LogError(ex, "Error during async initialization");
         }
     }
 
@@ -141,10 +147,8 @@ public class MainActivity : MauiAppCompatActivity
                 PerformEmergencyCleanup();
             }
             
-            if (level >= TrimMemory.RunningModerate)
-            {
-                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
-            }
+            // No explicit GC needed - Android runtime manages memory efficiently
+            // Automatic garbage collection will occur when appropriate
         }
         catch (Exception ex)
         {
@@ -187,10 +191,8 @@ public class MainActivity : MauiAppCompatActivity
     {
         try
         {
-            // Force garbage collection
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
+            // No explicit GC needed - Android runtime manages memory efficiently
+            // Automatic garbage collection will occur when appropriate
             
             // Clear any Android-specific caches
             if (Build.VERSION.SdkInt >= BuildVersionCodes.M)
@@ -220,9 +222,8 @@ public class MainActivity : MauiAppCompatActivity
         finally
         {
             base.OnDestroy();
-            Java.Lang.JavaSystem.Gc();
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
+            // No explicit GC needed - Android runtime manages memory efficiently
+            // Automatic garbage collection will occur when appropriate
         }
     }
 }

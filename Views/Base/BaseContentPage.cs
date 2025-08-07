@@ -166,7 +166,7 @@ public abstract class BaseContentPage<TViewModel> : ContentPage
         {
             // Clear any cached data, images, etc.
             // This is a base implementation - override in derived classes
-            GC.Collect(0, GCCollectionMode.Optimized);
+            // TODO: Replace forced GC with proper IDisposable patterns
         }
         catch (Exception ex)
         {

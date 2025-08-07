@@ -177,10 +177,10 @@ public class AppDelegate : MauiUIApplicationDelegate
     {
         try
         {
-            // Force garbage collection
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
+            // TODO: Replace forced GC with proper IDisposable patterns
+            // GC.Collect();
+            // GC.WaitForPendingFinalizers();
+            // GC.Collect();
             
             // Clear iOS-specific caches
             NSUrlCache.SharedCache.RemoveAllCachedResponses();
@@ -198,7 +198,7 @@ public class AppDelegate : MauiUIApplicationDelegate
         try
         {
             // Lighter cleanup for background state
-            GC.Collect(0, GCCollectionMode.Optimized);
+            // TODO: Replace forced GC with proper IDisposable patterns
             
             // Reduce cache sizes
             NSUrlCache.SharedCache.MemoryCapacity = NSUrlCache.SharedCache.MemoryCapacity / 2;
