@@ -15,7 +15,7 @@ namespace FlockForge;
 // They appear in debug logs but do not affect app performance or security.
 
 [Activity(
-    Theme = "@style/Maui.SplashTheme.NoSplash",
+    Theme = "@style/AppSplash",
     MainLauncher = true,
     LaunchMode = LaunchMode.SingleTop,
     ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
@@ -28,13 +28,16 @@ public class MainActivity : MauiAppCompatActivity
     {
         base.OnCreate(savedInstanceState);
         
+        // Set the main theme after splash screen
+        SetTheme(Resource.Style.MainTheme);
+        
         // Get services from DI container
         var serviceProvider = IPlatformApplication.Current?.Services;
         _logger = serviceProvider?.GetService<ILogger<MainActivity>>();
         _memoryService = serviceProvider?.GetService<IPlatformMemoryService>();
         
         // Move all heavy initialization off UI thread immediately
-        _ = Task.Run(() => InitializeAsync());
+        _ = InitializeAsync();
         
         _logger?.LogInformation("MainActivity created successfully");
     }

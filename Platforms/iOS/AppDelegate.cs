@@ -20,13 +20,7 @@ public class AppDelegate : MauiUIApplicationDelegate
     {
         try
         {
-            // Initialize Firebase BEFORE creating the MAUI app
-            InitializeFirebase();
-            
-            // Register custom fonts manually to avoid conflicts
-            RegisterCustomFonts();
-            
-            // Create the MAUI app - Firebase is now properly initialized
+            // Create the MAUI app first
             var result = base.FinishedLaunching(application, launchOptions);
             
             // Get services from DI container after MAUI app is created
@@ -37,8 +31,8 @@ public class AppDelegate : MauiUIApplicationDelegate
                 _memoryService = mauiApp.GetService<IPlatformMemoryService>();
             }
             
-            SetupMemoryManagement();
-            ConfigureForPerformance();
+            // Move all heavy initialization off UI thread immediately
+            _ = InitializeAsync();
             
             _logger?.LogInformation("iOS AppDelegate finished launching successfully");
             
@@ -50,22 +44,6 @@ public class AppDelegate : MauiUIApplicationDelegate
             System.Diagnostics.Debug.WriteLine($"Critical error during iOS app launch: {ex}");
             _logger?.LogError(ex, "Critical error during iOS app launch");
             throw;
-        }
-    }
-    
-    private void InitializeFirebase()
-    {
-        try
-        {
-            // Initialize Firebase Core - this must happen before any Firebase services are used
-            Firebase.Core.App.Configure();
-            System.Diagnostics.Debug.WriteLine("Firebase initialized successfully for iOS");
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Firebase initialization failed: {ex}");
-            // Don't throw here - let the app continue but log the error
-            System.Diagnostics.Debug.WriteLine("App will continue but Firebase services may not work properly");
         }
     }
     
@@ -82,7 +60,37 @@ public class AppDelegate : MauiUIApplicationDelegate
             System.Diagnostics.Debug.WriteLine($"Font registration workaround: {ex.Message}");
         }
     }
-
+    
+    private async Task InitializeAsync()
+    {
+        try
+        {
+            await Task.Delay(100); // Let UI settle
+            
+            // Initialize Firebase in background
+            try
+            {
+                // Initialize Firebase Core - this must happen before any Firebase services are used
+                Firebase.Core.App.Configure();
+                System.Diagnostics.Debug.WriteLine("Firebase initialized successfully for iOS");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Firebase initialization failed: {ex}");
+                // Don't throw here - let the app continue but log the error
+                System.Diagnostics.Debug.WriteLine("App will continue but Firebase services may not work properly");
+            }
+            
+            // Perform other heavy initialization tasks here
+            SetupMemoryManagement();
+            ConfigureForPerformance();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error during async initialization: {ex}");
+            _logger?.LogError(ex, "Error during async initialization");
+        }
+    }
     private void SetupMemoryManagement()
     {
         try

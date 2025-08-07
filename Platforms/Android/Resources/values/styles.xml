@@ -13,6 +13,12 @@
     <!-- App splash theme -->
     <style name="AppSplash" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+    
+    <!-- Main theme -->
+    <style name="MainTheme" parent="Maui.MainTheme">
+        <!-- Add any customizations for the main theme here -->
     </style>
     
     <!-- MaterialButton style -->

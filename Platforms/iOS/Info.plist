@@ -97,6 +97,6 @@
 	<false/>
 	<!-- Disable splash screen by setting empty launch storyboard -->
 	<key>UILaunchStoryboardName</key>
-	<string></string>
+	<string>LaunchScreen</string>
 </dict>
 </plist>
