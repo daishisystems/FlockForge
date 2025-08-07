@@ -313,35 +313,11 @@ namespace FlockForge.Services.Firebase
             }
         }
         
-        private void LogAuthenticationDebugInfo(string email, string password)
-        {
-            _logger.LogInformation("=== AUTH DEBUG START ===");
-            _logger.LogInformation($"Email: '{email}' | Length: {email?.Length}");
-            _logger.LogInformation($"Email trimmed: '{email?.Trim()}' | Length: {email?.Trim().Length}");
-            _logger.LogInformation($"Password length: {password?.Length}");
-            _logger.LogInformation($"Password trimmed length: {password?.Trim().Length}");
-            
-            // Check for special characters
-            if (!string.IsNullOrEmpty(email))
-            {
-                for (int i = 0; i < email.Length; i++)
-                {
-                    if (char.IsControl(email[i]) || char.IsWhiteSpace(email[i]))
-                    {
-                        _logger.LogWarning($"Special character found at position {i}: Unicode {(int)email[i]}");
-                    }
-                }
-            }
-            _logger.LogInformation("=== AUTH DEBUG END ===");
-        }
         
         public async Task<AuthResult> SignInWithEmailPasswordAsync(string email, string password, CancellationToken cancellationToken = default)
         {
             try
             {
-                // Add debug logging
-                LogAuthenticationDebugInfo(email, password);
-                
                 // Clean inputs - CRITICAL: Trim whitespace
                 email = email?.Trim().ToLowerInvariant();
                 password = password?.Trim();

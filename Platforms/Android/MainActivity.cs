@@ -24,6 +24,13 @@ public class MainActivity : MauiAppCompatActivity
     {
         base.OnCreate(savedInstanceState);
         
+        // Move heavy initialization off UI thread
+        Task.Run(async () =>
+        {
+            await Task.Delay(100); // Let UI settle
+            // Move any heavy init here
+        });
+        
         try
         {
             // Initialize Firebase early in MainActivity
@@ -133,6 +140,11 @@ public class MainActivity : MauiAppCompatActivity
             {
                 PerformEmergencyCleanup();
             }
+            
+            if (level >= TrimMemory.RunningModerate)
+            {
+                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+            }
         }
         catch (Exception ex)
         {
@@ -208,6 +220,9 @@ public class MainActivity : MauiAppCompatActivity
         finally
         {
             base.OnDestroy();
+            Java.Lang.JavaSystem.Gc();
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
     }
 }

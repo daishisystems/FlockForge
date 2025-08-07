@@ -9,7 +9,9 @@
 		android:allowBackup="true"
 		android:icon="@mipmap/appicon"
 		android:roundIcon="@mipmap/appicon_round"
-		android:supportsRtl="true">
+		android:supportsRtl="true"
+		android:enableOnBackInvokedCallback="true"
+		android:largeHeap="true">
 		
 		<!-- Comprehensive Firebase Crashlytics disabling -->
 		<meta-data
@@ -60,4 +62,3 @@
 			android:exported="false" />
 	</application>
 </manifest>
-

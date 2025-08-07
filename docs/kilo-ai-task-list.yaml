@@ -1,0 +1,119 @@
+# kilo-ai-tasks-flockforge.yaml
+
+tasks:
+  - title: Enable OnBackInvokedCallback in Android Manifest
+    file: Platforms/Android/AndroidManifest.xml
+    find: '<application'
+    action: add_attribute
+    insert: ' android:enableOnBackInvokedCallback="true"'
+    priority: HIGH
+    verifies: "OnBackInvokedCallback is not enabled" warnings disappear
+
+  - title: Fix FastDev Assembly Loading Issues
+    file: FlockForge.csproj
+    find: '</PropertyGroup>'
+    action: insert_before
+    insert: |
+      <!-- Prevent FastDev assembly override issues -->
+      <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+      <AndroidUseAssemblyStore>false</AndroidUseAssemblyStore>
+    priority: CRITICAL
+    verifies: "open_from_bundles: failed to load bundled assembly" warnings gone
+
+  - title: Remove Sensitive Auth Debug Logging
+    file: Services/Firebase/FirebaseAuthenticationService.cs
+    find: '=== AUTH DEBUG START ==='
+    action: delete_block
+    end_marker: '=== AUTH DEBUG END ==='
+    priority: CRITICAL
+    verifies: No passwords or full emails in logs
+
+  - title: Fix Main Thread Blocking (55 frames skipped)
+    file: Platforms/Android/MainActivity.cs
+    find: 'base.OnCreate(savedInstanceState);'
+    action: insert_after
+    insert: |
+      // Move heavy initialization off UI thread
+      Task.Run(async () =>
+      {
+          await Task.Delay(100); // Let UI settle
+          // Move any heavy init here
+      });
+    priority: HIGH
+    verifies: No "Skipped X frames" warnings
+
+  - title: Add Resource Cleanup in MainActivity
+    file: Platforms/Android/MainActivity.cs
+    find: 'public class MainActivity'
+    action: add_methods
+    insert: |
+      protected override void OnDestroy()
+      {
+          base.OnDestroy();
+          Java.Lang.JavaSystem.Gc();
+          GC.Collect();
+          GC.WaitForPendingFinalizers();
+      }
+      
+      protected override void OnTrimMemory(TrimMemory level)
+      {
+          base.OnTrimMemory(level);
+          if (level >= TrimMemory.RunningModerate)
+          {
+              GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+          }
+      }
+    priority: HIGH
+    verifies: Reduced "A resource failed to call release" warnings
+
+  - title: Fix TabLayout Mode Warning
+    file: "**/*.cs"
+    find_pattern: 'TabMode.*=.*ModeScrollable.*GravityFill'
+    action: replace
+    with: |
+      TabMode = TabLayout.ModeScrollable;
+      TabGravity = TabLayout.GravityStart;
+    priority: LOW
+    verifies: No "MODE_SCROLLABLE + GRAVITY_FILL" warnings
+
+  - title: Configure Logcat Filter for Debugging
+    file: .vscode/tasks.json
+    action: create_if_missing
+    content: |
+      {
+        "version": "2.0.0",
+        "tasks": [
+          {
+            "label": "Show FlockForge Logs Only",
+            "type": "shell",
+            "command": "adb logcat -c && adb logcat FlockForge:* *:S",
+            "problemMatcher": []
+          }
+        ]
+      }
+    priority: LOW
+    verifies: Cleaner log output showing only app-specific messages
+
+  - title: Add Large Heap Support for Memory Management
+    file: Platforms/Android/AndroidManifest.xml
+    find: '<application'
+    action: add_attribute
+    insert: ' android:largeHeap="true"'
+    priority: MEDIUM
+    verifies: Fewer memory trim warnings at lower levels
+
+  - title: Clean Build Script
+    file: clean-rebuild.sh
+    action: create
+    content: |
+      #!/bin/bash
+      echo "Cleaning solution..."
+      rm -rf bin obj
+      rm -rf Platforms/Android/bin Platforms/Android/obj
+      dotnet clean
+      echo "Rebuilding..."
+      dotnet restore
+      dotnet build -f net9.0-android -c Debug
+      echo "Done! Now deploy to device."
+    priority: UTILITY
+    verifies: Clean build environment
