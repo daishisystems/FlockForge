@@ -4,6 +4,7 @@ using FlockForge.Core.Configuration;
 using FlockForge.Services.Firebase;
 using FlockForge.Services.Navigation;
 using CommunityToolkit.Maui;
+using System.Net.Http;
 
 #if IOS
 using FlockForge.Platforms.iOS.Services;
@@ -41,10 +42,11 @@ public static class MauiProgram
 			return config;
 		});
 		
-		// Platform services
-		builder.Services.AddSingleton<IConnectivity>(Connectivity.Current);
-		builder.Services.AddSingleton<ISecureStorage>(SecureStorage.Default);
-		builder.Services.AddSingleton<IPreferences>(Preferences.Default);
+                // Platform services
+                builder.Services.AddSingleton<IConnectivity>(Connectivity.Current);
+                builder.Services.AddSingleton<ISecureStorage>(SecureStorage.Default);
+                builder.Services.AddSingleton<IPreferences>(Preferences.Default);
+                builder.Services.AddSingleton<HttpClient>();
 		
 		// Firebase platform initializers
 #if IOS

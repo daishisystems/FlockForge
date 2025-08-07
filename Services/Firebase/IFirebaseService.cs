@@ -1,11 +1,12 @@
 using FlockForge.Models.Authentication;
+using System.Threading;
 
 namespace FlockForge.Services.Firebase;
 
 public interface IFirebaseService
 {
     Task<bool> IsAuthenticatedAsync();
-    Task<bool> IsOnlineAsync();
+    Task<bool> IsOnlineAsync(CancellationToken cancellationToken = default);
     Task<AuthResult> AuthenticateAsync(string email, string password);
     Task<AuthResult> AuthenticateWithGoogleAsync();
     Task<AuthResult> RegisterAsync(string email, string password, string displayName);

@@ -3,6 +3,8 @@ using FlockForge.Models.Authentication;
 using FlockForge.Core.Interfaces;
 using FlockForge.Core.Models;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Net.Http;
+using System.Threading;
 
 namespace FlockForge.Services.Firebase;
 
@@ -11,15 +13,18 @@ public class FirebaseService : IFirebaseService
     private readonly ILogger<FirebaseService> _logger;
     private readonly IAuthenticationService _authenticationService;
     private readonly IDataService _dataService;
+    private readonly HttpClient _httpClient;
 
     public FirebaseService(
         ILogger<FirebaseService> logger,
         IAuthenticationService authenticationService,
-        IDataService dataService)
+        IDataService dataService,
+        HttpClient httpClient)
     {
         _logger = logger;
         _authenticationService = authenticationService;
         _dataService = dataService;
+        _httpClient = httpClient;
     }
 
     public Task<bool> IsAuthenticatedAsync()
@@ -35,21 +40,48 @@ public class FirebaseService : IFirebaseService
         }
     }
 
-    public async Task<bool> IsOnlineAsync()
+    public async Task<bool> IsOnlineAsync(CancellationToken cancellationToken = default)
     {
-        try
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        cts.CancelAfter(TimeSpan.FromSeconds(5));
+
+        var delay = TimeSpan.FromMilliseconds(200);
+        const int maxAttempts = 3;
+
+        for (var attempt = 0; attempt < maxAttempts; attempt++)
         {
-            // Simple connectivity check
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            using var client = new HttpClient();
-            var response = await client.GetAsync("https://www.google.com", cts.Token);
-            return response.IsSuccessStatusCode;
+            try
+            {
+                var response = await _httpClient.GetAsync("https://www.google.com", cts.Token);
+                if (response.IsSuccessStatusCode)
+                    return true;
+            }
+            catch (OperationCanceledException) when (cts.IsCancellationRequested)
+            {
+                _logger.LogDebug("Network connectivity check cancelled");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex, "Network connectivity check attempt {Attempt} failed", attempt + 1);
+            }
+
+            if (attempt < maxAttempts - 1)
+            {
+                try
+                {
+                    await Task.Delay(delay, cts.Token);
+                }
+                catch (OperationCanceledException)
+                {
+                    _logger.LogDebug("Network connectivity check cancelled during delay");
+                    return false;
+                }
+                delay = delay * 2;
+            }
         }
-        catch (Exception ex)
-        {
-            _logger.LogDebug(ex, "Network connectivity check failed");
-            return false;
-        }
+
+        return false;
     }
 
     public async Task<Models.Authentication.AuthResult> AuthenticateAsync(string email, string password)
