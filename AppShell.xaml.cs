@@ -5,9 +5,11 @@ namespace FlockForge;
 
 public partial class AppShell : Shell
 {
-	private readonly IAuthenticationService _authService;
-	private readonly ILogger<AppShell> _logger;
-	private IDisposable? _authStateSubscription;
+        private readonly IAuthenticationService _authService;
+        private readonly ILogger<AppShell> _logger;
+        private IDisposable? _authStateSubscription;
+        private bool _isShellLoaded;
+        private bool _disposed;
 
 	public AppShell(IAuthenticationService authService, ILogger<AppShell> logger)
 	{
@@ -20,7 +22,7 @@ public partial class AppShell : Shell
 		_authStateSubscription = _authService.AuthStateChanged.Subscribe(OnAuthStateChanged);
 		
 		// Defer initial route setting until after the Shell is fully loaded
-		Loaded += OnShellLoaded;
+                Loaded += OnShellLoaded;
 		
 		// Also try immediate initialization as fallback for Android
 		Task.Run(async () =>
@@ -44,19 +46,23 @@ public partial class AppShell : Shell
 		});
 	}
 
-	private void OnShellLoaded(object? sender, EventArgs e)
-	{
-		try
-		{
-			_logger?.LogDebug("Shell loaded, setting initial route");
-			// Set initial route based on current auth state
-			SetInitialRoute();
-		}
-		catch (Exception ex)
-		{
-			_logger?.LogError(ex, "Error in OnShellLoaded");
-		}
-	}
+        private void OnShellLoaded(object? sender, EventArgs e)
+        {
+                if (_isShellLoaded)
+                        return;
+
+                _isShellLoaded = true;
+                try
+                {
+                        _logger?.LogDebug("Shell loaded, setting initial route");
+                        // Set initial route based on current auth state
+                        SetInitialRoute();
+                }
+                catch (Exception ex)
+                {
+                        _logger?.LogError(ex, "Error in OnShellLoaded");
+                }
+        }
 
 	private void SetInitialRoute()
 	{
@@ -184,10 +190,16 @@ public partial class AppShell : Shell
 		}
 	}
 
-	protected override void OnDisappearing()
-	{
-		base.OnDisappearing();
-		_authStateSubscription?.Dispose();
-	}
+        protected override void OnDisappearing()
+        {
+                if (_disposed)
+                        return;
+
+                _disposed = true;
+
+                Loaded -= OnShellLoaded;
+                _authStateSubscription?.Dispose();
+                base.OnDisappearing();
+        }
 }
 
