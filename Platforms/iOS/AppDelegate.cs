@@ -20,6 +20,10 @@ public class AppDelegate : MauiUIApplicationDelegate
     {
         try
         {
+            // Initialize Firebase Core - this must happen before any Firebase services are used
+            Firebase.Core.App.Configure();
+            System.Diagnostics.Debug.WriteLine("Firebase initialized successfully for iOS");
+            
             // Create the MAUI app first
             var result = base.FinishedLaunching(application, launchOptions);
             
@@ -67,19 +71,7 @@ public class AppDelegate : MauiUIApplicationDelegate
         {
             await Task.Delay(100); // Let UI settle
             
-            // Initialize Firebase in background
-            try
-            {
-                // Initialize Firebase Core - this must happen before any Firebase services are used
-                Firebase.Core.App.Configure();
-                System.Diagnostics.Debug.WriteLine("Firebase initialized successfully for iOS");
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Firebase initialization failed: {ex}");
-                // Don't throw here - let the app continue but log the error
-                System.Diagnostics.Debug.WriteLine("App will continue but Firebase services may not work properly");
-            }
+            
             
             // Perform other heavy initialization tasks here
             SetupMemoryManagement();
