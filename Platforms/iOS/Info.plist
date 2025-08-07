@@ -98,5 +98,7 @@
 	<!-- Disable splash screen by setting empty launch storyboard -->
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
+	<key>MinimumOSVersion</key>
+	<string>14.0</string>
 </dict>
 </plist>
