@@ -22,6 +22,12 @@ namespace FlockForge.Platforms.iOS.Helpers
                 _subscriptions.Add(subscription);
         }
 
+        public void Add(IDisposable subscription)
+        {
+            if (subscription != null)
+                _subscriptions.Add(subscription);
+        }
+
         public void Dispose()
         {
             Dispose(true);

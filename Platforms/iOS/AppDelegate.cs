@@ -106,18 +106,18 @@ public class AppDelegate : MauiUIApplicationDelegate
             var observer1 = NSNotificationCenter.DefaultCenter.AddObserver(
                 UIApplication.DidReceiveMemoryWarningNotification,
                 HandleMemoryWarning).AsDisposable();
-            _observerManager.AddSubscription(observer1);
+            _observerManager.Add(observer1);
             
             // Register for background/foreground notifications
             var observer2 = NSNotificationCenter.DefaultCenter.AddObserver(
                 UIApplication.DidEnterBackgroundNotification,
                 HandleDidEnterBackground).AsDisposable();
-            _observerManager.AddSubscription(observer2);
+            _observerManager.Add(observer2);
                 
             var observer3 = NSNotificationCenter.DefaultCenter.AddObserver(
                 UIApplication.WillEnterForegroundNotification,
                 HandleWillEnterForeground).AsDisposable();
-            _observerManager.AddSubscription(observer3);
+            _observerManager.Add(observer3);
             
             _logger?.LogDebug("iOS memory management setup completed");
         }
