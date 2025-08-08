@@ -117,6 +117,10 @@ namespace FlockForge.ViewModels.Base
             _subscriptions.Add(subscription);
         }
         
+        public virtual void OnAppearing() { }
+        
+        public virtual void OnDisappearing() { }
+        
         public virtual void Dispose()
         {
             if (IsDisposed) return;

@@ -9,6 +9,7 @@ using Plugin.Firebase.Firestore;
 using Polly;
 using FlockForge.Core.Interfaces;
 using FlockForge.Core.Models;
+using FlockForge.Helpers;
 
 namespace FlockForge.Services.Firebase
 {
@@ -278,6 +279,36 @@ namespace FlockForge.Services.Firebase
             return subject;
         }
         
+        public IDisposable SubscribeToDocument<T>(string documentId, Action<T> onNext) where T : BaseEntity
+        {
+            var key = $"{typeof(T).Name}:{documentId}:subscription";
+            
+            // Remove existing listener if any
+            if (_listeners.TryGetValue(key, out var existing))
+            {
+                existing.Dispose();
+            }
+            
+            var docRef = Firestore
+                .GetCollection(GetCollectionName<T>())
+                .GetDocument(documentId);
+            
+            var listener = docRef.AddSnapshotListener<T>(snapshot =>
+            {
+                if (snapshot != null && snapshot.Data != null)
+                {
+                    onNext(snapshot.Data);
+                }
+            }, error =>
+            {
+                _logger.LogError("Document listener error: {Error}", error.Message);
+            });
+            
+            _listeners[key] = listener;
+            
+            return listener;
+        }
+        
         public IObservable<IReadOnlyList<T>> CollectionChanged<T>() where T : BaseEntity
         {
             var subject = new Subject<IReadOnlyList<T>>();
@@ -321,6 +352,51 @@ namespace FlockForge.Services.Firebase
             _listeners[key] = listener;
             
             return subject;
+        }
+        
+        public IDisposable SubscribeToCollection<T>(string path, Action<IReadOnlyList<T>> onSnapshot) where T : BaseEntity
+        {
+            var key = $"{typeof(T).Name}:{path}:subscription";
+            
+            // Remove existing listener if any
+            if (_listeners.TryGetValue(key, out var existing))
+            {
+                existing.Dispose();
+            }
+            
+            if (!_authService.IsAuthenticated)
+            {
+                // Return a no-op disposable if not authenticated
+                return new ActionDisposable(() => { });
+            }
+            
+            var userId = _authService.CurrentUser!.Id;
+            
+            var query = Firestore
+                .GetCollection(path)
+                .WhereEqualsTo("userId", userId)
+                .WhereEqualsTo("isDeleted", false)
+                .OrderBy("updatedAt", true);
+            
+            var listener = query.AddSnapshotListener<T>(snapshot =>
+            {
+                if (snapshot != null)
+                {
+                    var data = snapshot.Documents
+                        .Select(d => d.Data)
+                        .Where(d => d != null)
+                        .ToList();
+                    
+                    onSnapshot(data!);
+                }
+            }, error =>
+            {
+                _logger.LogError("Collection listener error: {Error}", error.Message);
+            });
+            
+            _listeners[key] = listener;
+            
+            return listener;
         }
         
         private string GetCollectionName<T>() where T : BaseEntity

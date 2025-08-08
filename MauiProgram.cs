@@ -26,19 +26,6 @@ public static class MauiProgram
 		var builder = MauiApp.CreateBuilder();
 		builder
 			.UseMauiApp<App>()
-			.ConfigureFonts(fonts =>
-			{
-				#if !IOS
-				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-				#else
-				// Check if font already exists before registering
-				if (!UIKit.UIFont.FamilyNames.Contains("OpenSans"))
-				{
-					fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-				}
-				#endif
-				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-			})
 			.UseMauiCommunityToolkit();
 
 		// Configuration

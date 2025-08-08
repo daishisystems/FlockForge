@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<local:BaseContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:FlockForge.Controls"
              xmlns:vm="clr-namespace:FlockForge.ViewModels.Pages"
+             xmlns:local="clr-namespace:FlockForge.Views.Base"
              x:Class="FlockForge.Views.Pages.RegisterPage"
              x:DataType="vm:RegisterViewModel"
              Title="Create Account">
@@ -45,8 +46,7 @@
                     ReturnType="Next"
                     HeightRequest="60"
                     Margin="0,10"
-                    SemanticProperties.Description="Enter display name"
-                    AutomationProperties.Name="Display Name"/>
+                    SemanticProperties.Description="Enter display name"/>
             </Frame>
             
             <!-- Email Input -->
@@ -58,8 +58,7 @@
                     ReturnType="Next"
                     HeightRequest="60"
                     Margin="0,10"
-                    SemanticProperties.Description="Enter email address"
-                    AutomationProperties.Name="Email"/>
+                    SemanticProperties.Description="Enter email address"/>
             </Frame>
             
             <!-- Password Input with AutoFill protection -->
@@ -70,8 +69,7 @@
                     ReturnType="Next"
                     HeightRequest="60"
                     Margin="0,10"
-                    SemanticProperties.Description="Enter password"
-                    AutomationProperties.Name="Password"/>
+                    SemanticProperties.Description="Enter password"/>
             </Frame>
             
             <!-- Confirm Password Input with AutoFill protection -->
@@ -82,8 +80,7 @@
                     ReturnType="Done"
                     HeightRequest="60"
                     Margin="0,10"
-                    SemanticProperties.Description="Re-enter password for confirmation"
-                    AutomationProperties.Name="Confirm Password"/>
+                    SemanticProperties.Description="Re-enter password for confirmation"/>
             </Frame>
             
             <!-- Error Message -->
@@ -107,8 +104,7 @@
                 CornerRadius="10"
                 HeightRequest="70"
                 Margin="0,20"
-                SemanticProperties.Description="Submit registration"
-                AutomationProperties.Name="Create Account"/>
+                SemanticProperties.Description="Submit registration"/>
             
             <!-- Cancel Button -->
             <Button
@@ -118,8 +114,7 @@
                 BackgroundColor="Transparent"
                 HeightRequest="60"
                 Margin="0,10"
-                SemanticProperties.Description="Cancel registration"
-                AutomationProperties.Name="Cancel"/>
+                SemanticProperties.Description="Cancel registration"/>
             
             <!-- Busy Indicator -->
             <StackLayout
@@ -140,4 +135,4 @@
             <BoxView HeightRequest="50" Color="Transparent"/>
         </VerticalStackLayout>
     </ScrollView>
-</ContentPage>
+</local:BaseContentPage>

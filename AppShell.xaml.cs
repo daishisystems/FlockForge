@@ -44,6 +44,16 @@ public partial class AppShell : Shell
 				}
 			});
 		});
+
+		// Add shell-level safety net
+		Navigated += (_, __) =>
+		{
+			if (Current?.CurrentPage is FlockForge.Views.Base.BaseContentPage page)
+				page.Disposables.Clear();
+
+			(Current?.CurrentPage?.BindingContext as FlockForge.ViewModels.Base.BaseViewModel)
+				?.OnDisappearing();
+		};
 	}
 
         private void OnShellLoaded(object? sender, EventArgs e)
@@ -202,4 +212,3 @@ public partial class AppShell : Shell
                 base.OnDisappearing();
         }
 }
-

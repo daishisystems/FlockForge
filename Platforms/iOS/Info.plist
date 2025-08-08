@@ -35,11 +35,6 @@
 		<string>fetch</string>
 		<string>remote-notification</string>
 	</array>
-	<key>UIAppFonts</key>
-	<array>
-		<string>OpenSans-Regular.ttf</string>
-		<string>OpenSans-Semibold.ttf</string>
-	</array>
 	<!-- Firebase Configuration -->
 	<key>CFBundleURLTypes</key>
 	<array>
