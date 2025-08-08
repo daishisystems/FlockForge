@@ -5,7 +5,6 @@ using FlockForge.Platforms.iOS.Services;
 using Microsoft.Extensions.Logging;
 using Firebase.Core;
 using FlockForge.Platforms.iOS.Helpers;
-using FlockForge.Utilities.Disposal;
 
 namespace FlockForge;
 
@@ -64,20 +63,6 @@ public class AppDelegate : MauiUIApplicationDelegate
         }
     }
     
-    private void RegisterCustomFonts()
-    {
-        try
-        {
-            // Explicitly handle font registration to prevent conflicts
-            // This prevents the "GSFont already exists" error by ensuring
-            // fonts are only registered once
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Font registration workaround: {ex.Message}");
-        }
-    }
-    
     private async Task InitializeAsync()
     {
         try
@@ -105,19 +90,19 @@ public class AppDelegate : MauiUIApplicationDelegate
             // Register for memory warning notifications
             var observer1 = NSNotificationCenter.DefaultCenter.AddObserver(
                 UIApplication.DidReceiveMemoryWarningNotification,
-                HandleMemoryWarning).AsDisposable();
-            _observerManager.AddSubscription(observer1);
-            
+                HandleMemoryWarning);
+            _observerManager.AddObserver(observer1);
+
             // Register for background/foreground notifications
             var observer2 = NSNotificationCenter.DefaultCenter.AddObserver(
                 UIApplication.DidEnterBackgroundNotification,
-                HandleDidEnterBackground).AsDisposable();
-            _observerManager.AddSubscription(observer2);
-                
+                HandleDidEnterBackground);
+            _observerManager.AddObserver(observer2);
+
             var observer3 = NSNotificationCenter.DefaultCenter.AddObserver(
                 UIApplication.WillEnterForegroundNotification,
-                HandleWillEnterForeground).AsDisposable();
-            _observerManager.AddSubscription(observer3);
+                HandleWillEnterForeground);
+            _observerManager.AddObserver(observer3);
             
             _logger?.LogDebug("iOS memory management setup completed");
         }
