@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<local:BaseContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<local:DisposableContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:FlockForge.Controls"
              xmlns:vm="clr-namespace:FlockForge.ViewModels.Pages"
@@ -135,4 +135,4 @@
             <BoxView HeightRequest="50" Color="Transparent"/>
         </VerticalStackLayout>
     </ScrollView>
-</local:BaseContentPage>
+</local:DisposableContentPage>

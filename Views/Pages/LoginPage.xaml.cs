@@ -1,10 +1,10 @@
 using System;
-using System.Reactive.Disposables;
+using Microsoft.Maui.Controls;
 using FlockForge.ViewModels.Pages;
 
 namespace FlockForge.Views.Pages;
 
-public partial class LoginPage : FlockForge.Views.Base.BaseContentPage
+public partial class LoginPage : FlockForge.Views.Base.DisposableContentPage
 {
 	public LoginPage(LoginViewModel viewModel)
 	{
