@@ -28,8 +28,15 @@ public static class MauiProgram
 			.UseMauiApp<App>()
 			.ConfigureFonts(fonts =>
 			{
-				// Only add fonts if they're not already registered (reduces iOS simulator warnings)
+				#if !IOS
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+				#else
+				// Check if font already exists before registering
+				if (!UIKit.UIFont.FamilyNames.Contains("OpenSans"))
+				{
+					fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+				}
+				#endif
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 			})
 			.UseMauiCommunityToolkit();

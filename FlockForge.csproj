@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
+<Import Project="build.props" />
 
 	<PropertyGroup>
 		<TargetFrameworks>net9.0-android;net9.0-ios</TargetFrameworks>
@@ -120,6 +121,10 @@
 		<!-- App Store Connect Integration -->
 		<EnableOnDemandResources>false</EnableOnDemandResources>
 		<MtouchFloat32>true</MtouchFloat32>
+		
+		<!-- Additional Release Optimizations -->
+		<MtouchEnableSGenConc>true</MtouchEnableSGenConc>
+		<UseInterpreter>false</UseInterpreter>
 	</PropertyGroup>
 	
 	<!-- iOS AdHoc/TestFlight Configuration -->
@@ -142,6 +147,39 @@
 		<CreatePackage>true</CreatePackage>
 		<BuildIpa>true</BuildIpa>
 		<ArchiveOnBuild>true</ArchiveOnBuild>
+	</PropertyGroup>
+	
+	<!-- Android Release Configuration -->
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)' == 'Release|net9.0-android'">
+		<AndroidEnableProfiledAot>true</AndroidEnableProfiledAot>
+		<AndroidEnableAssemblyCompression>true</AndroidEnableAssemblyCompression>
+		<AndroidUseAapt2>true</AndroidUseAapt2>
+		<AndroidCreatePackagePerAbi>false</AndroidCreatePackagePerAbi>
+		<AndroidPackageFormats>apk</AndroidPackageFormats>
+		<AndroidLinkMode>SdkOnly</AndroidLinkMode>
+		<AndroidEnableMultiDex>false</AndroidEnableMultiDex>
+		<DebugSymbols>false</DebugSymbols>
+		<DebugType>None</DebugType>
+	</PropertyGroup>
+
+	<!-- iOS Release Configuration -->
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)' == 'Release|net9.0-ios'">
+		<MtouchEnableSGenConc>true</MtouchEnableSGenConc>
+		<MtouchLink>SdkOnly</MtouchLink>
+		<MtouchUseLlvm>true</MtouchUseLlvm>
+		<UseInterpreter>false</UseInterpreter>
+		<MtouchFloat32>true</MtouchFloat32>
+		<DebugSymbols>false</DebugSymbols>
+		<DebugType>None</DebugType>
+	</PropertyGroup>
+
+	<!-- Shared Release Optimizations -->
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<PublishTrimmed>true</PublishTrimmed>
+		<TrimMode>partial</TrimMode>
+		<EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+		<RunAOTCompilation>true</RunAOTCompilation>
+		<Optimize>true</Optimize>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -196,4 +234,3 @@
 	</ItemGroup>
 
 </Project>
-

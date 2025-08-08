@@ -4,6 +4,7 @@ using FlockForge.Services.Platform;
 using FlockForge.Platforms.iOS.Services;
 using Microsoft.Extensions.Logging;
 using Firebase.Core;
+using FlockForge.Platforms.iOS.Helpers;
 
 namespace FlockForge;
 
@@ -11,6 +12,7 @@ namespace FlockForge;
 public class AppDelegate : MauiUIApplicationDelegate
 {
     private ILogger<AppDelegate>? _logger;
+    private ObserverManager? _observerManager;
     private IPlatformMemoryService? _memoryService;
 
     protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
@@ -22,6 +24,16 @@ public class AppDelegate : MauiUIApplicationDelegate
         {
             // Initialize Firebase Core - this must happen before any Firebase services are used
             Firebase.Core.App.Configure();
+// Ensure Crashlytics is properly initialized
+            if (Firebase.Crashlytics.Crashlytics.SharedInstance != null)
+            {
+                Firebase.Crashlytics.Crashlytics.SharedInstance.SetCrashlyticsCollectionEnabled(true);
+                System.Diagnostics.Debug.WriteLine("✅ Crashlytics initialized successfully");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("⚠️ Crashlytics SharedInstance is null");
+            }
             System.Diagnostics.Debug.WriteLine("Firebase initialized successfully for iOS");
             
             // Create the MAUI app first
@@ -87,19 +99,24 @@ public class AppDelegate : MauiUIApplicationDelegate
     {
         try
         {
+            _observerManager = new ObserverManager();
+            
             // Register for memory warning notifications
-            NSNotificationCenter.DefaultCenter.AddObserver(
+            var observer1 = NSNotificationCenter.DefaultCenter.AddObserver(
                 UIApplication.DidReceiveMemoryWarningNotification,
                 HandleMemoryWarning);
+            _observerManager.AddObserver(observer1);
             
             // Register for background/foreground notifications
-            NSNotificationCenter.DefaultCenter.AddObserver(
+            var observer2 = NSNotificationCenter.DefaultCenter.AddObserver(
                 UIApplication.DidEnterBackgroundNotification,
                 HandleDidEnterBackground);
+            _observerManager.AddObserver(observer2);
                 
-            NSNotificationCenter.DefaultCenter.AddObserver(
+            var observer3 = NSNotificationCenter.DefaultCenter.AddObserver(
                 UIApplication.WillEnterForegroundNotification,
                 HandleWillEnterForeground);
+            _observerManager.AddObserver(observer3);
             
             _logger?.LogDebug("iOS memory management setup completed");
         }
@@ -234,8 +251,9 @@ public class AppDelegate : MauiUIApplicationDelegate
         {
             try
             {
-                // Unregister notifications
-                NSNotificationCenter.DefaultCenter.RemoveObserver(this);
+                // Dispose observer manager which will properly dispose all observers
+                _observerManager?.Dispose();
+                _observerManager = null;
                 _logger?.LogInformation("iOS AppDelegate disposed");
             }
             catch (Exception ex)
@@ -247,4 +265,3 @@ public class AppDelegate : MauiUIApplicationDelegate
         base.Dispose(disposing);
     }
 }
-
