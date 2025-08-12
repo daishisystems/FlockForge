@@ -1,4 +1,5 @@
 using FlockForge.Core.Interfaces;
+using FlockForge.Utilities.Disposal;
 using Microsoft.Extensions.Logging;
 
 namespace FlockForge;
@@ -18,8 +19,15 @@ public partial class AppShell : Shell
 		_authService = authService;
 		_logger = logger;
 		
-		// Subscribe to authentication state changes
-		_authStateSubscription = _authService.AuthStateChanged.Subscribe(OnAuthStateChanged);
+                // Subscribe to authentication state changes
+#if DEBUG
+                _authStateSubscription = DisposeTracker.Track(
+                        _authService.AuthStateChanged.Subscribe(OnAuthStateChanged),
+                        nameof(AppShell),
+                        "auth state");
+#else
+                _authStateSubscription = _authService.AuthStateChanged.Subscribe(OnAuthStateChanged);
+#endif
 		
 		// Defer initial route setting until after the Shell is fully loaded
                 Loaded += OnShellLoaded;
@@ -48,8 +56,8 @@ public partial class AppShell : Shell
 		// Add shell-level safety net
 		Navigated += (_, __) =>
 		{
-			if (Current?.CurrentPage is FlockForge.Views.Base.BaseContentPage page)
-				page.Disposables.Clear();
+                        if (Current?.CurrentPage is FlockForge.Views.Base.DisposableContentPage page)
+                                page.Disposables.Clear();
 
 			(Current?.CurrentPage?.BindingContext as FlockForge.ViewModels.Base.BaseViewModel)
 				?.OnDisappearing();
@@ -208,7 +216,12 @@ public partial class AppShell : Shell
                 _disposed = true;
 
                 Loaded -= OnShellLoaded;
+#if DEBUG
+                DisposeTracker.Dispose(ref _authStateSubscription);
+#else
                 _authStateSubscription?.Dispose();
+                _authStateSubscription = null;
+#endif
                 base.OnDisappearing();
         }
 }
