@@ -10,6 +10,7 @@ public partial class AppShell : Shell
         private IDisposable? _authStateSubscription;
         private bool _isShellLoaded;
         private bool _disposed;
+        private EventHandler<ShellNavigatedEventArgs>? _navigatedHandler;
 
 	public AppShell(IAuthenticationService authService, ILogger<AppShell> logger)
 	{
@@ -45,15 +46,16 @@ public partial class AppShell : Shell
 			});
 		});
 
-		// Add shell-level safety net
-		Navigated += (_, __) =>
-		{
-			if (Current?.CurrentPage is FlockForge.Views.Base.BaseContentPage page)
-				page.Disposables.Clear();
+                // Add shell-level safety net
+                _navigatedHandler = (_, __) =>
+                {
+                        if (Current?.CurrentPage is FlockForge.Views.Base.DisposableContentPage page)
+                                page.Disposables.Clear();
 
-			(Current?.CurrentPage?.BindingContext as FlockForge.ViewModels.Base.BaseViewModel)
-				?.OnDisappearing();
-		};
+                        (Current?.CurrentPage?.BindingContext as FlockForge.ViewModels.Base.BaseViewModel)
+                                ?.OnDisappearing();
+                };
+                Navigated += _navigatedHandler;
 	}
 
         private void OnShellLoaded(object? sender, EventArgs e)
@@ -208,6 +210,11 @@ public partial class AppShell : Shell
                 _disposed = true;
 
                 Loaded -= OnShellLoaded;
+                if (_navigatedHandler != null)
+                {
+                        Navigated -= _navigatedHandler;
+                        _navigatedHandler = null;
+                }
                 _authStateSubscription?.Dispose();
                 base.OnDisappearing();
         }

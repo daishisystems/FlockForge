@@ -1,0 +1,3 @@
+- Use `DisposableContentPage` to manage page-scoped subscriptions with a built-in `CompositeDisposable`.
+- Store observer or subscription tokens as fields and dispose them in `OnDisappearing`.
+- In debug builds, wrap tokens with `DisposeTracker.Track` to verify they are released.
