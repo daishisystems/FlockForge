@@ -1,3 +1,5 @@
+using System;
+using System.Reactive.Disposables;
 using FlockForge.Core.Interfaces;
 using FlockForge.Utilities.Disposal;
 using Microsoft.Extensions.Logging;
@@ -8,52 +10,47 @@ public partial class AppShell : Shell
 {
         private readonly IAuthenticationService _authService;
         private readonly ILogger<AppShell> _logger;
-        private IDisposable? _authStateSubscription;
+        private readonly CompositeDisposable _disposables = new();
+        private EventHandler? _loadedHandler;
         private EventHandler<ShellNavigatedEventArgs>? _navigatedHandler;
         private bool _isShellLoaded;
-        private bool _disposed;
 
-	public AppShell(IAuthenticationService authService, ILogger<AppShell> logger)
-	{
-		InitializeComponent();
-		
-		_authService = authService;
-		_logger = logger;
-		
-                // Subscribe to authentication state changes
-#if DEBUG
-                _authStateSubscription = DisposeTracker.Track(
-                    _authService.AuthStateChanged.Subscribe(OnAuthStateChanged),
-                    nameof(AppShell), "auth state");
-#else
-                _authStateSubscription = _authService.AuthStateChanged.Subscribe(OnAuthStateChanged);
-#endif
-		
-		// Defer initial route setting until after the Shell is fully loaded
-                Loaded += OnShellLoaded;
-		
-		// Also try immediate initialization as fallback for Android
-		Task.Run(async () =>
-		{
-			await Task.Delay(100); // Small delay to ensure Shell is ready
-			MainThread.BeginInvokeOnMainThread(() =>
-			{
-				try
-				{
-					if (CurrentItem == null) // Only set if no navigation has occurred
-					{
-						_logger?.LogDebug("Fallback: Setting initial route");
-						SetInitialRoute();
-					}
-				}
-				catch (Exception ex)
-				{
-					_logger?.LogError(ex, "Error in fallback initialization");
-				}
-			});
-		});
+        public AppShell(IAuthenticationService authService, ILogger<AppShell> logger)
+        {
+                InitializeComponent();
 
-                // Add shell-level safety net
+                _authService = authService;
+                _logger = logger;
+
+                // Also try immediate initialization as fallback for Android
+                Task.Run(async () =>
+                {
+                        await Task.Delay(100); // Small delay to ensure Shell is ready
+                        MainThread.BeginInvokeOnMainThread(() =>
+                        {
+                                try
+                                {
+                                        if (CurrentItem == null) // Only set if no navigation has occurred
+                                        {
+                                                _logger?.LogDebug("Fallback: Setting initial route");
+                                                SetInitialRoute();
+                                        }
+                                }
+                                catch (Exception ex)
+                                {
+                                        _logger?.LogError(ex, "Error in fallback initialization");
+                                }
+                        });
+                });
+        }
+
+        protected override void OnAppearing()
+        {
+                base.OnAppearing();
+
+                _loadedHandler = OnShellLoaded;
+                Loaded += _loadedHandler;
+
                 _navigatedHandler = (_, __) =>
                 {
                         if (Current?.CurrentPage is FlockForge.Views.Base.BaseContentPage page)
@@ -63,7 +60,15 @@ public partial class AppShell : Shell
                                 ?.OnDisappearing();
                 };
                 Navigated += _navigatedHandler;
-	}
+
+#if DEBUG
+                _disposables.Add(DisposeTracker.Track(
+                    _authService.AuthStateChanged.Subscribe(OnAuthStateChanged),
+                    nameof(AppShell), "auth state"));
+#else
+                _disposables.Add(_authService.AuthStateChanged.Subscribe(OnAuthStateChanged));
+#endif
+        }
 
         private void OnShellLoaded(object? sender, EventArgs e)
         {
@@ -211,23 +216,19 @@ public partial class AppShell : Shell
 
         protected override void OnDisappearing()
         {
-                if (_disposed)
-                        return;
+                if (_loadedHandler != null)
+                {
+                        Loaded -= _loadedHandler;
+                        _loadedHandler = null;
+                }
 
-                _disposed = true;
-
-                Loaded -= OnShellLoaded;
                 if (_navigatedHandler != null)
                 {
                         Navigated -= _navigatedHandler;
                         _navigatedHandler = null;
                 }
-#if DEBUG
-                DisposeTracker.Dispose(ref _authStateSubscription);
-#else
-                _authStateSubscription?.Dispose();
-                _authStateSubscription = null;
-#endif
+
+                _disposables.Clear();
                 base.OnDisappearing();
         }
 }
