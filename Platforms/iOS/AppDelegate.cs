@@ -103,20 +103,44 @@ public class AppDelegate : MauiUIApplicationDelegate
             _observerManager = new ObserverManager();
             
             // Register for memory warning notifications
+#if DEBUG
+            var observer1 = DisposeTracker.Track(
+                NSNotificationCenter.DefaultCenter.AddObserver(
+                    UIApplication.DidReceiveMemoryWarningNotification,
+                    HandleMemoryWarning).AsDisposable(),
+                nameof(AppDelegate), "memory warning");
+#else
             var observer1 = NSNotificationCenter.DefaultCenter.AddObserver(
                 UIApplication.DidReceiveMemoryWarningNotification,
                 HandleMemoryWarning).AsDisposable();
+#endif
             _observerManager.Add(observer1);
-            
+
             // Register for background/foreground notifications
+#if DEBUG
+            var observer2 = DisposeTracker.Track(
+                NSNotificationCenter.DefaultCenter.AddObserver(
+                    UIApplication.DidEnterBackgroundNotification,
+                    HandleDidEnterBackground).AsDisposable(),
+                nameof(AppDelegate), "did enter background");
+#else
             var observer2 = NSNotificationCenter.DefaultCenter.AddObserver(
                 UIApplication.DidEnterBackgroundNotification,
                 HandleDidEnterBackground).AsDisposable();
+#endif
             _observerManager.Add(observer2);
-                
+
+#if DEBUG
+            var observer3 = DisposeTracker.Track(
+                NSNotificationCenter.DefaultCenter.AddObserver(
+                    UIApplication.WillEnterForegroundNotification,
+                    HandleWillEnterForeground).AsDisposable(),
+                nameof(AppDelegate), "will enter foreground");
+#else
             var observer3 = NSNotificationCenter.DefaultCenter.AddObserver(
                 UIApplication.WillEnterForegroundNotification,
                 HandleWillEnterForeground).AsDisposable();
+#endif
             _observerManager.Add(observer3);
             
             _logger?.LogDebug("iOS memory management setup completed");

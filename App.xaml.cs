@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using FlockForge.Utilities.Disposal;
 using FlockForge.Core.Interfaces;
 using FlockForge.Core.Models;
 using FlockForge.Services.Firebase;
@@ -34,7 +35,13 @@ namespace FlockForge
             SetupExceptionHandlers();
             
             // Subscribe to auth state changes
+#if DEBUG
+            _authSubscription = DisposeTracker.Track(
+                _authService.AuthStateChanged.Subscribe(OnAuthStateChanged),
+                nameof(App), "auth state");
+#else
             _authSubscription = _authService.AuthStateChanged.Subscribe(OnAuthStateChanged);
+#endif
             
             // Set initial page based on auth state
             SetMainPage(_authService.IsAuthenticated);
@@ -271,7 +278,12 @@ namespace FlockForge
         
         ~App()
         {
+#if DEBUG
+            DisposeTracker.Dispose(ref _authSubscription);
+#else
             _authSubscription?.Dispose();
+            _authSubscription = null;
+#endif
             _navigationLock?.Dispose();
         }
     }
