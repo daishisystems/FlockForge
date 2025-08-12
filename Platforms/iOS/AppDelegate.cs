@@ -105,7 +105,8 @@ public class AppDelegate : MauiUIApplicationDelegate
             _memoryWarningObserver = ObserverTracker.Mark(
                 NSNotificationCenter.DefaultCenter.AddObserver(
                     UIApplication.DidReceiveMemoryWarningNotification,
-                    HandleMemoryWarning));
+                    HandleMemoryWarning),
+                "AppDelegate.cs:SetupMemoryManagement");
 #else
             _memoryWarningObserver = NSNotificationCenter.DefaultCenter.AddObserver(
                 UIApplication.DidReceiveMemoryWarningNotification,
@@ -117,7 +118,8 @@ public class AppDelegate : MauiUIApplicationDelegate
             _didEnterBackgroundObserver = ObserverTracker.Mark(
                 NSNotificationCenter.DefaultCenter.AddObserver(
                     UIApplication.DidEnterBackgroundNotification,
-                    HandleDidEnterBackground));
+                    HandleDidEnterBackground),
+                "AppDelegate.cs:SetupMemoryManagement");
 #else
             _didEnterBackgroundObserver = NSNotificationCenter.DefaultCenter.AddObserver(
                 UIApplication.DidEnterBackgroundNotification,
@@ -128,7 +130,8 @@ public class AppDelegate : MauiUIApplicationDelegate
             _willEnterForegroundObserver = ObserverTracker.Mark(
                 NSNotificationCenter.DefaultCenter.AddObserver(
                     UIApplication.WillEnterForegroundNotification,
-                    HandleWillEnterForeground));
+                    HandleWillEnterForeground),
+                "AppDelegate.cs:SetupMemoryManagement");
 #else
             _willEnterForegroundObserver = NSNotificationCenter.DefaultCenter.AddObserver(
                 UIApplication.WillEnterForegroundNotification,
