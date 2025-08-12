@@ -1,22 +1,22 @@
 using System.Reactive.Disposables;
+using Microsoft.Maui.Controls;
 
 namespace FlockForge.Views.Base;
-public class DisposableContentPage : ContentPage, IDisposable
+public abstract class DisposableContentPage : ContentPage
 {
     protected CompositeDisposable Disposables { get; } = new();
-    private bool _disposed;
 
     protected override void OnDisappearing()
     {
+        Disposables.Clear();
         base.OnDisappearing();
-        Disposables.Clear(); // unsubscribe page-level observers
     }
 
-    public void Dispose()
+#if IOS
+    protected static void StopWebView(WebView? view)
     {
-        if (_disposed) return;
-        _disposed = true;
-        Disposables.Dispose();
-        GC.SuppressFinalize(this);
+        view?.StopLoading();
+        view?.Source = null;
     }
+#endif
 }
