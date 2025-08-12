@@ -15,6 +15,7 @@ public class AppDelegate : MauiUIApplicationDelegate
     private NSObject? _memoryWarningObserver;
     private NSObject? _didEnterBackgroundObserver;
     private NSObject? _willEnterForegroundObserver;
+    private bool _observersHooked;
 
     protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
     
@@ -82,10 +83,6 @@ public class AppDelegate : MauiUIApplicationDelegate
     {
         try
         {
-            await Task.Delay(100); // Let UI settle
-            
-            
-            
             // Perform other heavy initialization tasks here
             SetupMemoryManagement();
             ConfigureForPerformance();
@@ -100,6 +97,9 @@ public class AppDelegate : MauiUIApplicationDelegate
     {
         try
         {
+            if (_observersHooked)
+                return;
+
             // Register for memory warning notifications
 #if DEBUG
             _memoryWarningObserver = ObserverTracker.Mark(
@@ -135,6 +135,7 @@ public class AppDelegate : MauiUIApplicationDelegate
                 HandleWillEnterForeground);
 #endif
 
+            _observersHooked = true;
             _logger?.LogDebug("iOS memory management setup completed");
         }
         catch (Exception ex)
@@ -274,6 +275,7 @@ public class AppDelegate : MauiUIApplicationDelegate
                 _didEnterBackgroundObserver = null;
                 _willEnterForegroundObserver?.Dispose();
                 _willEnterForegroundObserver = null;
+                _observersHooked = false;
                 _logger?.LogInformation("iOS AppDelegate disposed");
             }
             catch (Exception ex)
