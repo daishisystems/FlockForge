@@ -1,12 +1,9 @@
 using System;
-using System.Reactive.Disposables;
 
 namespace FlockForge;
 
-public partial class MainPage : ContentPage, IDisposable
+public partial class MainPage : FlockForge.Views.Base.DisposableContentPage
 {
-    private readonly CompositeDisposable _disposables = new();
-    private bool _disposed;
     private int count = 0;
 
     public MainPage()
@@ -24,19 +21,5 @@ public partial class MainPage : ContentPage, IDisposable
             CounterBtn.Text = $"Clicked {count} times";
 
         SemanticScreenReader.Announce(CounterBtn.Text);
-    }
-
-    protected override void OnDisappearing()
-    {
-        _disposables.Clear();
-        base.OnDisappearing();
-    }
-
-    public void Dispose()
-    {
-        if (_disposed) return;
-        _disposed = true;
-        _disposables.Dispose();
-        GC.SuppressFinalize(this);
     }
 }

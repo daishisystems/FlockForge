@@ -20,6 +20,13 @@ namespace FlockForge
         private IDisposable? _authSubscription;
         private readonly SemaphoreSlim _navigationLock = new(1, 1);
         private volatile bool _isNavigating;
+        private EventHandler<UnobservedTaskExceptionEventArgs>? _unobservedTaskHandler;
+        private UnhandledExceptionEventHandler? _domainExceptionHandler;
+#if ANDROID
+        private EventHandler<Android.Runtime.RaiseThrowableEventArgs>? _androidExceptionHandler;
+#elif IOS
+        private EventHandler<ObjCRuntime.MarshalManagedExceptionEventArgs>? _iosExceptionHandler;
+#endif
         
         public App(IServiceProvider serviceProvider)
         {
@@ -43,18 +50,19 @@ namespace FlockForge
         private void SetupExceptionHandlers()
         {
             // Handle unobserved task exceptions
-            TaskScheduler.UnobservedTaskException += (sender, args) =>
+            _unobservedTaskHandler = (sender, args) =>
             {
                 _logger.LogError(args.Exception, "Unobserved task exception");
                 args.SetObserved();
             };
-            
+            TaskScheduler.UnobservedTaskException += _unobservedTaskHandler;
+
             // Handle domain exceptions
-            AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+            _domainExceptionHandler = (sender, args) =>
             {
                 var exception = args.ExceptionObject as Exception;
                 _logger.LogCritical(exception, "Unhandled domain exception");
-                
+
                 // Try to save critical data before crash
                 Task.Run(async () =>
                 {
@@ -65,19 +73,22 @@ namespace FlockForge
                     catch { }
                 });
             };
-            
+            AppDomain.CurrentDomain.UnhandledException += _domainExceptionHandler;
+
             // Platform-specific crash handlers
 #if ANDROID
-            Android.Runtime.AndroidEnvironment.UnhandledExceptionRaiser += (sender, args) =>
+            _androidExceptionHandler = (sender, args) =>
             {
                 _logger.LogCritical(args.Exception, "Android unhandled exception");
                 args.Handled = true;
             };
+            Android.Runtime.AndroidEnvironment.UnhandledExceptionRaiser += _androidExceptionHandler;
 #elif IOS
-            ObjCRuntime.Runtime.MarshalManagedException += (sender, args) =>
+            _iosExceptionHandler = (sender, args) =>
             {
                 _logger.LogCritical(args.Exception, "iOS unhandled exception");
             };
+            ObjCRuntime.Runtime.MarshalManagedException += _iosExceptionHandler;
 #endif
         }
         
@@ -272,6 +283,17 @@ namespace FlockForge
         ~App()
         {
             _authSubscription?.Dispose();
+            if (_unobservedTaskHandler != null)
+                TaskScheduler.UnobservedTaskException -= _unobservedTaskHandler;
+            if (_domainExceptionHandler != null)
+                AppDomain.CurrentDomain.UnhandledException -= _domainExceptionHandler;
+#if ANDROID
+            if (_androidExceptionHandler != null)
+                Android.Runtime.AndroidEnvironment.UnhandledExceptionRaiser -= _androidExceptionHandler;
+#elif IOS
+            if (_iosExceptionHandler != null)
+                ObjCRuntime.Runtime.MarshalManagedException -= _iosExceptionHandler;
+#endif
             _navigationLock?.Dispose();
         }
     }
