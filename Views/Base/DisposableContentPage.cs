@@ -1,22 +1,34 @@
 using System.Reactive.Disposables;
+#if ANDROID
+using AndroidWebView = Android.Webkit.WebView;
+#elif IOS
+using WebKit;
+#endif
 
 namespace FlockForge.Views.Base;
-public class DisposableContentPage : ContentPage, IDisposable
+
+public abstract class DisposableContentPage : ContentPage
 {
     protected CompositeDisposable Disposables { get; } = new();
-    private bool _disposed;
 
     protected override void OnDisappearing()
     {
+        Disposables.Clear();
         base.OnDisappearing();
-        Disposables.Clear(); // unsubscribe page-level observers
     }
 
-    public void Dispose()
+    protected static void StopWebView(WebView? webView)
     {
-        if (_disposed) return;
-        _disposed = true;
-        Disposables.Dispose();
-        GC.SuppressFinalize(this);
+        if (webView?.Handler?.PlatformView is null)
+            return;
+
+#if IOS
+        if (webView.Handler.PlatformView is WKWebView wkWebView)
+            wkWebView.StopLoading();
+#elif ANDROID
+        if (webView.Handler.PlatformView is AndroidWebView androidWebView)
+            androidWebView.StopLoading();
+#endif
+        webView.Source = null;
     }
 }
