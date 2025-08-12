@@ -265,4 +265,11 @@ public class AppDelegate : MauiUIApplicationDelegate
         
         base.Dispose(disposing);
     }
+
+    public override void WillTerminate(UIApplication application)
+    {
+        _observerManager?.Dispose();
+        _observerManager = null;
+        base.WillTerminate(application);
+    }
 }

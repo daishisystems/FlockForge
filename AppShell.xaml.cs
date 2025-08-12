@@ -1,4 +1,5 @@
 using FlockForge.Core.Interfaces;
+using FlockForge.Utilities.Disposal;
 using Microsoft.Extensions.Logging;
 
 namespace FlockForge;
@@ -8,8 +9,8 @@ public partial class AppShell : Shell
         private readonly IAuthenticationService _authService;
         private readonly ILogger<AppShell> _logger;
         private IDisposable? _authStateSubscription;
+        private EventHandler? _navigatedHandler;
         private bool _isShellLoaded;
-        private bool _disposed;
 
 	public AppShell(IAuthenticationService authService, ILogger<AppShell> logger)
 	{
@@ -18,10 +19,7 @@ public partial class AppShell : Shell
 		_authService = authService;
 		_logger = logger;
 		
-		// Subscribe to authentication state changes
-		_authStateSubscription = _authService.AuthStateChanged.Subscribe(OnAuthStateChanged);
-		
-		// Defer initial route setting until after the Shell is fully loaded
+                // Defer initial route setting until after the Shell is fully loaded
                 Loaded += OnShellLoaded;
 		
 		// Also try immediate initialization as fallback for Android
@@ -45,16 +43,29 @@ public partial class AppShell : Shell
 			});
 		});
 
-		// Add shell-level safety net
-		Navigated += (_, __) =>
-		{
-			if (Current?.CurrentPage is FlockForge.Views.Base.BaseContentPage page)
-				page.Disposables.Clear();
+                // Add shell-level safety net
+                _navigatedHandler = (_, __) =>
+                {
+                         if (Current?.CurrentPage is FlockForge.Views.Base.DisposableContentPage page)
+                                 page.Disposables.Clear();
 
-			(Current?.CurrentPage?.BindingContext as FlockForge.ViewModels.Base.BaseViewModel)
-				?.OnDisappearing();
-		};
-	}
+                        (Current?.CurrentPage?.BindingContext as FlockForge.ViewModels.Base.BaseViewModel)
+                                ?.OnDisappearing();
+                };
+                Navigated += _navigatedHandler;
+        }
+
+        protected override void OnAppearing()
+        {
+                base.OnAppearing();
+#if DEBUG
+                _authStateSubscription = DisposeTracker.Track(
+                        _authService.AuthStateChanged.Subscribe(OnAuthStateChanged),
+                        nameof(AppShell), "auth state");
+#else
+                _authStateSubscription = _authService.AuthStateChanged.Subscribe(OnAuthStateChanged);
+#endif
+        }
 
         private void OnShellLoaded(object? sender, EventArgs e)
         {
@@ -202,13 +213,18 @@ public partial class AppShell : Shell
 
         protected override void OnDisappearing()
         {
-                if (_disposed)
-                        return;
-
-                _disposed = true;
-
                 Loaded -= OnShellLoaded;
+                if (_navigatedHandler != null)
+                {
+                        Navigated -= _navigatedHandler;
+                        _navigatedHandler = null;
+                }
+#if DEBUG
+                DisposeTracker.Dispose(ref _authStateSubscription);
+#else
                 _authStateSubscription?.Dispose();
+                _authStateSubscription = null;
+#endif
                 base.OnDisappearing();
         }
 }
