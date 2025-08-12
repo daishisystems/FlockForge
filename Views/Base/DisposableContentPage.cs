@@ -1,22 +1,22 @@
 using System.Reactive.Disposables;
 
 namespace FlockForge.Views.Base;
-public class DisposableContentPage : ContentPage, IDisposable
+
+public abstract class DisposableContentPage : ContentPage
 {
     protected CompositeDisposable Disposables { get; } = new();
-    private bool _disposed;
+    protected WebView? ActiveWebView { get; set; }
 
     protected override void OnDisappearing()
     {
-        base.OnDisappearing();
-        Disposables.Clear(); // unsubscribe page-level observers
-    }
+        ActiveWebView?.StopLoading();
+        if (ActiveWebView != null)
+        {
+            ActiveWebView.Source = null;
+            ActiveWebView = null;
+        }
 
-    public void Dispose()
-    {
-        if (_disposed) return;
-        _disposed = true;
-        Disposables.Dispose();
-        GC.SuppressFinalize(this);
+        Disposables.Clear();
+        base.OnDisappearing();
     }
 }
