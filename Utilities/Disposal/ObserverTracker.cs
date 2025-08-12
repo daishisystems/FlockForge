@@ -1,5 +1,6 @@
 #if DEBUG
 using System;
+using System.Runtime.CompilerServices;
 namespace FlockForge.Utilities.Disposal
 {
     static class ObserverTracker
