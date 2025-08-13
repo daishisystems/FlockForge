@@ -85,11 +85,19 @@ public class MainActivity : MauiAppCompatActivity
                 WindowManagerFlags.HardwareAccelerated);
             
             // Configure task description for better memory management
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.Tiramisu)
             {
-                // Android 9.0+ (API 28+) - Use the simplified constructor
+                // Android 13.0+ (API 33+) - Use the simplified constructor without deprecated color parameter
                 var taskDescription = new ActivityManager.TaskDescription("FlockForge");
                 SetTaskDescription(taskDescription);
+            }
+            else if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
+            {
+                // Android 9.0+ (API 28+) - Use the constructor with label only
+#pragma warning disable CA1422 // Validate platform compatibility
+                var taskDescription = new ActivityManager.TaskDescription("FlockForge");
+                SetTaskDescription(taskDescription);
+#pragma warning restore CA1422 // Validate platform compatibility
             }
             else if (Build.VERSION.SdkInt >= BuildVersionCodes.M)
             {

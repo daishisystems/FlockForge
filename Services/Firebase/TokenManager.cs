@@ -82,7 +82,7 @@ public class TokenManager
     /// <summary>
     /// Clears all stored authentication tokens and user information
     /// </summary>
-    public async Task ClearStoredTokensAsync()
+    public Task ClearStoredTokensAsync()
     {
         try
         {
@@ -95,6 +95,8 @@ public class TokenManager
             // Log error but don't throw - token clearing failure is not critical
             System.Diagnostics.Debug.WriteLine($"Error clearing tokens: {ex.Message}");
         }
+        
+        return Task.CompletedTask;
     }
     
     /// <summary>
