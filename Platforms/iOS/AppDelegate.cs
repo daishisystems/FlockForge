@@ -64,7 +64,7 @@ public class AppDelegate : MauiUIApplicationDelegate
             ObjCRuntime.Runtime.MarshalManagedException += (s, a) =>
                 System.Diagnostics.Debug.WriteLine($"[OBS-PROOF] {DateTime.Now:HH:mm:ss.fff} MarshalManagedException: {a.Exception?.GetType().Name}: {a.Exception?.Message}");
             ObjCRuntime.Runtime.MarshalObjectiveCException += (s, a) =>
-                System.Diagnostics.Debug.WriteLine($"[OBS-PROOF] {DateTime.Now:HH:mm:ss.fff} MarshalObjectiveCException: {a.ExceptionName}: {a.Message}");
+                System.Diagnostics.Debug.WriteLine($"[OBS-PROOF] {DateTime.Now:HH:mm:ss.fff} MarshalObjectiveCException occurred");
 #endif
 
             // Move all heavy initialization off UI thread immediately

@@ -30,7 +30,6 @@ namespace FlockForge.Services.Firebase
         private Timer? _tokenRefreshTimer;
         private CancellationTokenSource? _disposeCts;
         private volatile bool _isDisposed;
-        private IDisposable? _authStateListener;
         
         // Storage keys
         private const string RefreshTokenKey = "firebase_refresh_token";
@@ -236,7 +235,7 @@ namespace FlockForge.Services.Firebase
             }
         }
         
-        private async Task<CoreUser?> GetUserFromBackupAsync()
+        private Task<CoreUser?> GetUserFromBackupAsync()
         {
             try
             {
@@ -248,13 +247,13 @@ namespace FlockForge.Services.Firebase
                 if (!string.IsNullOrEmpty(userId) && !string.IsNullOrEmpty(userEmail))
                 {
                     _logger.LogInformation("Restored user from backup preferences");
-                    return new CoreUser
+                    return Task.FromResult<CoreUser?>(new CoreUser
                     {
                         Id = userId,
                         Email = userEmail,
                         DisplayName = userName ?? userEmail,
                         LastLoginAt = DateTime.TryParse(authTime, out var time) ? time : DateTime.UtcNow
-                    };
+                    });
                 }
             }
             catch (Exception ex)
@@ -262,7 +261,7 @@ namespace FlockForge.Services.Firebase
                 _logger.LogError(ex, "Failed to restore from backup");
             }
             
-            return null;
+            return Task.FromResult<CoreUser?>(null);
         }
         
         private void StartTokenRefreshTimer()
@@ -319,8 +318,8 @@ namespace FlockForge.Services.Firebase
             try
             {
                 // Clean inputs - CRITICAL: Trim whitespace
-                email = email?.Trim().ToLowerInvariant();
-                password = password?.Trim();
+                email = email?.Trim().ToLowerInvariant() ?? string.Empty;
+                password = password?.Trim() ?? string.Empty;
                 
                 // Validate cleaned inputs
                 if (string.IsNullOrEmpty(email))
@@ -560,7 +559,7 @@ private async Task StoreAuthTokensAsync(IFirebaseUser user)
             }
         }
         
-        private async Task ClearAllStorageAsync()
+        private Task ClearAllStorageAsync()
         {
             // Clear secure storage
             try
@@ -590,6 +589,8 @@ private async Task StoreAuthTokensAsync(IFirebaseUser user)
             {
                 _logger.LogError(ex, "Failed to clear preferences");
             }
+            
+            return Task.CompletedTask;
         }
         
         public async Task<bool> SendEmailVerificationAsync()
@@ -640,45 +641,45 @@ private async Task StoreAuthTokensAsync(IFirebaseUser user)
             }
         }
         
-        public async Task<AuthResult> SignInWithGoogleAsync(CancellationToken cancellationToken = default)
+        public Task<AuthResult> SignInWithGoogleAsync(CancellationToken cancellationToken = default)
         {
-            if (_isDisposed) return AuthResult.Failure("Service is disposed");
+            if (_isDisposed) return Task.FromResult(AuthResult.Failure("Service is disposed"));
             
             try
             {
                 if (!_connectivity.NetworkAccess.HasFlag(NetworkAccess.Internet))
                 {
-                    return AuthResult.Failure("Google sign in requires an internet connection");
+                    return Task.FromResult(AuthResult.Failure("Google sign in requires an internet connection"));
                 }
                 
                 // TODO: Implement Google sign-in
-                return AuthResult.Failure("Google sign-in not yet implemented");
+                return Task.FromResult(AuthResult.Failure("Google sign-in not yet implemented"));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Google sign in failed");
-                return AuthResult.Failure("Google sign in failed");
+                return Task.FromResult(AuthResult.Failure("Google sign in failed"));
             }
         }
         
-        public async Task<AuthResult> SignInWithAppleAsync(CancellationToken cancellationToken = default)
+        public Task<AuthResult> SignInWithAppleAsync(CancellationToken cancellationToken = default)
         {
-            if (_isDisposed) return AuthResult.Failure("Service is disposed");
+            if (_isDisposed) return Task.FromResult(AuthResult.Failure("Service is disposed"));
             
             try
             {
                 if (!_connectivity.NetworkAccess.HasFlag(NetworkAccess.Internet))
                 {
-                    return AuthResult.Failure("Apple sign in requires an internet connection");
+                    return Task.FromResult(AuthResult.Failure("Apple sign in requires an internet connection"));
                 }
                 
                 // TODO: Implement Apple sign-in
-                return AuthResult.Failure("Apple sign-in not yet implemented");
+                return Task.FromResult(AuthResult.Failure("Apple sign-in not yet implemented"));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Apple sign in failed");
-                return AuthResult.Failure("Apple sign in failed");
+                return Task.FromResult(AuthResult.Failure("Apple sign in failed"));
             }
         }
         
