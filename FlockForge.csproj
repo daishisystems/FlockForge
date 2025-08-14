@@ -196,13 +196,18 @@
 
 		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
-	</ItemGroup>
+</ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
-		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
+<ItemGroup>
+<MauiFont Include="Resources/Fonts/OpenSans-Regular.ttf" Alias="OpenSansRegular" />
+<MauiFont Include="Resources/Fonts/OpenSans-Semibold.ttf" Alias="OpenSansSemibold" />
+</ItemGroup>
+
+<ItemGroup>
+<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
+<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
 		
 		<!-- Platform-specific Firebase packages to avoid Crashlytics conflicts -->
 		<!-- iOS: Complete package for framework dependencies -->
@@ -226,10 +231,25 @@
 		<GoogleServicesJson Include="Platforms\Android\google-services.json" />
 	</ItemGroup>
 
-	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
-		<BundleResource Include="Platforms\iOS\GoogleService-Info.plist">
-			<LogicalName>GoogleService-Info.plist</LogicalName>
-		</BundleResource>
-	</ItemGroup>
+<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+<BundleResource Include="Platforms\iOS\GoogleService-Info.plist">
+<LogicalName>GoogleService-Info.plist</LogicalName>
+</BundleResource>
+</ItemGroup>
+
+<PropertyGroup>
+<PowerShellExe Condition="'$(OS)' == 'Windows_NT' and '$(PowerShellExe)' == ''">powershell</PowerShellExe>
+<PowerShellExe Condition="'$(OS)' != 'Windows_NT' and '$(PowerShellExe)' == ''">pwsh</PowerShellExe>
+</PropertyGroup>
+
+<Target Name="VerifyFonts" BeforeTargets="Build">
+<Exec
+Command="&quot;$(PowerShellExe)&quot; -NoProfile -ExecutionPolicy Bypass -File &quot;$([System.IO.Path]::Combine('$(MSBuildProjectDirectory)','build','scripts','verify-fonts.ps1'))&quot; -Project &quot;$(MSBuildProjectFullPath)&quot; -TargetFramework &quot;$(TargetFramework)&quot; -Configuration &quot;$(Configuration)&quot;"
+IgnoreExitCode="true">
+<Output TaskParameter="ExitCode" PropertyName="VerifyFontsExitCode" />
+</Exec>
+<Warning Condition="'$(VerifyFontsExitCode)' == '2'" Text="verify-fonts reported warnings (non-blocking). See details above." />
+<Error   Condition="'$(VerifyFontsExitCode)' == '1'" Text="verify-fonts reported errors. See details above." />
+</Target>
 
 </Project>
