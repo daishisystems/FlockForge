@@ -15,7 +15,6 @@ using FlockForge.Platforms.Android.Services;
 using Firebase;
 using Plugin.Firebase.Auth;
 using Plugin.Firebase.Firestore;
-using Android.Graphics;
 #endif
 
 namespace FlockForge;
@@ -30,9 +29,8 @@ public static class MauiProgram
                         .UseMauiCommunityToolkit()
                         .ConfigureFonts(fonts =>
                         {
-                                // The aliases must match the csproj entries
-                                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                                fonts.AddFont("OpenSans-Regular.ttf", FontNames.Regular);
+                                fonts.AddFont("OpenSans-Semibold.ttf", FontNames.Semibold);
                         });
 
 		// Configuration
@@ -163,29 +161,6 @@ public static class MauiProgram
 #endif
 
                 var app = builder.Build();
-
-#if ANDROID
-                // Android-only smoke test (AFTER MAUI font registration and app build).
-                // If this fails, we log a warning and switch to a safe system fallback so the UI still renders.
-                try
-                {
-                        using var tf = Typeface.CreateFromAsset(Android.App.Application.Context.Assets, "OpenSans-Regular.ttf");
-                }
-                catch (Exception ex)
-                {
-                        var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("Fonts");
-                        logger.LogWarning(ex, "Android font runtime smoke test failed: OpenSans-Regular.ttf not found in Assets. Falling back to system font 'sans-serif'.");
-
-                        if (Application.Current?.Resources != null)
-                        {
-                                const string key = "AppFontFamily";
-                                if (Application.Current.Resources.ContainsKey(key))
-                                        Application.Current.Resources[key] = "sans-serif";
-                                else
-                                        Application.Current.Resources.Add(key, "sans-serif");
-                        }
-                }
-#endif
 
                 return app;
         }

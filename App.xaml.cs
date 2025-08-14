@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Maui.Controls;
 using FlockForge.Utilities.Disposal;
 using FlockForge.Core.Interfaces;
 using FlockForge.Core.Models;
@@ -30,7 +31,12 @@ namespace FlockForge
             _authService = serviceProvider.GetRequiredService<IAuthenticationService>();
             _dataService = serviceProvider.GetRequiredService<IDataService>();
             _logger = serviceProvider.GetRequiredService<ILogger<App>>();
-            
+
+#if DEBUG
+            var probe = new Label { FontFamily = FontNames.Regular, Text = "font probe" };
+            System.Diagnostics.Debug.WriteLine($"Font probe: {probe.FontFamily}");
+#endif
+
             // Set up global exception handlers
             SetupExceptionHandlers();
             
