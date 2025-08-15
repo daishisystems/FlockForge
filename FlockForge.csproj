@@ -193,6 +193,7 @@
     <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
+  <!-- Fonts -->
   <ItemGroup>
     <MauiFont Include="Resources/Fonts/OpenSans-Regular.ttf" Alias="OpenSansRegular" />
     <MauiFont Include="Resources/Fonts/OpenSans-Semibold.ttf" Alias="OpenSansSemibold" />
@@ -234,6 +235,13 @@
     <PowerShellExe Condition="'$(OS)' == 'Windows_NT' and '$(PowerShellExe)' == ''">powershell</PowerShellExe>
     <PowerShellExe Condition="'$(OS)' != 'Windows_NT' and '$(PowerShellExe)' == ''">pwsh</PowerShellExe>
   </PropertyGroup>
+
+  <Target Name="ValidateMauiFonts" BeforeTargets="Build">
+    <Error Condition="!Exists('Resources/Fonts/OpenSans-Regular.ttf')"
+           Text="Missing Resources/Fonts/OpenSans-Regular.ttf" />
+    <Error Condition="!Exists('Resources/Fonts/OpenSans-Semibold.ttf')"
+           Text="Missing Resources/Fonts/OpenSans-Semibold.ttf" />
+  </Target>
 
   <Target Name="VerifyFonts" BeforeTargets="Build">
     <Exec

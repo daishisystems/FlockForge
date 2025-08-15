@@ -32,12 +32,6 @@ namespace FlockForge
             _dataService = serviceProvider.GetRequiredService<IDataService>();
             _logger = serviceProvider.GetRequiredService<ILogger<App>>();
 
-#if DEBUG
-            var probe = new Label { FontFamily = FontNames.Regular, Text = "font probe" };
-            System.Diagnostics.Debug.WriteLine($"Font probe: {probe.FontFamily}");
-#endif
-
-            _logger.LogInformation("Fonts: Registered OpenSansRegular and OpenSansSemibold; all usages normalized.");
 
             // Set up global exception handlers
             SetupExceptionHandlers();
