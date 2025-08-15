@@ -37,6 +37,8 @@ namespace FlockForge
             System.Diagnostics.Debug.WriteLine($"Font probe: {probe.FontFamily}");
 #endif
 
+            _logger.LogInformation("Fonts: Registered OpenSansRegular and OpenSansSemibold; all usages normalized.");
+
             // Set up global exception handlers
             SetupExceptionHandlers();
             
