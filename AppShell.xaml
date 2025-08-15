@@ -62,8 +62,13 @@
                 Route="settings" />
         </Tab>
     </TabBar>
-#if DEBUG
-    <ShellContent Title="Fonts" ContentTemplate="{DataTemplate debug:FontDiagnosticsPage}" />
-#endif
+    
+    <!-- Debug-only content (can be toggled via IsVisible in code-behind if needed) -->
+    <ShellContent
+        x:Name="FontDiagnosticsPage"
+        Title="Fonts"
+        ContentTemplate="{DataTemplate debug:FontDiagnosticsPage}"
+        Route="fontdiagnostics"
+        IsVisible="False" />
 </Shell>
 
