@@ -1,255 +1,256 @@
 <Project Sdk="Microsoft.NET.Sdk">
-<Import Project="build.props" />
+  <Import Project="build.props" />
 
-	<PropertyGroup>
-		<TargetFrameworks>net9.0-android;net9.0-ios</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.19041.0</TargetFrameworks>
-		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
-		<!-- <TargetFrameworks>$(TargetFrameworks);net9.0-tizen</TargetFrameworks> -->
+  <!-- Fast device debug knobs (additive to the device group below) -->
+  <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'
+                            and '$(Configuration)' == 'Debug'
+                            and '$(DeviceBuild)' == 'true'">
+    <UseInterpreter>true</UseInterpreter>
+    <MtouchFastDev>true</MtouchFastDev>   <!-- incremental device deploy -->
+    <MtouchUseLlvm>false</MtouchUseLlvm>  <!-- LLVM only for Release -->
+    <MtouchLink>SdkOnly</MtouchLink>      <!-- keep size down on device -->
+    <DebugSymbols>false</DebugSymbols>    <!-- skip dSYMs in Debug -->
+  </PropertyGroup>
 
-		<!-- Note for MacCatalyst:
-		The default runtime is maccatalyst-x64, except in Release config, in which case the default is maccatalyst-x64;maccatalyst-arm64.
-		When specifying both architectures, use the plural <RuntimeIdentifiers> instead of the singular <RuntimeIdentifier>.
-		The Mac App Store will NOT accept apps with ONLY maccatalyst-arm64 indicated;
-		either BOTH runtimes must be indicated or ONLY macatalyst-x64. -->
-		<!-- For example: <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers> -->
+  <PropertyGroup>
+    <TargetFrameworks>net9.0-android;net9.0-ios</TargetFrameworks>
+    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.19041.0</TargetFrameworks>
 
-		<OutputType>Exe</OutputType>
-		<RootNamespace>FlockForge</RootNamespace>
-		<UseMaui>true</UseMaui>
-		<SingleProject>true</SingleProject>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>FlockForge</RootNamespace>
+    <UseMaui>true</UseMaui>
+    <SingleProject>true</SingleProject>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
 
-		<!-- Display name -->
-		<ApplicationTitle>FlockForge</ApplicationTitle>
+    <!-- App identity -->
+    <ApplicationTitle>FlockForge</ApplicationTitle>
+    <ApplicationId>io.nexair.flockforge</ApplicationId>
+    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <ApplicationVersion>1</ApplicationVersion>
 
-		<!-- App Identifier -->
-		<ApplicationId>io.nexair.flockforge</ApplicationId>
+    <!-- Store metadata -->
+    <ApplicationDescription>FlockForge - Advanced Farm Management System</ApplicationDescription>
+    <ApplicationCopyright>© 2025 NexAir Solutions</ApplicationCopyright>
+    <ApplicationCategory>Productivity</ApplicationCategory>
 
-		<!-- Versions -->
-		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
-		<ApplicationVersion>1</ApplicationVersion>
-		
-		<!-- App Store Connect Metadata -->
-		<ApplicationDescription>FlockForge - Advanced Farm Management System</ApplicationDescription>
-		<ApplicationCopyright>© 2025 NexAir Solutions</ApplicationCopyright>
-		<ApplicationCategory>Productivity</ApplicationCategory>
-		
-		<!-- Privacy and Permissions -->
-		<NSLocationWhenInUseUsageDescription>FlockForge needs location access to provide location-based farm management features.</NSLocationWhenInUseUsageDescription>
-		<NSCameraUsageDescription>FlockForge needs camera access to capture photos of livestock and farm conditions.</NSCameraUsageDescription>
-		<NSPhotoLibraryUsageDescription>FlockForge needs photo library access to select and save farm-related images.</NSPhotoLibraryUsageDescription>
-		<NSMicrophoneUsageDescription>FlockForge needs microphone access for voice notes and audio recordings.</NSMicrophoneUsageDescription>
-		<NSContactsUsageDescription>FlockForge needs contacts access to share farm data with team members.</NSContactsUsageDescription>
-		<NSCalendarsUsageDescription>FlockForge needs calendar access to schedule farm activities and reminders.</NSCalendarsUsageDescription>
-		<NSRemindersUsageDescription>FlockForge needs reminders access to create farm management tasks.</NSRemindersUsageDescription>
+    <!-- iOS privacy strings -->
+    <NSLocationWhenInUseUsageDescription>FlockForge needs location access to provide location-based farm management features.</NSLocationWhenInUseUsageDescription>
+    <NSCameraUsageDescription>FlockForge needs camera access to capture photos of livestock and farm conditions.</NSCameraUsageDescription>
+    <NSPhotoLibraryUsageDescription>FlockForge needs photo library access to select and save farm-related images.</NSPhotoLibraryUsageDescription>
+    <NSMicrophoneUsageDescription>FlockForge needs microphone access for voice notes and audio recordings.</NSMicrophoneUsageDescription>
+    <NSContactsUsageDescription>FlockForge needs contacts access to share farm data with team members.</NSContactsUsageDescription>
+    <NSCalendarsUsageDescription>FlockForge needs calendar access to schedule farm activities and reminders.</NSCalendarsUsageDescription>
+    <NSRemindersUsageDescription>FlockForge needs reminders access to create farm management tasks.</NSRemindersUsageDescription>
 
-		<!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
-		<WindowsPackageType>None</WindowsPackageType>
+    <!-- Windows -->
+    <WindowsPackageType>None</WindowsPackageType>
 
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.0</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">29.0</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
-		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
-		
-		<!-- Android -->
-		<AndroidMinSdkVersion>29</AndroidMinSdkVersion>
-		<AndroidTargetSdkVersion>35</AndroidTargetSdkVersion>
+    <!-- Supported platform versions -->
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">29.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
+    <TargetPlatformMinVersion   Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 
-		<!-- iOS -->
-		<iOSDeploymentTarget>14.0</iOSDeploymentTarget>
-		
-		<!-- Prevent FastDev assembly override issues -->
-		<EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
-		<AndroidUseAssemblyStore>false</AndroidUseAssemblyStore>
-	</PropertyGroup>
+    <!-- Android -->
+    <AndroidMinSdkVersion>29</AndroidMinSdkVersion>
+    <AndroidTargetSdkVersion>35</AndroidTargetSdkVersion>
 
-	<!-- iOS Runtime Identifiers - conditional based on configuration -->
-	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios' and '$(Configuration)' == 'Debug'">
-		<RuntimeIdentifier>iossimulator-x64</RuntimeIdentifier>
-	</PropertyGroup>
-	
-	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios' and '$(Configuration)' == 'Release'">
-		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
-	</PropertyGroup>
+    <!-- iOS -->
+    <iOSDeploymentTarget>14.0</iOSDeploymentTarget>
 
-	<!-- iOS Development Configuration for Simulator (No Provisioning Required) -->
-	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios' and '$(Configuration)' == 'Debug'">
-		<!-- Completely disable code signing for Debug/Simulator builds -->
-		<CodesignKey>-</CodesignKey>
-		<CodesignProvision>Automatic</CodesignProvision>
-		<CodesignEntitlements></CodesignEntitlements>
-		<MtouchLink>None</MtouchLink>
-		<MtouchDebug>true</MtouchDebug>
-		<CreatePackage>false</CreatePackage>
-		<BuildIpa>false</BuildIpa>
-		<!-- Disable provisioning profile requirement -->
-		<EnableCodeSigning>false</EnableCodeSigning>
-		<!-- Remove hardcoded RuntimeIdentifier to allow multiple targets -->
-	</PropertyGroup>
-	
-	<!-- iOS Release Configuration for App Store Distribution -->
-	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios' and '$(Configuration)' == 'Release'">
-		<!-- App Store Distribution Settings -->
-		<CodesignEntitlements>Platforms\iOS\Entitlements.plist</CodesignEntitlements>
-		<CodesignProvision>Automatic</CodesignProvision>
-		<CodesignKey>Apple Distribution</CodesignKey>
-		<EnableCodeSigning>true</EnableCodeSigning>
-		
-		<!-- Device Runtime for Physical Devices -->
-		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
-		
-		<!-- App Store Optimization -->
-		<MtouchLink>SdkOnly</MtouchLink>
-		<MtouchDebug>false</MtouchDebug>
-		<MtouchProfiling>false</MtouchProfiling>
-		<MtouchUseLlvm>true</MtouchUseLlvm>
-		<MtouchEnableBitcode>true</MtouchEnableBitcode>
-		
-		<!-- Package Settings -->
-		<CreatePackage>true</CreatePackage>
-		<BuildIpa>true</BuildIpa>
-		<ArchiveOnBuild>true</ArchiveOnBuild>
-		
-		<!-- Performance Optimization -->
-		<Optimize>true</Optimize>
-		<DebugType>portable</DebugType>
-		<DebugSymbols>true</DebugSymbols>
-		
-		<!-- App Store Connect Integration -->
-		<EnableOnDemandResources>false</EnableOnDemandResources>
-		<MtouchFloat32>true</MtouchFloat32>
-		
-		<!-- Additional Release Optimizations -->
-		<MtouchEnableSGenConc>true</MtouchEnableSGenConc>
-		<UseInterpreter>false</UseInterpreter>
-	</PropertyGroup>
-	
-	<!-- iOS AdHoc/TestFlight Configuration -->
-	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios' and '$(Configuration)' == 'AdHoc'">
-		<!-- TestFlight Distribution Settings -->
-		<CodesignEntitlements>Platforms\iOS\Entitlements.plist</CodesignEntitlements>
-		<CodesignProvision>Automatic</CodesignProvision>
-		<CodesignKey>Apple Distribution</CodesignKey>
-		<EnableCodeSigning>true</EnableCodeSigning>
-		
-		<!-- Device Runtime for TestFlight -->
-		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
-		
-		<!-- TestFlight Optimization -->
-		<MtouchLink>SdkOnly</MtouchLink>
-		<MtouchDebug>false</MtouchDebug>
-		<MtouchUseLlvm>true</MtouchUseLlvm>
-		
-		<!-- Package Settings -->
-		<CreatePackage>true</CreatePackage>
-		<BuildIpa>true</BuildIpa>
-		<ArchiveOnBuild>true</ArchiveOnBuild>
-	</PropertyGroup>
-	
-	<!-- Android Release Configuration -->
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)' == 'Release|net9.0-android'">
-		<AndroidEnableProfiledAot>true</AndroidEnableProfiledAot>
-		<AndroidEnableAssemblyCompression>true</AndroidEnableAssemblyCompression>
-		<AndroidUseAapt2>true</AndroidUseAapt2>
-		<AndroidCreatePackagePerAbi>false</AndroidCreatePackagePerAbi>
-		<AndroidPackageFormats>apk</AndroidPackageFormats>
-		<AndroidLinkMode>SdkOnly</AndroidLinkMode>
-		<AndroidEnableMultiDex>false</AndroidEnableMultiDex>
-		<DebugSymbols>false</DebugSymbols>
-		<DebugType>None</DebugType>
-	</PropertyGroup>
+    <!-- Prevent FastDev assembly override issues -->
+    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+    <AndroidUseAssemblyStore>false</AndroidUseAssemblyStore>
+  </PropertyGroup>
 
-	<!-- iOS Release Configuration -->
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)' == 'Release|net9.0-ios'">
-		<MtouchEnableSGenConc>true</MtouchEnableSGenConc>
-		<MtouchLink>SdkOnly</MtouchLink>
-		<MtouchUseLlvm>true</MtouchUseLlvm>
-		<UseInterpreter>false</UseInterpreter>
-		<MtouchFloat32>true</MtouchFloat32>
-		<DebugSymbols>false</DebugSymbols>
-		<DebugType>None</DebugType>
-	</PropertyGroup>
+  <!-- iOS Debug: SIMULATOR (default) -->
+  <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'
+                            and '$(Configuration)' == 'Debug'
+                            and '$(DeviceBuild)' != 'true'">
+    <!-- For Apple Silicon you may switch to iossimulator-arm64 -->
+    <RuntimeIdentifier>iossimulator-x64</RuntimeIdentifier>
+    <CodesignKey>-</CodesignKey>
+    <CodesignProvision>Automatic</CodesignProvision>
+    <CodesignEntitlements></CodesignEntitlements>
+    <MtouchLink>None</MtouchLink>
+    <MtouchDebug>true</MtouchDebug>
+    <CreatePackage>false</CreatePackage>
+    <BuildIpa>false</BuildIpa>
+    <EnableCodeSigning>false</EnableCodeSigning>
+  </PropertyGroup>
 
-	<!-- Shared Release Optimizations -->
-	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
-		<PublishTrimmed>true</PublishTrimmed>
-		<TrimMode>partial</TrimMode>
-		<EnableTrimAnalyzer>true</EnableTrimAnalyzer>
-		<RunAOTCompilation>true</RunAOTCompilation>
-		<Optimize>true</Optimize>
-	</PropertyGroup>
+  <!-- iOS Debug: PHYSICAL DEVICE (opt-in with -p:DeviceBuild=true) -->
+  <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'
+                            and '$(Configuration)' == 'Debug'
+                            and '$(DeviceBuild)' == 'true'">
+    <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+    <EnableCodeSigning>true</EnableCodeSigning>
+    <CodesignKey>Apple Development: Paul Mooney (9UP764SL37)</CodesignKey>
+    <CodesignProvision>Automatic</CodesignProvision>
+    <CodesignEntitlements>Platforms\iOS\Entitlements.plist</CodesignEntitlements>
+    <MtouchLink>SdkOnly</MtouchLink>
+    <MtouchDebug>true</MtouchDebug>
+    <CreatePackage>false</CreatePackage>
+    <BuildIpa>false</BuildIpa>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\appicon.svg" Color="#2E7D32" />
+  <!-- iOS Release: App Store distribution -->
+  <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'
+                            and '$(Configuration)' == 'Release'">
+    <CodesignEntitlements>Platforms\iOS\Entitlements.plist</CodesignEntitlements>
+    <CodesignProvision>Automatic</CodesignProvision>
+    <CodesignKey>Apple Distribution</CodesignKey>
+    <EnableCodeSigning>true</EnableCodeSigning>
 
+    <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
 
-		<!-- Images -->
-		<MauiImage Include="Resources\Images\*" />
-		<MauiImage Update="Resources\Images\dotnet_bot.png" Resize="True" BaseSize="300,185" />
-		<MauiImage Update="Resources\Images\flockforge_logo.png" Resize="True" BaseSize="120,120" />
+    <MtouchLink>SdkOnly</MtouchLink>
+    <MtouchDebug>false</MtouchDebug>
+    <MtouchProfiling>false</MtouchProfiling>
+    <MtouchUseLlvm>true</MtouchUseLlvm>
+    <MtouchEnableBitcode>false</MtouchEnableBitcode>
 
-            <!-- Custom Fonts -->
+    <CreatePackage>true</CreatePackage>
+    <BuildIpa>true</BuildIpa>
+    <ArchiveOnBuild>true</ArchiveOnBuild>
 
-		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
-		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
-</ItemGroup>
+    <Optimize>true</Optimize>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
 
-<ItemGroup>
-<MauiFont Include="Resources/Fonts/OpenSans-Regular.ttf" Alias="OpenSansRegular" />
-<MauiFont Include="Resources/Fonts/OpenSans-Semibold.ttf" Alias="OpenSansSemibold" />
-</ItemGroup>
+    <EnableOnDemandResources>false</EnableOnDemandResources>
+    <MtouchFloat32>true</MtouchFloat32>
+    <MtouchEnableSGenConc>true</MtouchEnableSGenConc>
+    <UseInterpreter>false</UseInterpreter>
+  </PropertyGroup>
 
-<ItemGroup>
-<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
-<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
-<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
-		
-		<!-- Platform-specific Firebase packages to avoid Crashlytics conflicts -->
-		<!-- iOS: Complete package for framework dependencies -->
-		<PackageReference Include="Plugin.Firebase" Version="3.1.1" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'" />
-		
-		<!-- Android: Individual packages without Crashlytics -->
-		<PackageReference Include="Plugin.Firebase.Core" Version="3.1.1" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'" />
-		<PackageReference Include="Plugin.Firebase.Auth" Version="3.1.1" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'" />
-		<PackageReference Include="Plugin.Firebase.Firestore" Version="3.1.1" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'" />
-		<PackageReference Include="Plugin.Firebase.Storage" Version="3.1.1" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'" />
-		
-		<!-- Supporting packages -->
-		<PackageReference Include="System.Reactive" Version="6.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
-		<PackageReference Include="Polly" Version="8.2.0" />
-		<PackageReference Include="CommunityToolkit.Maui" Version="7.0.0" />
-	</ItemGroup>
+  <!-- iOS AdHoc/TestFlight -->
+  <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'
+                            and '$(Configuration)' == 'AdHoc'">
+    <CodesignEntitlements>Platforms\iOS\Entitlements.plist</CodesignEntitlements>
+    <CodesignProvision>Automatic</CodesignProvision>
+    <CodesignKey>Apple Distribution</CodesignKey>
+    <EnableCodeSigning>true</EnableCodeSigning>
 
-	<!-- Firebase Configuration Files -->
-	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
-		<GoogleServicesJson Include="Platforms\Android\google-services.json" />
-	</ItemGroup>
+    <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
 
-<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
-<BundleResource Include="Platforms\iOS\GoogleService-Info.plist">
-<LogicalName>GoogleService-Info.plist</LogicalName>
-</BundleResource>
-</ItemGroup>
+    <MtouchLink>SdkOnly</MtouchLink>
+    <MtouchDebug>false</MtouchDebug>
+    <MtouchUseLlvm>true</MtouchUseLlvm>
+    <MtouchEnableBitcode>false</MtouchEnableBitcode>
 
-<PropertyGroup>
-<PowerShellExe Condition="'$(OS)' == 'Windows_NT' and '$(PowerShellExe)' == ''">powershell</PowerShellExe>
-<PowerShellExe Condition="'$(OS)' != 'Windows_NT' and '$(PowerShellExe)' == ''">pwsh</PowerShellExe>
-</PropertyGroup>
+    <CreatePackage>true</CreatePackage>
+    <BuildIpa>true</BuildIpa>
+    <ArchiveOnBuild>true</ArchiveOnBuild>
+  </PropertyGroup>
 
-<Target Name="VerifyFonts" BeforeTargets="Build">
-<Exec
-Command="&quot;$(PowerShellExe)&quot; -NoProfile -ExecutionPolicy Bypass -File &quot;$([System.IO.Path]::Combine('$(MSBuildProjectDirectory)','build','scripts','verify-fonts.ps1'))&quot; -Project &quot;$(MSBuildProjectFullPath)&quot; -TargetFramework &quot;$(TargetFramework)&quot; -Configuration &quot;$(Configuration)&quot;"
-IgnoreExitCode="true">
-<Output TaskParameter="ExitCode" PropertyName="VerifyFontsExitCode" />
-</Exec>
-<Warning Condition="'$(VerifyFontsExitCode)' == '2'" Text="verify-fonts reported warnings (non-blocking). See details above." />
-<Error   Condition="'$(VerifyFontsExitCode)' == '1'" Text="verify-fonts reported errors. See details above." />
-</Target>
+  <!-- Android Release -->
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)' == 'Release|net9.0-android'">
+    <AndroidEnableProfiledAot>true</AndroidEnableProfiledAot>
+    <AndroidEnableAssemblyCompression>true</AndroidEnableAssemblyCompression>
+    <AndroidUseAapt2>true</AndroidUseAapt2>
+    <AndroidCreatePackagePerAbi>false</AndroidCreatePackagePerAbi>
+    <AndroidPackageFormats>apk</AndroidPackageFormats>
+    <AndroidLinkMode>SdkOnly</AndroidLinkMode>
+    <AndroidEnableMultiDex>false</AndroidEnableMultiDex>
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>None</DebugType>
+  </PropertyGroup>
 
+  <!-- iOS Release (extra tuning when targeting net9.0-ios directly) -->
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)' == 'Release|net9.0-ios'">
+    <MtouchEnableSGenConc>true</MtouchEnableSGenConc>
+    <MtouchLink>SdkOnly</MtouchLink>
+    <MtouchUseLlvm>true</MtouchUseLlvm>
+    <UseInterpreter>false</UseInterpreter>
+    <MtouchFloat32>true</MtouchFloat32>
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>None</DebugType>
+    <MtouchEnableBitcode>false</MtouchEnableBitcode>
+  </PropertyGroup>
+
+  <!-- Shared Release optimizations -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>partial</TrimMode>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <RunAOTCompilation>true</RunAOTCompilation>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- App Icon -->
+    <MauiIcon Include="Resources\AppIcon\appicon.svg" Color="#2E7D32" />
+
+    <!-- Images -->
+    <MauiImage Include="Resources\Images\*" />
+    <MauiImage Update="Resources\Images\dotnet_bot.png" Resize="True" BaseSize="300,185" />
+    <MauiImage Update="Resources\Images\flockforge_logo.png" Resize="True" BaseSize="120,120" />
+
+    <!-- Raw assets -->
+    <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <MauiFont Include="Resources/Fonts/OpenSans-Regular.ttf" Alias="OpenSansRegular" />
+    <MauiFont Include="Resources/Fonts/OpenSans-Semibold.ttf" Alias="OpenSansSemibold" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
+
+    <!-- iOS: keep full Plugin.Firebase (includes Crashlytics you reference) -->
+    <PackageReference Include="Plugin.Firebase" Version="3.1.1" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'" />
+
+    <!-- Android: individual packages -->
+    <PackageReference Include="Plugin.Firebase.Core" Version="3.1.1" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'" />
+    <PackageReference Include="Plugin.Firebase.Auth" Version="3.1.1" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'" />
+    <PackageReference Include="Plugin.Firebase.Firestore" Version="3.1.1" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'" />
+    <PackageReference Include="Plugin.Firebase.Storage" Version="3.1.1" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'" />
+
+    <PackageReference Include="System.Reactive" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
+    <PackageReference Include="Polly" Version="8.2.0" />
+    <PackageReference Include="CommunityToolkit.Maui" Version="7.0.0" />
+  </ItemGroup>
+
+  <!-- Firebase config files -->
+  <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+    <GoogleServicesJson Include="Platforms\Android\google-services.json" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+    <BundleResource Include="Platforms\iOS\GoogleService-Info.plist">
+      <LogicalName>GoogleService-Info.plist</LogicalName>
+    </BundleResource>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <PowerShellExe Condition="'$(OS)' == 'Windows_NT' and '$(PowerShellExe)' == ''">powershell</PowerShellExe>
+    <PowerShellExe Condition="'$(OS)' != 'Windows_NT' and '$(PowerShellExe)' == ''">pwsh</PowerShellExe>
+  </PropertyGroup>
+
+  <Target Name="VerifyFonts" BeforeTargets="Build">
+    <Exec
+      Command="&quot;$(PowerShellExe)&quot; -NoProfile -ExecutionPolicy Bypass -File &quot;$([System.IO.Path]::Combine('$(MSBuildProjectDirectory)','build','scripts','verify-fonts.ps1'))&quot; -Project &quot;$(MSBuildProjectFullPath)&quot; -TargetFramework &quot;$(TargetFramework)&quot; -Configuration &quot;$(Configuration)&quot;"
+      IgnoreExitCode="true">
+      <Output TaskParameter="ExitCode" PropertyName="VerifyFontsExitCode" />
+    </Exec>
+    <Warning Condition="'$(VerifyFontsExitCode)' == '2'" Text="verify-fonts reported warnings (non-blocking). See details above." />
+    <Error   Condition="'$(VerifyFontsExitCode)' == '1'" Text="verify-fonts reported errors. See details above." />
+  </Target>
+
+  <!-- Prune framework header folders before codesign (Debug + iOS device only) -->
+  <Target Name="TrimFrameworkHeaders"
+          BeforeTargets="_CodesignAppBundle"
+          Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'
+                     and '$(Configuration)' == 'Debug'
+                     and '$(RuntimeIdentifier)' == 'ios-arm64'">
+    <Exec Command="/bin/sh -c &quot;if [ -d '$(AppBundleDir)/Frameworks' ]; then find '$(AppBundleDir)/Frameworks' -type d \( -name Headers -o -name PrivateHeaders \) -prune -exec rm -rf {} +; fi&quot;" />
+  </Target>
 </Project>
