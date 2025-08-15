@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:FlockForge"
     xmlns:pages="clr-namespace:FlockForge.Views.Pages"
+    xmlns:debug="clr-namespace:FlockForge.Pages"
     Title="FlockForge"
     FlyoutBehavior="Disabled">
 
@@ -61,6 +62,13 @@
                 Route="settings" />
         </Tab>
     </TabBar>
-
+    
+    <!-- Debug-only content (can be toggled via IsVisible in code-behind if needed) -->
+    <ShellContent
+        x:Name="FontDiagnosticsPage"
+        Title="Fonts"
+        ContentTemplate="{DataTemplate debug:FontDiagnosticsPage}"
+        Route="fontdiagnostics"
+        IsVisible="False" />
 </Shell>
 

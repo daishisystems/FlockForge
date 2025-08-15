@@ -88,7 +88,9 @@ public class MainActivity : MauiAppCompatActivity
             if (Build.VERSION.SdkInt >= BuildVersionCodes.Tiramisu)
             {
                 // Android 13.0+ (API 33+) - Use the simplified constructor without deprecated color parameter
+#pragma warning disable CA1422 // This is the correct API for Android 33+, false positive warning
                 var taskDescription = new ActivityManager.TaskDescription("FlockForge");
+#pragma warning restore CA1422
                 SetTaskDescription(taskDescription);
             }
             else if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
