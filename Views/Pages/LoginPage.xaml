@@ -16,11 +16,12 @@
             
             <Label Text="Welcome to FlockForge"
                    FontSize="28"
-                   FontAttributes="Bold"
+                   FontFamily="OpenSansSemibold"
                    HorizontalOptions="Center" />
-            
+
             <Label Text="Sign in to continue"
                    FontSize="16"
+                   FontFamily="OpenSansRegular"
                    TextColor="Gray"
                    HorizontalOptions="Center" />
             

@@ -83,20 +83,6 @@ public class AppDelegate : MauiUIApplicationDelegate
         }
     }
     
-    private void RegisterCustomFonts()
-    {
-        try
-        {
-            // Explicitly handle font registration to prevent conflicts
-            // This prevents the "GSFont already exists" error by ensuring
-            // fonts are only registered once
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Font registration workaround: {ex.Message}");
-        }
-    }
-    
     private async Task InitializeAsync()
     {
         try
