@@ -357,3 +357,10 @@ Thumbs.db
 ehthumbs.db
 [Dd]esktop.ini
 $RECYCLE.BIN/
+# Binary assets
+Resources/Fonts/*.ttf
+Resources/Images/*.png
+Resources/Images/*.jpg
+Resources/Images/*.jpeg
+Resources/Images/*.webp
+Resources/Images/*.svg

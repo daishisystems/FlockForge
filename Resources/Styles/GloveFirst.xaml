@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:services="clr-namespace:FlockForge.Services"
+    xmlns:converters="clr-namespace:FlockForge.Converters">
+
+  <!-- Dynamic tokens (scaled at runtime) -->
+  <x:Double x:Key="GF.Padding">16</x:Double>          <!-- 24 when Glove Mode -->
+  <x:Double x:Key="GF.Spacing">16</x:Double>          <!-- 24 when Glove Mode -->
+  <OnIdiom x:Key="GF.MinControlHeight" x:TypeArguments="x:Double">
+    <OnIdiom.Phone>56</OnIdiom.Phone>
+    <OnIdiom.Tablet>60</OnIdiom.Tablet>
+    <OnIdiom.Desktop>60</OnIdiom.Desktop>
+  </OnIdiom>
+  <OnIdiom x:Key="GF.TileHeight" x:TypeArguments="x:Double">
+    <OnIdiom.Phone>96</OnIdiom.Phone>
+    <OnIdiom.Tablet>108</OnIdiom.Tablet>
+    <OnIdiom.Desktop>108</OnIdiom.Desktop>
+  </OnIdiom>
+  <x:Double x:Key="GF.Corner">16</x:Double>
+
+  <!-- Dark mode -->
+  <Color x:Key="GF.Color.Surface.Light">#FFFFFF</Color>
+  <Color x:Key="GF.Color.Surface.Dark">#1A1A1A</Color>
+  <Color x:Key="GF.Color.Text.Light">#212121</Color>
+  <Color x:Key="GF.Color.Text.Dark">#F5F5F5</Color>
+  <Color x:Key="GF.Color.Primary.Light">#2B5CB6</Color>
+  <Color x:Key="GF.Color.Primary.Dark">#82A7FF</Color>
+  <Color x:Key="GF.Color.Accent.Light">#F4B942</Color>
+  <Color x:Key="GF.Color.Accent.Dark">#F4C85F</Color>
+  <Color x:Key="GF.Color.Border.Light">#E5E7EB</Color>
+  <Color x:Key="GF.Color.Border.Dark">#2A2A2A</Color>
+
+  <!-- Converter -->
+  <converters:InvertedBooleanConverter x:Key="InvertedBool" />
+
+  <!-- Base styles (system fonts by default) -->
+  <Style TargetType="ContentPage" x:Key="GF.ContentPageBase">
+    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Surface.Light}, Dark={StaticResource GF.Color.Surface.Dark}}" />
+    <Setter Property="Padding" Value="0" />
+  </Style>
+
+  <Style TargetType="Grid" x:Key="GF.Grid">
+    <Setter Property="RowSpacing" Value="{DynamicResource GF.Spacing}" />
+    <Setter Property="ColumnSpacing" Value="{DynamicResource GF.Spacing}" />
+    <Setter Property="Padding" Value="{DynamicResource GF.Padding}" />
+  </Style>
+
+  <Style TargetType="Label" x:Key="GF.LabelBase">
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Text.Light}, Dark={StaticResource GF.Color.Text.Dark}}" />
+    <Setter Property="FontSize" Value="16" />
+  </Style>
+
+  <Style TargetType="Button" x:Key="GF.ButtonBase">
+    <Setter Property="MinimumHeightRequest" Value="{DynamicResource GF.MinControlHeight}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource GF.Corner}" />
+    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Accent.Light}, Dark={StaticResource GF.Color.Accent.Dark}}" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Text.Light}, Dark={StaticResource GF.Color.Text.Dark}}" />
+    <Setter Property="FontAttributes" Value="Bold" />
+    <Setter Property="Padding" Value="{DynamicResource GF.Padding}" />
+  </Style>
+
+  <!-- Primary tiles -->
+  <Style TargetType="Button" x:Key="GF.Tile">
+    <Setter Property="HeightRequest" Value="{DynamicResource GF.TileHeight}" />
+    <Setter Property="MinimumHeightRequest" Value="{DynamicResource GF.TileHeight}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource GF.Corner}" />
+    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Accent.Light}, Dark={StaticResource GF.Color.Accent.Dark}}" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Text.Light}, Dark={StaticResource GF.Color.Text.Dark}}" />
+    <Setter Property="FontSize" Value="18" />
+    <Setter Property="FontAttributes" Value="Bold" />
+    <Setter Property="Padding" Value="{DynamicResource GF.Padding}" />
+  </Style>
+
+  <!-- Inputs -->
+  <Style TargetType="Entry" x:Key="GF.Entry">
+    <Setter Property="MinimumHeightRequest" Value="{DynamicResource GF.MinControlHeight}" />
+    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Surface.Light}, Dark={StaticResource GF.Color.Surface.Dark}}" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Text.Light}, Dark={StaticResource GF.Color.Text.Dark}}" />
+    <Setter Property="Margin" Value="0,8,0,0" />
+  </Style>
+  
+  <Style TargetType="Editor" x:Key="GF.Editor">
+    <Setter Property="MinimumHeightRequest" Value="{DynamicResource GF.MinControlHeight}" />
+    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Surface.Light}, Dark={StaticResource GF.Color.Surface.Dark}}" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Text.Light}, Dark={StaticResource GF.Color.Text.Dark}}" />
+    <Setter Property="Margin" Value="0,8,0,0" />
+  </Style>
+  
+  <Style TargetType="Picker" x:Key="GF.Picker">
+    <Setter Property="MinimumHeightRequest" Value="{DynamicResource GF.MinControlHeight}" />
+    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Surface.Light}, Dark={StaticResource GF.Color.Surface.Dark}}" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Text.Light}, Dark={StaticResource GF.Color.Text.Dark}}" />
+    <Setter Property="Margin" Value="0,8,0,0" />
+  </Style>
+  
+  <Style TargetType="DatePicker" x:Key="GF.DatePicker">
+    <Setter Property="MinimumHeightRequest" Value="{DynamicResource GF.MinControlHeight}" />
+    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Surface.Light}, Dark={StaticResource GF.Color.Surface.Dark}}" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Text.Light}, Dark={StaticResource GF.Color.Text.Dark}}" />
+    <Setter Property="Margin" Value="0,8,0,0" />
+  </Style>
+  
+  <Style TargetType="TimePicker" x:Key="GF.TimePicker">
+    <Setter Property="MinimumHeightRequest" Value="{DynamicResource GF.MinControlHeight}" />
+    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Surface.Light}, Dark={StaticResource GF.Color.Surface.Dark}}" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Text.Light}, Dark={StaticResource GF.Color.Text.Dark}}" />
+    <Setter Property="Margin" Value="0,8,0,0" />
+  </Style>
+
+  <!-- Lists: perf-friendly defaults -->
+  <Style TargetType="CollectionView" x:Key="GF.CollectionView">
+    <Setter Property="Margin" Value="0,8,0,0" />
+    <Setter Property="ItemsLayout">
+      <Setter.Value>
+        <LinearItemsLayout Orientation="Vertical" ItemSpacing="16" />
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Global ControlTemplate -->
+  <ControlTemplate x:Key="GF.PageTemplate">
+    <Grid RowDefinitions="Auto,*,Auto">
+
+      <!-- Status strip -->
+      <Grid Grid.Row="0"
+            BackgroundColor="{AppThemeBinding Light={StaticResource GF.Color.Surface.Light}, Dark={StaticResource GF.Color.Surface.Dark}}"
+            Padding="16,8"
+            ColumnDefinitions="*,Auto">
+        <Label Text="{TemplateBinding Title}"
+               FontAttributes="Bold" FontSize="18"
+               TextColor="{AppThemeBinding Light={StaticResource GF.Color.Text.Light}, Dark={StaticResource GF.Color.Text.Dark}}" />
+        <Label Grid.Column="1"
+               Text="{Binding Source={x:Static services:AppStatusService.Instance}, Path=SyncLabel}"
+               TextColor="{AppThemeBinding Light={StaticResource GF.Color.Primary.Light}, Dark={StaticResource GF.Color.Primary.Dark}}"
+               VerticalOptions="Center" />
+      </Grid>
+
+      <!-- Page content -->
+      <ContentPresenter Grid.Row="1" />
+
+      <!-- Bottom dock: dynamic + fallback -->
+      <Grid Grid.Row="2"
+            BackgroundColor="{AppThemeBinding Light={StaticResource GF.Color.Surface.Light}, Dark={StaticResource GF.Color.Surface.Dark}}"
+            Padding="16,8">
+
+        <!-- Dynamic dock -->
+        <HorizontalStackLayout
+            Spacing="16"
+            HorizontalOptions="Fill"
+            HeightRequest="72"
+            IsVisible="{Binding Source={x:Static services:NavigationService.Instance}, Path=HasItems}"
+            BindableLayout.ItemsSource="{Binding Source={x:Static services:NavigationService.Instance}, Path=Items}">
+          <BindableLayout.ItemTemplate>
+            <DataTemplate>
+              <Button Style="{StaticResource GF.ButtonBase}"
+                      Text="{Binding Text}"
+                      Command="{Binding Command}"
+                      HorizontalOptions="FillAndExpand" />
+            </DataTemplate>
+          </BindableLayout.ItemTemplate>
+        </HorizontalStackLayout>
+
+        <!-- Fallback dock -->
+        <Grid ColumnDefinitions="*,*,*"
+              HeightRequest="72"
+              IsVisible="{Binding Source={x:Static services:NavigationService.Instance}, Path=HasItems, Converter={StaticResource InvertedBool}}">
+          <Button Style="{StaticResource GF.ButtonBase}" Text="Home"
+                  Command="{Binding Source={x:Static services:NavigationService.Instance}, Path=GoHomeCommand}" />
+          <Button Grid.Column="1" Style="{StaticResource GF.ButtonBase}" Text="Animals"
+                  Command="{Binding Source={x:Static services:NavigationService.Instance}, Path=GoAnimalsCommand}" />
+          <Button Grid.Column="2" Style="{StaticResource GF.ButtonBase}" Text="Reports"
+                  Command="{Binding Source={x:Static services:NavigationService.Instance}, Path=GoReportsCommand}" />
+        </Grid>
+      </Grid>
+    </Grid>
+  </ControlTemplate>
+
+  <!-- Apply template to all pages -->
+  <Style TargetType="ContentPage" BasedOn="{StaticResource GF.ContentPageBase}">
+    <Setter Property="ControlTemplate" Value="{StaticResource GF.PageTemplate}" />
+  </Style>
+
+  <!-- Uncomment after fetching assets to enable brand font -->
+  <!--
+  <Style TargetType="Label" x:Key="GF.LabelBase">
+    <Setter Property="FontFamily" Value="{StaticResource FFont.Regular}" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Text.Light}, Dark={StaticResource GF.Color.Text.Dark}}" />
+    <Setter Property="FontSize" Value="16" />
+  </Style>
+  <Style TargetType="Button" x:Key="GF.ButtonBase">
+    <Setter Property="FontFamily" Value="{StaticResource FFont.Semibold}" />
+    <Setter Property="Padding" Value="{DynamicResource GF.Padding}" />
+  </Style>
+  -->
+</ResourceDictionary>

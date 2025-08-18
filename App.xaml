@@ -8,7 +8,19 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+                <ResourceDictionary Source="Resources/Styles/GloveFirst.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- Optional font aliases (safe even without files) -->
+            <x:String x:Key="FFont.Regular">InterRegular</x:String>
+            <x:String x:Key="FFont.Semibold">InterSemibold</x:String>
+            <x:String x:Key="FFont.Bold">InterBold</x:String>
+
+            <!-- Optional system fallback names (not used by default) -->
+            <OnPlatform x:Key="FFont.SystemPrimary" x:TypeArguments="x:String">
+                <On Platform="iOS"     Value="SF Pro" />
+                <On Platform="Android" Value="Roboto" />
+            </OnPlatform>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -88,8 +88,11 @@ public class AppDelegate : MauiUIApplicationDelegate
         try
         {
             // Perform other heavy initialization tasks here
-            SetupMemoryManagement();
-            ConfigureForPerformance();
+            await Task.Run(() =>
+            {
+                SetupMemoryManagement();
+                ConfigureForPerformance();
+            });
         }
         catch (Exception ex)
         {
