@@ -617,6 +617,19 @@ For support and questions:
 - **Documentation** - [Wiki](https://github.com/your-username/flockforge/wiki)
 - **Issues** - [GitHub Issues](https://github.com/your-username/flockforge/issues)
 
+## Assets (fonts/images)
+PRs are text-only. To use brand fonts locally or in CI:
+
+```bash
+# macOS/Linux
+bash scripts/fetch_assets.sh
+# Windows
+powershell -ExecutionPolicy Bypass -File scripts/fetch_assets.ps1
+```
+
+After fetching, optionally enable the Inter FontFamily setters in Resources/Styles/GloveFirst.xaml.
+Builds succeed without fonts by falling back to system fonts.
+
 ---
 
 **FlockForge** - Empowering sheep farmers with intelligent livestock management.

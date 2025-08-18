@@ -3,10 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="FlockForge.Pages.FontDiagnosticsPage"
              Title="Font Diagnostics">
-  <VerticalStackLayout Padding="20" Spacing="16">
-    <Label Text="OpenSans Regular sample — The quick brown fox 123"
-           FontFamily="OpenSansRegular" FontSize="18" />
-    <Label Text="OpenSans Semibold sample — The quick brown fox 123"
-           FontFamily="OpenSansSemibold" FontSize="18" />
-  </VerticalStackLayout>
+  <Grid Style="{StaticResource GF.Grid}">
+    <VerticalStackLayout Spacing="{DynamicResource GF.Spacing}">
+      <Label Text="OpenSans Regular sample — The quick brown fox 123"
+             FontFamily="OpenSansRegular" FontSize="18"
+             Style="{StaticResource GF.LabelBase}" />
+      <Label Text="OpenSans Semibold sample — The quick brown fox 123"
+             FontFamily="OpenSansSemibold" FontSize="18"
+             Style="{StaticResource GF.LabelBase}" />
+    </VerticalStackLayout>
+  </Grid>
 </ContentPage>

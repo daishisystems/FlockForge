@@ -5,123 +5,102 @@
              xmlns:local="clr-namespace:FlockForge.Views.Base"
              x:Class="FlockForge.Views.Pages.LoginPage"
              x:DataType="vm:LoginViewModel"
-             Title="Sign In"
-             BackgroundColor="White">
-    
-    <ScrollView>
-        <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
-            
-            <!-- Logo/Image -->
-            <Image Source="flockforge_logo.png" HeightRequest="120" HorizontalOptions="Center" />
-            
-            <Label Text="Welcome to FlockForge"
-                   FontSize="28"
-                   FontFamily="OpenSansSemibold"
-                   HorizontalOptions="Center" />
+             Title="Sign In">
 
-            <Label Text="Sign in to continue"
-                   FontSize="16"
-                   FontFamily="OpenSansRegular"
-                   TextColor="Gray"
-                   HorizontalOptions="Center" />
-            
-            <!-- Email Entry without black bars -->
-            <Border Stroke="LightGray"
-                    StrokeThickness="1"
-                    BackgroundColor="White"
-                    Padding="5"
-                    Margin="0,10">
+    <Grid Style="{StaticResource GF.Grid}">
+        <ScrollView>
+            <VerticalStackLayout Spacing="{DynamicResource GF.Spacing}" Padding="0" VerticalOptions="Center">
+
+                <!-- Logo/Image -->
+                <Image Source="flockforge_logo.png" HeightRequest="120" HorizontalOptions="Center" />
+
+                <Label Text="Welcome to FlockForge"
+                       FontSize="28"
+                       Style="{StaticResource GF.LabelBase}"
+                       HorizontalOptions="Center" />
+
+                <Label Text="Sign in to continue"
+                       FontSize="16"
+                       TextColor="Gray"
+                       Style="{StaticResource GF.LabelBase}"
+                       HorizontalOptions="Center" />
+
+                <!-- Email Entry -->
                 <Entry x:Name="EmailEntry"
+                       Style="{StaticResource GF.Entry}"
                        Text="{Binding Email}"
                        Placeholder="Email"
                        Keyboard="Email"
-                       BackgroundColor="Transparent"
-                       HeightRequest="60"
                        SemanticProperties.Description="Enter your email address" />
-            </Border>
-            
-            <!-- Password Entry without black bars -->
-            <Border Stroke="LightGray"
-                    StrokeThickness="1"
-                    BackgroundColor="White"
-                    Padding="5"
-                    Margin="0,10">
+
+                <!-- Password Entry -->
                 <Entry x:Name="PasswordEntry"
+                       Style="{StaticResource GF.Entry}"
                        Text="{Binding Password}"
                        Placeholder="Password"
                        IsPassword="True"
-                       BackgroundColor="Transparent"
-                       HeightRequest="60"
                        SemanticProperties.Description="Enter your password" />
-            </Border>
-            
-            <!-- Error message label -->
-            <Label Text="{Binding ErrorMessage}"
-                   TextColor="Red"
-                   IsVisible="{Binding HasError}"
-                   HorizontalOptions="Center" />
-            
-            <!-- Sign In Button -->
-            <Button Text="Sign In"
-                    BackgroundColor="#5B4CF5"
-                    TextColor="White"
-                    HeightRequest="70"
-                    Margin="0,10"
-                    CornerRadius="8"
-                    Command="{Binding LoginCommand}"
-                    SemanticProperties.Description="Submit sign in form" />
-            
-            <!-- Google Sign In -->
-            <Button Text="Sign in with Google"
-                    BackgroundColor="#4285F4"
-                    TextColor="White"
-                    HeightRequest="70"
-                    Margin="0,10"
-                    CornerRadius="8"
-                    Command="{Binding LoginWithGoogleCommand}"
-                    SemanticProperties.Description="Sign in using Google account" />
-            
-            <!-- Links -->
-            <Label HorizontalOptions="Center">
-                <Label.FormattedText>
-                    <FormattedString>
-                        <Span Text="Don't have an account? " TextColor="Gray" />
-                        <Span Text="Register" TextColor="#5B4CF5" TextDecorations="Underline">
-                            <Span.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding RegisterCommand}" />
-                            </Span.GestureRecognizers>
-                        </Span>
-                    </FormattedString>
-                </Label.FormattedText>
-            </Label>
-            
-            <!-- Forgot Password Link -->
-            <Label HorizontalOptions="Center" Margin="0,10,0,0">
-                <Label.FormattedText>
-                    <FormattedString>
-                        <Span Text="Forgot Password?" TextColor="#5B4CF5" TextDecorations="Underline">
-                            <Span.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding ResetPasswordCommand}" />
-                            </Span.GestureRecognizers>
-                        </Span>
-                    </FormattedString>
-                </Label.FormattedText>
-            </Label>
-            
-            <!-- Busy Indicator -->
-            <StackLayout
-                IsVisible="{Binding IsBusy}"
-                Orientation="Horizontal"
-                HorizontalOptions="Center"
-                Spacing="10">
-                <ActivityIndicator
-                    IsRunning="{Binding IsBusy}"
-                    Color="#5B4CF5"/>
-                <Label Text="{Binding BusyMessage}"
-                   IsVisible="{Binding IsBusy}"
-                   HorizontalOptions="Center" />
-            </StackLayout>
-            
-        </VerticalStackLayout>
-    </ScrollView>
+
+                <!-- Error message label -->
+                <Label Text="{Binding ErrorMessage}"
+                       TextColor="Red"
+                       IsVisible="{Binding HasError}"
+                       HorizontalOptions="Center" />
+
+                <!-- Sign In Button -->
+                <Button Text="Sign In"
+                        Style="{StaticResource GF.ButtonBase}"
+                        Command="{Binding LoginCommand}"
+                        SemanticProperties.Description="Submit sign in form" />
+
+                <!-- Google Sign In -->
+                <Button Text="Sign in with Google"
+                        Style="{StaticResource GF.ButtonBase}"
+                        Command="{Binding LoginWithGoogleCommand}"
+                        SemanticProperties.Description="Sign in using Google account" />
+
+                <!-- Links -->
+                <Label HorizontalOptions="Center">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="Don't have an account? " TextColor="Gray" />
+                            <Span Text="Register" TextColor="#5B4CF5" TextDecorations="Underline">
+                                <Span.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding RegisterCommand}" />
+                                </Span.GestureRecognizers>
+                            </Span>
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+
+                <!-- Forgot Password Link -->
+                <Label HorizontalOptions="Center" Margin="0,10,0,0">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="Forgot Password?" TextColor="#5B4CF5" TextDecorations="Underline">
+                                <Span.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ResetPasswordCommand}" />
+                                </Span.GestureRecognizers>
+                            </Span>
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+
+                <!-- Busy Indicator -->
+                <StackLayout
+                    IsVisible="{Binding IsBusy}"
+                    Orientation="Horizontal"
+                    HorizontalOptions="Center"
+                    Spacing="10">
+                    <ActivityIndicator
+                        IsRunning="{Binding IsBusy}"
+                        Color="#5B4CF5"/>
+                    <Label Text="{Binding BusyMessage}"
+                       IsVisible="{Binding IsBusy}"
+                       HorizontalOptions="Center" />
+                </StackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
 </local:DisposableContentPage>
