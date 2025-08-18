@@ -9,7 +9,8 @@ namespace FlockForge.Helpers
 #if DEBUG
         public static bool Expect<T>(string key)
         {
-            if (!Application.Current?.Resources?.TryGetValue(key, out var obj) ?? true)
+            object obj = null;
+            if (!Application.Current?.Resources?.TryGetValue(key, out obj) ?? true)
             {
                 Debug.WriteLine($"Resource missing: {key}");
                 return false;
