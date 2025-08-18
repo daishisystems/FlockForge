@@ -4,9 +4,8 @@ using Android.OS;
 using Android.Views;
 using Android.Content;
 using FlockForge.Services.Platform;
-using FlockForge.Platforms.Android.Services;
+using FlockForge.Platform;
 using Microsoft.Extensions.Logging;
-using Firebase;
 
 namespace FlockForge;
 
@@ -27,7 +26,10 @@ public class MainActivity : MauiAppCompatActivity
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
-        
+
+        // Plugin-only Firebase init (idempotent)
+        FirebaseBootstrap.TryInit(this, savedInstanceState);
+
         // Set the main theme after splash screen
         SetTheme(Resource.Style.MainTheme);
         
@@ -47,24 +49,6 @@ public class MainActivity : MauiAppCompatActivity
         try
         {
             await Task.Delay(100); // Let UI settle
-            
-            // Initialize Firebase in background
-            try
-            {
-                if (FirebaseApp.GetApps(this).Count == 0)
-                {
-                    FirebaseApp.InitializeApp(this);
-                    System.Diagnostics.Debug.WriteLine("Firebase initialized in MainActivity");
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("Firebase already initialized");
-                }
-            }
-            catch (Exception firebaseEx)
-            {
-                System.Diagnostics.Debug.WriteLine($"Firebase initialization error in MainActivity: {firebaseEx.Message}");
-            }
             
             // Perform other heavy initialization tasks here
             ConfigureForPerformance();

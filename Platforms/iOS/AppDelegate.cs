@@ -2,8 +2,8 @@ using Foundation;
 using UIKit;
 using FlockForge.Services.Platform;
 using Microsoft.Extensions.Logging;
-using Firebase.Core;
 using FlockForge.Utilities.Disposal;
+using FlockForge.Platform;
 
 namespace FlockForge;
 
@@ -35,22 +35,10 @@ public class AppDelegate : MauiUIApplicationDelegate
     {
         try
         {
-            // Initialize Firebase Core - this must happen before any Firebase services are used
-            Firebase.Core.App.Configure();
-// Ensure Crashlytics is properly initialized
-            if (Firebase.Crashlytics.Crashlytics.SharedInstance != null)
-            {
-                Firebase.Crashlytics.Crashlytics.SharedInstance.SetCrashlyticsCollectionEnabled(true);
-                System.Diagnostics.Debug.WriteLine("✅ Crashlytics initialized successfully");
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("⚠️ Crashlytics SharedInstance is null");
-            }
-            System.Diagnostics.Debug.WriteLine("Firebase initialized successfully for iOS");
-            
-            // Create the MAUI app first
             var result = base.FinishedLaunching(application, launchOptions);
+
+            // Plugin-only Firebase init (idempotent)
+            FirebaseBootstrap.TryInit();
 
             // Get services from DI container after MAUI app is created
             var mauiApp = IPlatformApplication.Current?.Services;
@@ -69,9 +57,9 @@ public class AppDelegate : MauiUIApplicationDelegate
 
             // Move all heavy initialization off UI thread immediately
             _ = InitializeAsync();
-            
+
             _logger?.LogInformation("iOS AppDelegate finished launching successfully");
-            
+
             return result;
         }
         catch (Exception ex)
