@@ -28,10 +28,20 @@ public static class MauiProgram
                         .UseMauiApp<App>()
                         .UseMauiCommunityToolkit();
 
-		// Configuration
-		builder.Services.AddSingleton<FirebaseConfig>(sp =>
-		{
-			var config = new FirebaseConfig();
+#if ANDROID
+                builder.ConfigureFonts(fonts =>
+                {
+                        // Re-register the same files/aliases to ensure Android alias→asset mapping is present at runtime.
+                        // Use file names (not paths); build packs them from Resources/Fonts.
+                        fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                        fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                });
+#endif
+
+                // Configuration
+                builder.Services.AddSingleton<FirebaseConfig>(sp =>
+                {
+                        var config = new FirebaseConfig();
 			// Load from appsettings.json or platform config
 			return config;
 		});
