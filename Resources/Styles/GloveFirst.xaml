@@ -6,9 +6,7 @@
     xmlns:converters="clr-namespace:FlockForge.Converters">
 
   <!-- Dynamic tokens (scaled at runtime) -->
-  <x:Double x:Key="GF.Padding">16</x:Double>          <!-- 24 when Glove Mode -->
-  <x:Double x:Key="GF.Spacing">16</x:Double>          <!-- 24 when Glove Mode -->
-  <OnIdiom x:Key="GF.MinControlHeight" x:TypeArguments="x:Double">
+  <OnIdiom x:Key="GF.MinHeightRequest" x:TypeArguments="x:Double">
     <OnIdiom.Phone>56</OnIdiom.Phone>
     <OnIdiom.Tablet>60</OnIdiom.Tablet>
     <OnIdiom.Desktop>60</OnIdiom.Desktop>
@@ -18,7 +16,6 @@
     <OnIdiom.Tablet>108</OnIdiom.Tablet>
     <OnIdiom.Desktop>108</OnIdiom.Desktop>
   </OnIdiom>
-  <x:Double x:Key="GF.Corner">16</x:Double>
 
   <!-- Dark mode -->
   <Color x:Key="GF.Color.Surface.Light">#FFFFFF</Color>
@@ -45,16 +42,17 @@
     <Setter Property="RowSpacing" Value="{DynamicResource GF.Spacing}" />
     <Setter Property="ColumnSpacing" Value="{DynamicResource GF.Spacing}" />
     <Setter Property="Padding" Value="{DynamicResource GF.Padding}" />
+    <Setter Property="Margin" Value="{DynamicResource GF.Margin}" />
   </Style>
 
   <Style TargetType="Label" x:Key="GF.LabelBase">
     <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Text.Light}, Dark={StaticResource GF.Color.Text.Dark}}" />
-    <Setter Property="FontSize" Value="16" />
+    <Setter Property="FontSize" Value="{DynamicResource GF.FontSize}" />
   </Style>
 
   <Style TargetType="Button" x:Key="GF.ButtonBase">
-    <Setter Property="MinimumHeightRequest" Value="{DynamicResource GF.MinControlHeight}" />
-    <Setter Property="CornerRadius" Value="{DynamicResource GF.Corner}" />
+    <Setter Property="MinimumHeightRequest" Value="{DynamicResource GF.MinHeightRequest}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource GF.Corner.Button}" />
     <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Accent.Light}, Dark={StaticResource GF.Color.Accent.Dark}}" />
     <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Text.Light}, Dark={StaticResource GF.Color.Text.Dark}}" />
     <Setter Property="FontAttributes" Value="Bold" />
@@ -65,7 +63,7 @@
   <Style TargetType="Button" x:Key="GF.Tile">
     <Setter Property="HeightRequest" Value="{DynamicResource GF.TileHeight}" />
     <Setter Property="MinimumHeightRequest" Value="{DynamicResource GF.TileHeight}" />
-    <Setter Property="CornerRadius" Value="{DynamicResource GF.Corner}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource GF.Corner.Button}" />
     <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Accent.Light}, Dark={StaticResource GF.Color.Accent.Dark}}" />
     <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Text.Light}, Dark={StaticResource GF.Color.Text.Dark}}" />
     <Setter Property="FontSize" Value="18" />
@@ -75,35 +73,35 @@
 
   <!-- Inputs -->
   <Style TargetType="Entry" x:Key="GF.Entry">
-    <Setter Property="MinimumHeightRequest" Value="{DynamicResource GF.MinControlHeight}" />
+    <Setter Property="MinimumHeightRequest" Value="{DynamicResource GF.MinHeightRequest}" />
     <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Surface.Light}, Dark={StaticResource GF.Color.Surface.Dark}}" />
     <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Text.Light}, Dark={StaticResource GF.Color.Text.Dark}}" />
     <Setter Property="Margin" Value="0,8,0,0" />
   </Style>
   
   <Style TargetType="Editor" x:Key="GF.Editor">
-    <Setter Property="MinimumHeightRequest" Value="{DynamicResource GF.MinControlHeight}" />
+    <Setter Property="MinimumHeightRequest" Value="{DynamicResource GF.MinHeightRequest}" />
     <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Surface.Light}, Dark={StaticResource GF.Color.Surface.Dark}}" />
     <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Text.Light}, Dark={StaticResource GF.Color.Text.Dark}}" />
     <Setter Property="Margin" Value="0,8,0,0" />
   </Style>
   
   <Style TargetType="Picker" x:Key="GF.Picker">
-    <Setter Property="MinimumHeightRequest" Value="{DynamicResource GF.MinControlHeight}" />
+    <Setter Property="MinimumHeightRequest" Value="{DynamicResource GF.MinHeightRequest}" />
     <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Surface.Light}, Dark={StaticResource GF.Color.Surface.Dark}}" />
     <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Text.Light}, Dark={StaticResource GF.Color.Text.Dark}}" />
     <Setter Property="Margin" Value="0,8,0,0" />
   </Style>
   
   <Style TargetType="DatePicker" x:Key="GF.DatePicker">
-    <Setter Property="MinimumHeightRequest" Value="{DynamicResource GF.MinControlHeight}" />
+    <Setter Property="MinimumHeightRequest" Value="{DynamicResource GF.MinHeightRequest}" />
     <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Surface.Light}, Dark={StaticResource GF.Color.Surface.Dark}}" />
     <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Text.Light}, Dark={StaticResource GF.Color.Text.Dark}}" />
     <Setter Property="Margin" Value="0,8,0,0" />
   </Style>
   
   <Style TargetType="TimePicker" x:Key="GF.TimePicker">
-    <Setter Property="MinimumHeightRequest" Value="{DynamicResource GF.MinControlHeight}" />
+    <Setter Property="MinimumHeightRequest" Value="{DynamicResource GF.MinHeightRequest}" />
     <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Surface.Light}, Dark={StaticResource GF.Color.Surface.Dark}}" />
     <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource GF.Color.Text.Light}, Dark={StaticResource GF.Color.Text.Dark}}" />
     <Setter Property="Margin" Value="0,8,0,0" />
@@ -114,7 +112,7 @@
     <Setter Property="Margin" Value="0,8,0,0" />
     <Setter Property="ItemsLayout">
       <Setter.Value>
-        <LinearItemsLayout Orientation="Vertical" ItemSpacing="16" />
+        <LinearItemsLayout Orientation="Vertical" ItemSpacing="{DynamicResource GF.Spacing}" />
       </Setter.Value>
     </Setter>
   </Style>
