@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Controls;
+using FlockForge.Helpers;
 using FlockForge.Utilities.Disposal;
 using FlockForge.Core.Interfaces;
 using FlockForge.Core.Models;
@@ -26,12 +27,15 @@ namespace FlockForge
         public App(IServiceProvider serviceProvider)
         {
             InitializeComponent();
-            
+
             _serviceProvider = serviceProvider;
             _authService = serviceProvider.GetRequiredService<IAuthenticationService>();
             _dataService = serviceProvider.GetRequiredService<IDataService>();
             _logger = serviceProvider.GetRequiredService<ILogger<App>>();
 
+#if DEBUG
+            ResourceTypeValidator.ValidateAll();
+#endif
 
             // Set up global exception handlers
             SetupExceptionHandlers();
