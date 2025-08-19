@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Shell
     x:Class="FlockForge.AppShell"
-    x:Name="AppShell"
+    x:Name="TheShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:FlockForge"
@@ -49,11 +49,11 @@
 
     <!-- Flyout menu for secondary items -->
     <MenuItem Text="Profile"
-              Command="{Binding Source={x:Reference AppShell}, Path=GoToCommand}"
+              Command="{Binding Source={x:Reference TheShell}, Path=GoToCommand}"
               CommandParameter="profile" />
 
     <MenuItem Text="Settings"
-              Command="{Binding Source={x:Reference AppShell}, Path=GoToCommand}"
+              Command="{Binding Source={x:Reference TheShell}, Path=GoToCommand}"
               CommandParameter="settings" />
 
     <!-- Hidden route for groups -->
