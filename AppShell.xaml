@@ -49,11 +49,11 @@
     <!-- Flyout menu for secondary items -->
     <MenuItem Text="Profile"
               Command="{Binding Source={x:Reference shell}, Path=GoToCommand}"
-              CommandParameter="///profile" />
+              CommandParameter="/profile" />
 
     <MenuItem Text="Settings"
               Command="{Binding Source={x:Reference shell}, Path=GoToCommand}"
-              CommandParameter="///settings" />
+              CommandParameter="/settings" />
 
     <!-- Hidden route for groups -->
     <ShellContent
