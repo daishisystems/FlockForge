@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Maui;                    // HandlerChangingEventArgs
 using Microsoft.Maui.Controls;          // Shell, GoToAsync, events
 using Microsoft.Maui.ApplicationModel;  // MainThread
+using FlockForge.Views.Pages;
 
 namespace FlockForge;
 
@@ -23,6 +24,9 @@ public partial class AppShell : Shell
         InitializeComponent();
         _authService = authService;
         _logger = logger;
+
+        Routing.RegisterRoute("profile", typeof(ProfilePage));
+        Routing.RegisterRoute("settings", typeof(SettingsPage));
 
         // Wire events once
         Loaded += OnLoadedOnce;
