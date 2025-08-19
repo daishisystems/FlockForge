@@ -15,13 +15,13 @@ public partial class MainPage : ContentPage, IDisposable
     }
 
     private async void OnProfileTapped(object? sender, EventArgs e) =>
-        await Shell.Current.GoToAsync("profile");
+        await Shell.Current.GoToAsync("///profile");
 
     private async void OnMyFarmsTapped(object? sender, EventArgs e) =>
         await Shell.Current.GoToAsync("//farms");
 
     private async void OnGroupsTapped(object? sender, EventArgs e) =>
-        await Shell.Current.GoToAsync("groups");
+        await Shell.Current.GoToAsync("///groups");
 
     protected override void OnDisappearing()
     {

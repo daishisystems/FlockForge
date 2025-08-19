@@ -6,14 +6,13 @@
              Title="Dashboard">
     <Grid Style="{StaticResource GF.Grid}" RowDefinitions="Auto,*">
         <!-- Header -->
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto">
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
             <Label Text="Farm: Demo" Style="{StaticResource GF.LabelBase}" VerticalOptions="Center" />
             <Label Grid.Column="1"
                    Text="{Binding Source={x:Static services:AppStatusService.Instance}, Path=SyncLabel}"
                    Style="{StaticResource GF.LabelBase}"
                    HorizontalOptions="End"
                    VerticalOptions="Center" />
-            <Image Grid.Column="2" Source="flockforge_logo.png" HeightRequest="24" WidthRequest="24" VerticalOptions="Center" HorizontalOptions="End" />
         </Grid>
 
         <!-- Dashboard cards -->
