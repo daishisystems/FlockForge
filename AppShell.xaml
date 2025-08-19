@@ -42,15 +42,6 @@
                 Route="farms" />
         </Tab>
 
-        <Tab Title="Reports">
-            <Tab.Icon>
-                <FontImageSource Glyph="📊" Size="24" />
-            </Tab.Icon>
-            <ShellContent
-                Title="Reports"
-                ContentTemplate="{DataTemplate pages:ReportsPage}"
-                Route="reports" />
-        </Tab>
     </TabBar>
 
     <!-- Flyout menu for secondary items -->
