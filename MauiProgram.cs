@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using FlockForge.Core.Interfaces;
 using FlockForge.Core.Configuration;
 using FlockForge.Services.Firebase;
@@ -17,6 +18,9 @@ public static class MauiProgram
 {
 	public static MauiApp CreateMauiApp()
 	{
+		// Defensive: ok if called again thanks to guard.
+		FirebaseBootstrap.TryInit();
+
 		var builder = MauiApp.CreateBuilder();
                 builder
                         .UseMauiApp<App>()
@@ -50,39 +54,19 @@ public static class MauiProgram
 
 		// Firebase services - platform-specific initialization
 #if IOS || ANDROID
-                builder.Services.AddSingleton<Lazy<IFirebaseAuth>>(serviceProvider =>
-                {
-                        return new Lazy<IFirebaseAuth>(() =>
-                        {
-                                try
-                                {
-                                        return CrossFirebaseAuth.Current;
-                                }
-                                catch (Exception ex)
-                                {
-                                        var logger = serviceProvider.GetService<ILogger<Lazy<IFirebaseAuth>>>();
-                                        logger?.LogError(ex, "Failed to initialize Firebase Auth. Ensure Firebase configuration files are properly set up.");
-                                        throw new InvalidOperationException("Firebase Auth initialization failed. Check Firebase configuration.", ex);
-                                }
-                        });
-                });
-
-                builder.Services.AddSingleton<Lazy<IFirebaseFirestore>>(serviceProvider =>
-                {
-                        return new Lazy<IFirebaseFirestore>(() =>
-                        {
-                                try
-                                {
-                                        return CrossFirebaseFirestore.Current;
-                                }
-                                catch (Exception ex)
-                                {
-                                        var logger = serviceProvider.GetService<ILogger<Lazy<IFirebaseFirestore>>>();
-                                        logger?.LogError(ex, "Failed to initialize Firebase Firestore. Ensure Firebase configuration files are properly set up.");
-                                        throw new InvalidOperationException("Firebase Firestore initialization failed. Check Firebase configuration.", ex);
-                                }
-                        });
-                });
+		// IMPORTANT: Use the IServiceProvider overload so CrossFirebaseAuth.Current
+		// is not evaluated during registration time.
+		builder.Services.AddSingleton<IFirebaseAuth>(sp => CrossFirebaseAuth.Current);
+		
+		// Also register Lazy<IFirebaseAuth> for services that need lazy initialization
+		builder.Services.AddSingleton<Lazy<IFirebaseAuth>>(sp =>
+			new Lazy<IFirebaseAuth>(() => sp.GetRequiredService<IFirebaseAuth>()));
+		
+		builder.Services.AddSingleton<IFirebaseFirestore>(sp => CrossFirebaseFirestore.Current);
+		
+		// Also register Lazy<IFirebaseFirestore> for services that need lazy initialization
+		builder.Services.AddSingleton<Lazy<IFirebaseFirestore>>(sp =>
+			new Lazy<IFirebaseFirestore>(() => sp.GetRequiredService<IFirebaseFirestore>()));
 #endif
 		
 		builder.Services.AddSingleton<IAuthenticationService, FirebaseAuthenticationService>();

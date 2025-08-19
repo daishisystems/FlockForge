@@ -8,7 +8,7 @@ using Microsoft.Maui.Devices;
 namespace FlockForge.Infrastructure
 {
     /// <summary>
-    /// Resolves OnIdiom<T>, OnAppTheme<T>, OnPlatform<T> into concrete values
+    /// Resolves OnIdiom, OnAppTheme, OnPlatform into concrete values
     /// and normalizes nested values within resource objects and style setters.
     /// </summary>
     public static class ResourceNormalizer
@@ -19,11 +19,11 @@ namespace FlockForge.Infrastructure
             NormalizeDictionary(app.Resources);
 
             // Re-run when theme changes (so OnAppTheme<T> stays correct)
-            app.RequestedThemeChanged -= OnRequestedThemeChanged;
-            app.RequestedThemeChanged += OnRequestedThemeChanged;
+            app.RequestedThemeChanged -= OnRequestedThemeChanged!;
+            app.RequestedThemeChanged += OnRequestedThemeChanged!;
         }
 
-        private static void OnRequestedThemeChanged(object sender, AppThemeChangedEventArgs e)
+        private static void OnRequestedThemeChanged(object? sender, AppThemeChangedEventArgs e)
         {
             if (sender is Application app && app.Resources != null)
                 NormalizeDictionary(app.Resources);
@@ -62,7 +62,7 @@ namespace FlockForge.Infrastructure
             foreach (var setter in style.Setters.ToList())
             {
                 var val = setter.Value;
-                var normalized = ResolveSpecialValues(val);
+                var normalized = ResolveSpecialValues(val!);
                 if (!ReferenceEquals(val, normalized))
                     setter.Value = normalized;
 
@@ -86,7 +86,7 @@ namespace FlockForge.Infrastructure
             {
                 if (!p.CanRead || !p.CanWrite) continue;
 
-                object cur;
+                object? cur;
                 try { cur = p.GetValue(obj); }
                 catch { continue; }
 
@@ -104,9 +104,9 @@ namespace FlockForge.Infrastructure
             }
         }
 
-        private static object ResolveSpecialValues(object value)
+        private static object? ResolveSpecialValues(object value)
         {
-            if (value == null) return null;
+            if (value == null) return null!;
             var t = value.GetType();
 
             // OnIdiom<T>
@@ -124,32 +124,36 @@ namespace FlockForge.Infrastructure
             return value;
         }
 
-        private static object ResolveOnIdiom(object onIdiom)
+        private static object? ResolveOnIdiom(object onIdiom)
         {
             var t = onIdiom.GetType();
-            object get(string name) =>
+            object? get(string name) =>
                 t.GetProperty(name, BindingFlags.Public | BindingFlags.Instance)?.GetValue(onIdiom);
 
             var idiom = DeviceInfo.Idiom;
-            object chosen = null;
+            object? chosen = null;
 
-            switch (idiom)
-            {
-                case DeviceIdiom.Phone:   chosen = get("Phone"); break;
-                case DeviceIdiom.Tablet:  chosen = get("Tablet"); break;
-                case DeviceIdiom.Desktop: chosen = get("Desktop"); break;
-                case DeviceIdiom.TV:      chosen = get("TV"); break;
-                case DeviceIdiom.Watch:   chosen = get("Watch"); break;
-                default:                  chosen = null; break;
-            }
+            // Use if-else chain instead of switch for DeviceIdiom comparison
+            if (idiom == DeviceIdiom.Phone)
+                chosen = get("Phone");
+            else if (idiom == DeviceIdiom.Tablet)
+                chosen = get("Tablet");
+            else if (idiom == DeviceIdiom.Desktop)
+                chosen = get("Desktop");
+            else if (idiom == DeviceIdiom.TV)
+                chosen = get("TV");
+            else if (idiom == DeviceIdiom.Watch)
+                chosen = get("Watch");
+            else
+                chosen = null;
 
             return chosen ?? get("Default") ?? onIdiom;
         }
 
-        private static object ResolveOnAppTheme(object onTheme)
+        private static object? ResolveOnAppTheme(object onTheme)
         {
             var t = onTheme.GetType();
-            object get(string name) =>
+            object? get(string name) =>
                 t.GetProperty(name, BindingFlags.Public | BindingFlags.Instance)?.GetValue(onTheme);
 
             var theme = Application.Current?.RequestedTheme ?? AppTheme.Unspecified;
@@ -162,13 +166,13 @@ namespace FlockForge.Infrastructure
             };
         }
 
-        private static object ResolveOnPlatform(object onPlatform)
+        private static object? ResolveOnPlatform(object onPlatform)
         {
             var t = onPlatform.GetType();
-            object get(string name) =>
+            object? get(string name) =>
                 t.GetProperty(name, BindingFlags.Public | BindingFlags.Instance)?.GetValue(onPlatform);
 
-            object pick(params string[] names)
+            object? pick(params string[] names)
             {
                 foreach (var n in names)
                 {

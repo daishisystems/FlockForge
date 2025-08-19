@@ -3,7 +3,8 @@ using UIKit;
 using FlockForge.Services.Platform;
 using Microsoft.Extensions.Logging;
 using FlockForge.Utilities.Disposal;
-using FlockForge.Platform;
+using FlockForge.Services.Firebase;
+using Microsoft.Maui.ApplicationModel;
 
 namespace FlockForge;
 
@@ -35,10 +36,10 @@ public class AppDelegate : MauiUIApplicationDelegate
     {
         try
         {
-            var result = base.FinishedLaunching(application, launchOptions);
-
-            // Plugin-only Firebase init (idempotent)
+            // Ensure Firebase is configured before any potential Auth access.
             FirebaseBootstrap.TryInit();
+
+            var result = base.FinishedLaunching(application, launchOptions);
 
             // Get services from DI container after MAUI app is created
             var mauiApp = IPlatformApplication.Current?.Services;
@@ -174,8 +175,11 @@ public class AppDelegate : MauiUIApplicationDelegate
     {
         try
         {
-            // Configure app for better performance
-            UIApplication.SharedApplication.IdleTimerDisabled = false; // Allow screen to sleep
+            // Configure app for better performance - wrap in MainThread to avoid UIKitThreadAccessException
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                UIApplication.SharedApplication.IdleTimerDisabled = true; // Prevent screen from sleeping
+            });
             
             _logger?.LogDebug("iOS performance configuration completed");
         }

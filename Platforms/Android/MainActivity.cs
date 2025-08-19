@@ -4,7 +4,7 @@ using Android.OS;
 using Android.Views;
 using Android.Content;
 using FlockForge.Services.Platform;
-using FlockForge.Platform;
+using FlockForge.Services.Firebase;
 using Microsoft.Extensions.Logging;
 
 namespace FlockForge;
@@ -25,10 +25,10 @@ public class MainActivity : MauiAppCompatActivity
 
     protected override void OnCreate(Bundle? savedInstanceState)
     {
-        base.OnCreate(savedInstanceState);
+        // Initialize Firebase via plugin before MAUI app spins up UI that may touch Auth.
+        FirebaseBootstrap.TryInit();
 
-        // Plugin-only Firebase init (idempotent)
-        FirebaseBootstrap.TryInit(this, savedInstanceState);
+        base.OnCreate(savedInstanceState);
 
         // Set the main theme after splash screen
         SetTheme(Resource.Style.MainTheme);
