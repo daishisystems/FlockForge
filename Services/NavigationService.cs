@@ -15,7 +15,6 @@ public sealed class NavigationService : INotifyPropertyChanged
 
     public ICommand GoHomeCommand { get; }
     public ICommand GoAnimalsCommand { get; }
-    public ICommand GoReportsCommand { get; }
 
     bool _hasItems;
     public bool HasItems
@@ -28,7 +27,6 @@ public sealed class NavigationService : INotifyPropertyChanged
     {
         GoHomeCommand    = new Command(async () => { try { await Shell.Current.GoToAsync("//home");    } catch { /* no-op; optionally log */ } });
         GoAnimalsCommand = new Command(async () => { try { await Shell.Current.GoToAsync("//animals"); } catch { /* no-op; optionally log */ } });
-        GoReportsCommand = new Command(async () => { try { await Shell.Current.GoToAsync("//reports"); } catch { /* no-op; optionally log */ } });
 
         Items.CollectionChanged += (_, __) => HasItems = Items.Count > 0;
         HasItems = Items.Count > 0;

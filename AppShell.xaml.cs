@@ -1,11 +1,13 @@
 using System;
 using System.Reactive.Disposables;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using FlockForge.Core.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui;                    // HandlerChangingEventArgs
 using Microsoft.Maui.Controls;          // Shell, GoToAsync, events
 using Microsoft.Maui.ApplicationModel;  // MainThread
+using FlockForge.Views.Pages;
 
 namespace FlockForge;
 
@@ -17,12 +19,28 @@ public partial class AppShell : Shell
     private readonly CompositeDisposable _bag = new();
     private IDisposable? _authSub;
     private bool _loaded;
+    public ICommand GoToCommand { get; }
 
     public AppShell(IAuthenticationService authService, ILogger<AppShell> logger)
     {
+        GoToCommand = new Command<string>(async route =>
+        {
+            try
+            {
+                await GoToAsync($"///{route}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed navigation to {Route}", route);
+            }
+        });
+
         InitializeComponent();
         _authService = authService;
         _logger = logger;
+
+        Routing.RegisterRoute("profile", typeof(ProfilePage));
+        Routing.RegisterRoute("settings", typeof(SettingsPage));
 
         // Wire events once
         Loaded += OnLoadedOnce;
@@ -124,7 +142,7 @@ public partial class AppShell : Shell
             if (MainTabBar != null) MainTabBar.IsVisible = true;
             else _logger.LogWarning("MainTabBar is null in ShowMainApplication");
 
-            FlyoutBehavior = FlyoutBehavior.Disabled;
+            FlyoutBehavior = FlyoutBehavior.Flyout;
 
             MainThread.BeginInvokeOnMainThread(async () =>
             {
