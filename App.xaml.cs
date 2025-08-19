@@ -11,6 +11,7 @@ using FlockForge.Core.Interfaces;
 using FlockForge.Core.Models;
 using FlockForge.Services.Firebase;
 using FlockForge.Views.Pages;
+using FlockForge.Infrastructure;
 
 namespace FlockForge
 {
@@ -27,6 +28,21 @@ namespace FlockForge
         public App(IServiceProvider serviceProvider)
         {
             InitializeComponent();
+
+            // Normalize resources so bindings get concrete values (e.g., double, Color, etc.)
+            ResourceNormalizer.NormalizeAll(this);
+            
+            // Resolve idiom-specific doubles once; bindings always see plain doubles.
+            ResourceFixes.NormalizeOnIdiomDoubles(
+                ("GF.MinHeightRequest", 44d),
+                ("GF.MinWidthRequest", 100d) // add more here as needed
+            );
+
+#if DEBUG
+            // Guard: GF.MinHeightRequest MUST be a double after normalization
+            if (Current?.Resources?.TryGetValue("GF.MinHeightRequest", out var v) == true && v is not double)
+                System.Diagnostics.Debug.Fail($"GF.MinHeightRequest must be double, found {v?.GetType().Name}");
+#endif
 
             _serviceProvider = serviceProvider;
             _authService = serviceProvider.GetRequiredService<IAuthenticationService>();

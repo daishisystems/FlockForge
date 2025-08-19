@@ -2,8 +2,9 @@ using Foundation;
 using UIKit;
 using FlockForge.Services.Platform;
 using Microsoft.Extensions.Logging;
-using Firebase.Core;
 using FlockForge.Utilities.Disposal;
+using FlockForge.Services.Firebase;
+using Microsoft.Maui.ApplicationModel;
 
 namespace FlockForge;
 
@@ -35,21 +36,9 @@ public class AppDelegate : MauiUIApplicationDelegate
     {
         try
         {
-            // Initialize Firebase Core - this must happen before any Firebase services are used
-            Firebase.Core.App.Configure();
-// Ensure Crashlytics is properly initialized
-            if (Firebase.Crashlytics.Crashlytics.SharedInstance != null)
-            {
-                Firebase.Crashlytics.Crashlytics.SharedInstance.SetCrashlyticsCollectionEnabled(true);
-                System.Diagnostics.Debug.WriteLine("✅ Crashlytics initialized successfully");
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("⚠️ Crashlytics SharedInstance is null");
-            }
-            System.Diagnostics.Debug.WriteLine("Firebase initialized successfully for iOS");
-            
-            // Create the MAUI app first
+            // Ensure Firebase is configured before any potential Auth access.
+            FirebaseBootstrap.TryInit();
+
             var result = base.FinishedLaunching(application, launchOptions);
 
             // Get services from DI container after MAUI app is created
@@ -69,9 +58,9 @@ public class AppDelegate : MauiUIApplicationDelegate
 
             // Move all heavy initialization off UI thread immediately
             _ = InitializeAsync();
-            
+
             _logger?.LogInformation("iOS AppDelegate finished launching successfully");
-            
+
             return result;
         }
         catch (Exception ex)
@@ -186,8 +175,11 @@ public class AppDelegate : MauiUIApplicationDelegate
     {
         try
         {
-            // Configure app for better performance
-            UIApplication.SharedApplication.IdleTimerDisabled = false; // Allow screen to sleep
+            // Configure app for better performance - wrap in MainThread to avoid UIKitThreadAccessException
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                UIApplication.SharedApplication.IdleTimerDisabled = true; // Prevent screen from sleeping
+            });
             
             _logger?.LogDebug("iOS performance configuration completed");
         }
