@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Shell
     x:Class="FlockForge.AppShell"
+    x:Name="TheShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:FlockForge"
@@ -13,15 +14,17 @@
     <ShellContent
         x:Name="LoginPage"
         ContentTemplate="{DataTemplate pages:LoginPage}"
-        Route="login" />
-        
+        Route="login"
+        Shell.FlyoutItemIsVisible="False" />
+
     <ShellContent
         x:Name="RegisterPage"
         ContentTemplate="{DataTemplate pages:RegisterPage}"
-        Route="register" />
+        Route="register"
+        Shell.FlyoutItemIsVisible="False" />
     
     <!-- Main Application Content (protected by authentication) -->
-    <TabBar x:Name="MainTabBar" IsVisible="False">
+    <TabBar x:Name="MainTabBar" IsVisible="False" Title="Home">
         <Tab Title="Dashboard">
             <Tab.Icon>
                 <FontImageSource Glyph="🏠" Size="24" />
@@ -38,30 +41,27 @@
             </Tab.Icon>
             <ShellContent
                 Title="Farms"
-                ContentTemplate="{DataTemplate local:MainPage}"
+                ContentTemplate="{DataTemplate pages:FarmsPage}"
                 Route="farms" />
         </Tab>
 
-        <Tab Title="Reports">
-            <Tab.Icon>
-                <FontImageSource Glyph="📊" Size="24" />
-            </Tab.Icon>
-            <ShellContent
-                Title="Reports"
-                ContentTemplate="{DataTemplate local:MainPage}"
-                Route="reports" />
-        </Tab>
-
-        <Tab Title="Settings">
-            <Tab.Icon>
-                <FontImageSource Glyph="⚙" Size="24" />
-            </Tab.Icon>
-            <ShellContent
-                Title="Settings"
-                ContentTemplate="{DataTemplate local:MainPage}"
-                Route="settings" />
-        </Tab>
     </TabBar>
+
+    <!-- Flyout menu for secondary items -->
+    <MenuItem Text="Profile"
+              Command="{Binding Source={x:Reference TheShell}, Path=GoToCommand}"
+              CommandParameter="profile" />
+
+    <MenuItem Text="Settings"
+              Command="{Binding Source={x:Reference TheShell}, Path=GoToCommand}"
+              CommandParameter="settings" />
+
+    <!-- Hidden route for groups -->
+    <ShellContent
+        Title="Groups"
+        ContentTemplate="{DataTemplate pages:GroupsPage}"
+        Route="groups"
+        IsVisible="False" />
     
     <!-- Debug-only content (can be toggled via IsVisible in code-behind if needed) -->
     <ShellContent
