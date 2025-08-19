@@ -83,14 +83,16 @@ namespace FlockForge.Utilities
         private static double PickIdiom(
             double phone, double tablet, double desktop, double tv, double watch, double @default, double fallback)
         {
-            return DeviceInfo.Idiom switch
+            // Use string comparison since DeviceIdiom values aren't compile-time constants
+            var idiomString = DeviceInfo.Idiom.ToString();
+            return idiomString switch
             {
-                DeviceIdiom.Phone   => phone,
-                DeviceIdiom.Tablet  => tablet,
-                DeviceIdiom.Desktop => desktop,
-                DeviceIdiom.TV      => tv,
-                DeviceIdiom.Watch   => watch,
-                _                   => @default
+                "Phone"   => phone,
+                "Tablet"  => tablet,
+                "Desktop" => desktop,
+                "TV"      => tv,
+                "Watch"   => watch,
+                _         => @default
             };
         }
 
@@ -98,14 +100,16 @@ namespace FlockForge.Utilities
         private static object? PickIdiomObj(
             object? phone, object? tablet, object? desktop, object? tv, object? watch, object? @default, object? fallback)
         {
-            var chosen = DeviceInfo.Idiom switch
+            // Use string comparison since DeviceIdiom values aren't compile-time constants
+            var idiomString = DeviceInfo.Idiom.ToString();
+            var chosen = idiomString switch
             {
-                DeviceIdiom.Phone   => phone,
-                DeviceIdiom.Tablet  => tablet,
-                DeviceIdiom.Desktop => desktop,
-                DeviceIdiom.TV      => tv,
-                DeviceIdiom.Watch   => watch,
-                _                   => @default
+                "Phone"   => phone,
+                "Tablet"  => tablet,
+                "Desktop" => desktop,
+                "TV"      => tv,
+                "Watch"   => watch,
+                _         => @default
             };
             return chosen ?? fallback;
         }
