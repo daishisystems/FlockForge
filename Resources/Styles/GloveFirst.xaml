@@ -161,15 +161,13 @@
         </HorizontalStackLayout>
 
         <!-- Fallback dock -->
-        <Grid ColumnDefinitions="*,*,*"
+        <Grid ColumnDefinitions="*,*"
               HeightRequest="72"
               IsVisible="{Binding Source={x:Static services:NavigationService.Instance}, Path=HasItems, Converter={StaticResource InvertedBool}}">
           <Button Style="{StaticResource GF.ButtonBase}" Text="Home"
                   Command="{Binding Source={x:Static services:NavigationService.Instance}, Path=GoHomeCommand}" />
           <Button Grid.Column="1" Style="{StaticResource GF.ButtonBase}" Text="Animals"
                   Command="{Binding Source={x:Static services:NavigationService.Instance}, Path=GoAnimalsCommand}" />
-          <Button Grid.Column="2" Style="{StaticResource GF.ButtonBase}" Text="Reports"
-                  Command="{Binding Source={x:Static services:NavigationService.Instance}, Path=GoReportsCommand}" />
         </Grid>
       </Grid>
     </Grid>
