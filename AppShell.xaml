@@ -38,7 +38,7 @@
             </Tab.Icon>
             <ShellContent
                 Title="Farms"
-                ContentTemplate="{DataTemplate local:MainPage}"
+                ContentTemplate="{DataTemplate pages:FarmsPage}"
                 Route="farms" />
         </Tab>
 
@@ -48,20 +48,26 @@
             </Tab.Icon>
             <ShellContent
                 Title="Reports"
-                ContentTemplate="{DataTemplate local:MainPage}"
+                ContentTemplate="{DataTemplate pages:ReportsPage}"
                 Route="reports" />
         </Tab>
-
-        <Tab Title="Settings">
-            <Tab.Icon>
-                <FontImageSource Glyph="⚙" Size="24" />
-            </Tab.Icon>
-            <ShellContent
-                Title="Settings"
-                ContentTemplate="{DataTemplate local:MainPage}"
-                Route="settings" />
-        </Tab>
     </TabBar>
+
+    <!-- Flyout menu for secondary items -->
+    <FlyoutItem Title="Profile" Route="profile">
+        <ShellContent ContentTemplate="{DataTemplate pages:ProfilePage}" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Settings" Route="settings">
+        <ShellContent ContentTemplate="{DataTemplate pages:SettingsPage}" />
+    </FlyoutItem>
+
+    <!-- Hidden route for groups -->
+    <ShellContent
+        Title="Groups"
+        ContentTemplate="{DataTemplate pages:GroupsPage}"
+        Route="groups"
+        IsVisible="False" />
     
     <!-- Debug-only content (can be toggled via IsVisible in code-behind if needed) -->
     <ShellContent
