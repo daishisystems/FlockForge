@@ -71,12 +71,10 @@
                             Text="{Binding Title}"
                             FontSize="24"
                             FontAttributes="Bold"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
                             Command="{Binding NavigateCommand}"
-                            SemanticProperties.Description="{Binding A11yDescription}">
-                        <Button.Shadow>
-                            <Shadow Opacity="0.2" Radius="12" Offset="0,4" />
-                        </Button.Shadow>
-                    </Button>
+                            SemanticProperties.Description="{Binding A11yDescription}" />
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
