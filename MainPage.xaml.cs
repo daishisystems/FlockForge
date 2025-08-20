@@ -1,5 +1,6 @@
 using System;
 using System.Reactive.Disposables;
+using Microsoft.Maui.Controls;
 
 namespace FlockForge;
 
@@ -7,24 +8,20 @@ public partial class MainPage : ContentPage, IDisposable
 {
     private readonly CompositeDisposable _disposables = new();
     private bool _disposed;
-    private int count = 0;
 
     public MainPage()
     {
         InitializeComponent();
     }
 
-    private void OnCounterClicked(object? sender, EventArgs e)
-    {
-        count++;
+    private async void OnProfileTapped(object? sender, EventArgs e) =>
+        await Shell.Current.GoToAsync("/profile");
 
-        if (count == 1)
-            CounterBtn.Text = $"Clicked {count} time";
-        else
-            CounterBtn.Text = $"Clicked {count} times";
+    private async void OnMyFarmsTapped(object? sender, EventArgs e) =>
+        await Shell.Current.GoToAsync("//farms");
 
-        SemanticScreenReader.Announce(CounterBtn.Text);
-    }
+    private async void OnGroupsTapped(object? sender, EventArgs e) =>
+        await Shell.Current.GoToAsync("/groups");
 
     protected override void OnDisappearing()
     {
