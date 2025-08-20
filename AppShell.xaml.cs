@@ -1,27 +1,26 @@
 using Microsoft.Maui.Controls;
 using System;
 using System.Linq;
-using FlockForge.Views.Pages;
-
-namespace FlockForge;
-
-public partial class AppShell : Shell
+namespace FlockForge
 {
-    public AppShell()
+    public partial class AppShell : Shell
     {
-        InitializeComponent();
+        public AppShell()
+        {
+            InitializeComponent();
 
-        var regs = Routing.GetRegisteredRoutes().ToHashSet();
-        void Reg(string route, Type pageType) { if (!regs.Contains(route)) Routing.RegisterRoute(route, pageType); }
+            var regs = Routing.GetRegisteredRoutes().ToHashSet();
+            void Reg(string route, Type pageType) { if (!regs.Contains(route)) Routing.RegisterRoute(route, pageType); }
 
-        Reg("profile",  typeof(ProfilePage));
-        Reg("farms",    typeof(FarmsPage));
-        Reg("groups",   typeof(GroupsPage));
-        Reg("breeding", typeof(BreedingPage));
-        Reg("scanning", typeof(ScanningPage));
-        Reg("lambing",  typeof(LambingPage));
-        Reg("weaning",  typeof(WeaningPage));
-        Reg("reports",  typeof(ReportsPage));
+            Reg("profile",  typeof(Views.Pages.ProfilePage));
+            Reg("farms",    typeof(Views.Pages.FarmsPage));
+            Reg("groups",   typeof(Views.Pages.GroupsPage));
+            Reg("breeding", typeof(Views.Pages.BreedingPage));
+            Reg("scanning", typeof(Views.Pages.ScanningPage));
+            Reg("lambing",  typeof(Views.Pages.LambingPage));
+            Reg("weaning",  typeof(Views.Pages.WeaningPage));
+            Reg("reports",  typeof(Views.Pages.ReportsPage));
+        }
     }
 }
 
