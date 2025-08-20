@@ -24,6 +24,9 @@ public partial class AppShell : Shell
 
     public AppShell(IAuthenticationService authService, ILogger<AppShell> logger)
     {
+        _authService = authService;
+        _logger = logger;
+
         GoToCommand = new Command<string>(async route =>
         {
             try
@@ -37,19 +40,26 @@ public partial class AppShell : Shell
         });
 
         InitializeComponent();
-        _authService = authService;
-        _logger = logger;
 
-        Routing.RegisterRoute("profile", typeof(ProfilePage));
-        Routing.RegisterRoute("settings", typeof(SettingsPage));
-        Routing.RegisterRoute("login", typeof(LoginPage));
-        Routing.RegisterRoute("farms", typeof(FarmsPage));
-        Routing.RegisterRoute("groups", typeof(GroupsPage));
-        Routing.RegisterRoute("breeding", typeof(BreedingPage));
-        Routing.RegisterRoute("scanning", typeof(ScanningPage));
-        Routing.RegisterRoute("lambing", typeof(LambingPage));
-        Routing.RegisterRoute("weaning", typeof(WeaningPage));
-        Routing.RegisterRoute("reports", typeof(ReportsPage));
+        void Reg(string route, Type pageType)
+        {
+            try { Routing.RegisterRoute(route, pageType); }
+            catch (ArgumentException) { }
+        }
+
+        Reg("profile", typeof(ProfilePage));
+        Reg("settings", typeof(SettingsPage));
+        Reg("farms", typeof(FarmsPage));
+        Reg("groups", typeof(GroupsPage));
+        Reg("breeding", typeof(BreedingPage));
+        Reg("scanning", typeof(ScanningPage));
+        Reg("lambing", typeof(LambingPage));
+        Reg("weaning", typeof(WeaningPage));
+        Reg("reports", typeof(ReportsPage));
+
+        // NEW: auth routes (keeps login/register reachable)
+        Reg("login", typeof(LoginPage));
+        Reg("register", typeof(RegisterPage));
 
         // Wire events once
         Loaded += OnLoadedOnce;
