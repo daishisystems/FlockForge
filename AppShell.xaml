@@ -5,7 +5,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:FlockForge"
-    xmlns:pages="clr-namespace:FlockForge.Views.Pages"
+    xmlns:views="clr-namespace:FlockForge.Views.Pages"
     xmlns:debug="clr-namespace:FlockForge.Pages"
     Title="FlockForge"
     FlyoutBehavior="Disabled">
@@ -13,13 +13,13 @@
     <!-- Authentication Routes (always accessible) -->
     <ShellContent
         x:Name="LoginPage"
-        ContentTemplate="{DataTemplate pages:LoginPage}"
+        ContentTemplate="{DataTemplate views:LoginPage}"
         Route="login"
         Shell.FlyoutItemIsVisible="False" />
 
     <ShellContent
         x:Name="RegisterPage"
-        ContentTemplate="{DataTemplate pages:RegisterPage}"
+        ContentTemplate="{DataTemplate views:RegisterPage}"
         Route="register"
         Shell.FlyoutItemIsVisible="False" />
     
@@ -41,7 +41,7 @@
             </Tab.Icon>
             <ShellContent
                 Title="Farms"
-                ContentTemplate="{DataTemplate pages:FarmsPage}"
+                ContentTemplate="{DataTemplate views:FarmsPage}"
                 Route="farms" />
         </Tab>
     </TabBar>
@@ -58,7 +58,7 @@
     <!-- Hidden route for groups -->
     <ShellContent
         Title="Groups"
-        ContentTemplate="{DataTemplate pages:GroupsPage}"
+        ContentTemplate="{DataTemplate views:GroupsPage}"
         Route="groups"
         IsVisible="False" />
     

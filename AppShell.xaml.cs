@@ -41,6 +41,7 @@ public partial class AppShell : Shell
 
         Routing.RegisterRoute("profile", typeof(ProfilePage));
         Routing.RegisterRoute("settings", typeof(SettingsPage));
+        Routing.RegisterRoute("login", typeof(LoginPage));
 
         // Wire events once
         Loaded += OnLoadedOnce;
@@ -112,7 +113,7 @@ public partial class AppShell : Shell
             _logger.LogError(ex, "Error in SetInitialRoute");
             MainThread.BeginInvokeOnMainThread(async () =>
             {
-                try { await GoToAsync("//login"); }
+                try { await GoToAsync("login"); }
                 catch (Exception navEx) { _logger.LogError(navEx, "Failed to navigate to login as fallback"); }
             });
         }
@@ -176,7 +177,7 @@ public partial class AppShell : Shell
                 try
                 {
                     _logger.LogDebug("Navigating to login");
-                    await GoToAsync("//login");
+                    await GoToAsync("login");
                     _logger.LogDebug("Successfully navigated to login");
                 }
                 catch (Exception ex) { _logger.LogError(ex, "Error navigating to login page"); }
