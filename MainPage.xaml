@@ -28,7 +28,8 @@
 
             <Button Grid.Row="0" Grid.Column="0" Text="Profile" Style="{StaticResource GF.Tile}" Clicked="OnProfileTapped" />
             <Button Grid.Row="0" Grid.Column="1" Text="My Farms" Style="{StaticResource GF.Tile}" Clicked="OnMyFarmsTapped" />
-            <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="Groups" Style="{StaticResource GF.Tile}" Clicked="OnGroupsTapped" />
+            <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="1" Text="Groups" Style="{StaticResource GF.Tile}" Clicked="OnGroupsTapped" />
+            <Button Grid.Row="1" Grid.Column="1" Text="Breeding" Style="{StaticResource GF.Tile}" Clicked="OnBreedingTapped" />
         </Grid>
     </Grid>
 </ContentPage>

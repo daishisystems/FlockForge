@@ -161,8 +161,6 @@ public partial class AppShell : Shell
             if (MainTabBar != null) MainTabBar.IsVisible = true;
             else _logger.LogWarning("MainTabBar is null in ShowMainApplication");
 
-            FlyoutBehavior = FlyoutBehavior.Flyout;
-
             MainThread.BeginInvokeOnMainThread(async () =>
             {
                 try

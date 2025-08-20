@@ -35,12 +35,12 @@
                 Route="dashboard" />
         </Tab>
 
-        <Tab Title="Farms">
+        <Tab Title="My Farms">
             <Tab.Icon>
                 <FontImageSource Glyph="🌾" Size="24" />
             </Tab.Icon>
             <ShellContent
-                Title="Farms"
+                Title="My Farms"
                 ContentTemplate="{DataTemplate views:FarmsPage}"
                 Route="farms" />
         </Tab>
