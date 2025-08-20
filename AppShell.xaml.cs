@@ -43,6 +43,13 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("profile", typeof(ProfilePage));
         Routing.RegisterRoute("settings", typeof(SettingsPage));
         Routing.RegisterRoute("login", typeof(LoginPage));
+        Routing.RegisterRoute("farms", typeof(FarmsPage));
+        Routing.RegisterRoute("groups", typeof(GroupsPage));
+        Routing.RegisterRoute("breeding", typeof(BreedingPage));
+        Routing.RegisterRoute("scanning", typeof(ScanningPage));
+        Routing.RegisterRoute("lambing", typeof(LambingPage));
+        Routing.RegisterRoute("weaning", typeof(WeaningPage));
+        Routing.RegisterRoute("reports", typeof(ReportsPage));
 
         // Wire events once
         Loaded += OnLoadedOnce;

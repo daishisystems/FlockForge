@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FlockForge.Views.Pages.ScanningPage"
+             Title="Scanning">
+    <Grid Style="{StaticResource GF.Grid}">
+        <Label Text="Scanning Page" Style="{StaticResource GF.LabelBase}" />
+    </Grid>
+</ContentPage>
+
