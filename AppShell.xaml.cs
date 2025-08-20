@@ -1,6 +1,5 @@
 using Microsoft.Maui.Controls;
 using System;
-using System.Linq;
 namespace FlockForge
 {
     public partial class AppShell : Shell
@@ -9,8 +8,11 @@ namespace FlockForge
         {
             InitializeComponent();
 
-            var regs = Routing.GetRegisteredRoutes().ToHashSet();
-            void Reg(string route, Type pageType) { if (!regs.Contains(route)) Routing.RegisterRoute(route, pageType); }
+            void Reg(string route, Type pageType)
+            {
+                try { Routing.RegisterRoute(route, pageType); }
+                catch (ArgumentException) { }
+            }
 
             Reg("profile",  typeof(Views.Pages.ProfilePage));
             Reg("farms",    typeof(Views.Pages.FarmsPage));
