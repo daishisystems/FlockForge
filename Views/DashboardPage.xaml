@@ -15,14 +15,12 @@
             <Color x:Key="FF_PillOffline">#E53935</Color>
 
             <!-- Light/Dark backgrounds -->
-            <AppThemeColor x:Key="FF_PageBg">
-                <AppThemeColor.Light>#FAFAFA</AppThemeColor.Light>
-                <AppThemeColor.Dark>#121212</AppThemeColor.Dark>
-            </AppThemeColor>
-            <AppThemeColor x:Key="FF_TileBg">
-                <AppThemeColor.Light>#FFFFFF</AppThemeColor.Light>
-                <AppThemeColor.Dark>#1E1E1E</AppThemeColor.Dark>
-            </AppThemeColor>
+            <Color x:Key="FF_PageBg">
+                <AppThemeBinding Light="#FAFAFA" Dark="#121212" />
+            </Color>
+            <Color x:Key="FF_TileBg">
+                <AppThemeBinding Light="#FFFFFF" Dark="#1E1E1E" />
+            </Color>
 
             <!-- Large, glove-friendly tile -->
             <Style x:Key="FF_TileButton" TargetType="Button">
