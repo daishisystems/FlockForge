@@ -3,11 +3,70 @@
     x:Class="FlockForge.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:views="clr-namespace:FlockForge.Views"
+    xmlns:local="clr-namespace:FlockForge"
+    xmlns:views="clr-namespace:FlockForge.Views.Pages"
+    xmlns:debug="clr-namespace:FlockForge.Pages"
+    Title="FlockForge"
     FlyoutBehavior="Disabled">
 
-    <ShellContent Route="//dashboard"
-                  Title="Paneelbord"
-                  ContentTemplate="{DataTemplate views:DashboardPage}" />
+    <!-- Authentication Routes (always accessible) -->
+    <ShellContent
+        x:Name="LoginPage"
+        ContentTemplate="{DataTemplate views:LoginPage}"
+        Route="login"
+        Shell.FlyoutItemIsVisible="False" />
+
+    <ShellContent
+        x:Name="RegisterPage"
+        ContentTemplate="{DataTemplate views:RegisterPage}"
+        Route="register"
+        Shell.FlyoutItemIsVisible="False" />
+    
+    <!-- Main Application Content (protected by authentication) -->
+    <TabBar x:Name="MainTabBar" IsVisible="False" Title="Home">
+        <Tab Title="Dashboard">
+            <Tab.Icon>
+                <FontImageSource Glyph="🏠" Size="24" />
+            </Tab.Icon>
+            <ShellContent
+                Title="Home"
+                ContentTemplate="{DataTemplate local:MainPage}"
+                Route="dashboard" />
+        </Tab>
+
+        <Tab Title="Farms">
+            <Tab.Icon>
+                <FontImageSource Glyph="🌾" Size="24" />
+            </Tab.Icon>
+            <ShellContent
+                Title="Farms"
+                ContentTemplate="{DataTemplate views:FarmsPage}"
+                Route="farms" />
+        </Tab>
+    </TabBar>
+
+    <!-- Flyout menu for secondary items -->
+    <MenuItem Text="Profile"
+              Command="{Binding Source={x:Reference shell}, Path=GoToCommand}"
+              CommandParameter="/profile" />
+
+    <MenuItem Text="Settings"
+              Command="{Binding Source={x:Reference shell}, Path=GoToCommand}"
+              CommandParameter="/settings" />
+
+    <!-- Hidden route for groups -->
+    <ShellContent
+        Title="Groups"
+        ContentTemplate="{DataTemplate views:GroupsPage}"
+        Route="groups"
+        IsVisible="False" />
+    
+    <!-- Debug-only content (can be toggled via IsVisible in code-behind if needed) -->
+    <ShellContent
+        x:Name="FontDiagnosticsPage"
+        Title="Fonts"
+        ContentTemplate="{DataTemplate debug:FontDiagnosticsPage}"
+        Route="fontdiagnostics"
+        IsVisible="False" />
 </Shell>
 
