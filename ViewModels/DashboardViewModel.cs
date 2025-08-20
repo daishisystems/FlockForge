@@ -43,14 +43,14 @@ namespace FlockForge.ViewModels
         public DashboardViewModel()
         {
             // Text-only Afrikaans tiles
-            Features.Add(new FeatureItem("Profiel",  CreateNav("//profile")));
-            Features.Add(new FeatureItem("My Plase", CreateNav("//farms")));
-            Features.Add(new FeatureItem("Groepe",   CreateNav("//groups")));
-            Features.Add(new FeatureItem("Teel",     CreateNav("//breeding")));
-            Features.Add(new FeatureItem("Skandering (Dragtigheid)", CreateNav("//scanning")));
-            Features.Add(new FeatureItem("Lammering", CreateNav("//lambing")));
-            Features.Add(new FeatureItem("Speen",     CreateNav("//weaning")));
-            Features.Add(new FeatureItem("Verslae",   CreateNav("//reports")));
+            Features.Add(new FeatureItem("Profiel",  CreateNav("profile")));
+            Features.Add(new FeatureItem("My Plase", CreateNav("farms")));
+            Features.Add(new FeatureItem("Groepe",   CreateNav("groups")));
+            Features.Add(new FeatureItem("Teel",     CreateNav("breeding")));
+            Features.Add(new FeatureItem("Skandering (Dragtigheid)", CreateNav("scanning")));
+            Features.Add(new FeatureItem("Lammering", CreateNav("lambing")));
+            Features.Add(new FeatureItem("Speen",     CreateNav("weaning")));
+            Features.Add(new FeatureItem("Verslae",   CreateNav("reports")));
 
             UpdateConnectivityLabel(); // one-shot; no timers/subscriptions
         }
