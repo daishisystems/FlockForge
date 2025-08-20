@@ -15,21 +15,23 @@
             <Color x:Key="FF_PillOffline">#E53935</Color>
 
             <!-- Light/Dark backgrounds -->
-            <AppThemeColor x:Key="FF_PageBg" Light="#FAFAFA" Dark="#121212" />
-            <AppThemeColor x:Key="FF_TileBg" Light="#FFFFFF" Dark="#1E1E1E" />
+            <Color x:Key="FF_PageBgLight">#FAFAFA</Color>
+            <Color x:Key="FF_PageBgDark">#121212</Color>
+            <Color x:Key="FF_TileBgLight">#FFFFFF</Color>
+            <Color x:Key="FF_TileBgDark">#1E1E1E</Color>
 
             <!-- Large, glove-friendly tile -->
             <Style x:Key="FF_TileButton" TargetType="Button">
                 <Setter Property="HeightRequest" Value="120" />
                 <Setter Property="Padding" Value="18" />
                 <Setter Property="CornerRadius" Value="20" />
-                <Setter Property="BackgroundColor" Value="{StaticResource FF_TileBg}" />
+                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource FF_TileBgLight}, Dark={StaticResource FF_TileBgDark}}" />
             </Style>
         </ResourceDictionary>
     </ContentPage.Resources>
 
     <ContentPage.BackgroundColor>
-        {StaticResource FF_PageBg}
+        <AppThemeBinding Light="{StaticResource FF_PageBgLight}" Dark="{StaticResource FF_PageBgDark}" />
     </ContentPage.BackgroundColor>
 
     <Grid RowDefinitions="Auto,*,Auto" Padding="16,8,16,0">
@@ -66,18 +68,14 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Button Style="{StaticResource FF_TileButton}"
+                            Text="{Binding Title}"
+                            FontSize="24"
+                            FontAttributes="Bold"
                             Command="{Binding NavigateCommand}"
                             SemanticProperties.Description="{Binding A11yDescription}">
                         <Button.Shadow>
                             <Shadow Opacity="0.2" Radius="12" Offset="0,4" />
                         </Button.Shadow>
-                        <Button.Content>
-                            <Label Text="{Binding Title}"
-                                   FontSize="24"
-                                   FontAttributes="Bold"
-                                   HorizontalTextAlignment="Center"
-                                   LineBreakMode="WordWrap" />
-                        </Button.Content>
                     </Button>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
