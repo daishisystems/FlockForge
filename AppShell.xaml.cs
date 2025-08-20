@@ -3,7 +3,6 @@ using System;
 using System.Reactive.Disposables;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using System.Linq;
 using FlockForge.Core.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui;                    // HandlerChangingEventArgs
@@ -25,6 +24,9 @@ public partial class AppShell : Shell
 
     public AppShell(IAuthenticationService authService, ILogger<AppShell> logger)
     {
+        _authService = authService;
+        _logger = logger;
+
         GoToCommand = new Command<string>(async route =>
         {
             try
@@ -38,14 +40,11 @@ public partial class AppShell : Shell
         });
 
         InitializeComponent();
-        _authService = authService;
-        _logger = logger;
 
-        var regs = Routing.GetRegisteredRoutes().ToHashSet();
         void Reg(string route, Type pageType)
         {
-            if (!regs.Contains(route))
-                Routing.RegisterRoute(route, pageType);
+            try { Routing.RegisterRoute(route, pageType); }
+            catch (ArgumentException) { }
         }
 
         Reg("profile", typeof(ProfilePage));
