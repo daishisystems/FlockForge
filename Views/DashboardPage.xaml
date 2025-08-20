@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="FlockForge.Views.DashboardPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Paneelbord">
+
+    <!-- Local page-scoped colors. Do not edit global resources. -->
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <!-- Brand-ish palette -->
+            <Color x:Key="FF_Primary">#F6B41B</Color>
+            <Color x:Key="FF_PillOnline">#19A974</Color>
+            <Color x:Key="FF_PillSync">#FFB300</Color>
+            <Color x:Key="FF_PillOffline">#E53935</Color>
+
+            <!-- Light/Dark backgrounds -->
+            <Color x:Key="FF_PageBgLight">#FAFAFA</Color>
+            <Color x:Key="FF_PageBgDark">#121212</Color>
+            <Color x:Key="FF_TileBgLight">#FFFFFF</Color>
+            <Color x:Key="FF_TileBgDark">#1E1E1E</Color>
+
+            <!-- Large, glove-friendly tile -->
+            <Style x:Key="FF_TileButton" TargetType="Button">
+                <Setter Property="HeightRequest" Value="120" />
+                <Setter Property="Padding" Value="18" />
+                <Setter Property="CornerRadius" Value="20" />
+                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource FF_TileBgLight}, Dark={StaticResource FF_TileBgDark}}" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BackgroundColor>
+        <AppThemeBinding Light="{StaticResource FF_PageBgLight}" Dark="{StaticResource FF_PageBgDark}" />
+    </ContentPage.BackgroundColor>
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="16,8,16,0">
+
+        <!-- Header -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="0,8">
+            <Label Text="{Binding CurrentFarmName, StringFormat='Plaas: {0}'}"
+                   FontSize="16"
+                   VerticalOptions="Center" />
+
+            <!-- Prominent status pill -->
+            <Frame Grid.Column="1"
+                   Padding="14,8"
+                   CornerRadius="18"
+                   BackgroundColor="{Binding StatusPillColor}"
+                   HasShadow="False"
+                   VerticalOptions="Center">
+                <Label Text="{Binding ConnectivityLabel}"
+                       FontAttributes="Bold"
+                       FontSize="16"
+                       TextColor="White" />
+            </Frame>
+        </Grid>
+
+        <!-- Tiles: text-only, Afrikaans -->
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Features}"
+                        SelectionMode="None"
+                        Margin="0,8,0,16">
+            <!-- NOTE: GridItemsLayout.Span binds to the PAGE ViewModel (not the item). -->
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical" Span="{Binding GridSpan}" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Button Style="{StaticResource FF_TileButton}"
+                            Text="{Binding Title}"
+                            FontSize="24"
+                            FontAttributes="Bold"
+                            Command="{Binding NavigateCommand}"
+                            SemanticProperties.Description="{Binding A11yDescription}">
+                        <Button.Shadow>
+                            <Shadow Opacity="0.2" Radius="12" Offset="0,4" />
+                        </Button.Shadow>
+                    </Button>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- No bottom action bar -->
+        <Grid Grid.Row="2" HeightRequest="0"/>
+    </Grid>
+</ContentPage>
+
