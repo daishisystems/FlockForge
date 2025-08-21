@@ -13,6 +13,7 @@ using FlockForge.Core.Models;
 using FlockForge.Services.Firebase;
 using FlockForge.Views.Pages;
 using FlockForge.Infrastructure;
+using FlockForge.Services;
 
 namespace FlockForge
 {
@@ -56,6 +57,9 @@ namespace FlockForge
 
             // Set up global exception handlers
             SetupExceptionHandlers();
+            
+            // Initialize AppStatusService with auth service
+            AppStatusService.Instance.InitializeWithAuthService(_authService);
             
             // Subscribe to auth state changes
 #if DEBUG

@@ -7,7 +7,7 @@
     <Grid Style="{StaticResource GF.Grid}" RowDefinitions="Auto,*">
         <!-- Header -->
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
-            <Label Text="Farm: Demo" Style="{StaticResource GF.LabelBase}" VerticalOptions="Center" />
+            <Label Text="{Binding Source={x:Static services:AppStatusService.Instance}, Path=CurrentUserName}" Style="{StaticResource GF.LabelBase}" VerticalOptions="Center" />
             <Label Grid.Column="1"
                    Text="{Binding Source={x:Static services:AppStatusService.Instance}, Path=SyncLabel}"
                    Style="{StaticResource GF.LabelBase}"
